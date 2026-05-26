@@ -109,6 +109,7 @@ If switching model later (e.g. from `text-embedding-3-large` to `text-embedding-
 
 | Event | Weight | Rationale |
 |---|---|---|
+| search | 4 | Explicit intent — user tells system what they want. Captured from search bar query text. Critical for cold start and interest profiling |
 | view | 1 | Lowest signal — user may just browse |
 | bookmark | 3 | Medium signal — shows intent |
 | apply | 5 | Highest signal — user committed |

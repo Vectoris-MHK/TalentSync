@@ -110,7 +110,7 @@ Stage 8: $project          → clean response shape
 {
   userId: { type: String, required: true, ref: "User" },
   jobId: { type: ObjectId, required: true, ref: "Job" },
-  eventType: { type: String, enum: ["view", "bookmark", "apply"], required: true },
+  eventType: { type: String, enum: ["search", "view", "bookmark", "apply"], required: true },
   weight: { type: Number, default: 1 },
   timestamp: { type: Number, required: true }
 }
@@ -120,7 +120,7 @@ Stage 8: $project          → clean response shape
 ### 3.2 Event Tracking API
 - [ ] `POST /api/users/events` — record view/bookmark events
   - Deduplicate: no duplicate view events within 30 minutes
-  - Auto-compute weight: view=1, bookmark=3, apply=5
+  - Auto-compute weight: search=4, view=1, bookmark=3, apply=5
 - [ ] Modify `applyForJob()` in `userController.js` to also create `userEvent` with type "apply"
 - [ ] Frontend: add `useEffect` in `ApplyJob.jsx` and `JobListing.jsx` to fire view events on page load
 

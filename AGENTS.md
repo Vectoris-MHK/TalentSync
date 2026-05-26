@@ -4,6 +4,12 @@
 > Deadline: 2026-05-31 18:00 VNT
 > Team: 1-3 members
 
+## Source of Truth Rules
+
+- **`docs/implement/`** — technical authority (schema, API, pipeline, decisions, conventions). Always cite these files for implementation.
+- **`WBS.md`** — progress tracker only. Do NOT use as technical spec. Update status/checkmarks only.
+- **`docs/hackathon/`** — original hackathon requirements (reference only, not implementation spec).
+
 ## Context Files (load as needed)
 
 | Topic | File |

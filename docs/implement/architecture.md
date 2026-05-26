@@ -26,9 +26,10 @@
 │     UserEvent by     │  2. $lookup: Company (name, logo)          │
 │     userId           │  3. $addFields: score calculation          │
 │  2. Weight events    │     score = vectorScore*0.6                │
-│     (view=1,         │           + recencyBoost*0.2               │
-│      bookmark=3,     │           + skillMatch*0.15                │
-│      apply=5)        │           + salaryMatch*0.05               │
+│     (search=4,       │           + recencyBoost*0.2               │
+│      view=1,         │           + skillMatch*0.15                │
+│      bookmark=3,     │           + salaryMatch*0.05               │
+│      apply=5)        │                                             │
 │  3. $lookup jobs     │  4. $match: _id NOT in appliedJobIds       │
 │     for embeddings   │  5. $sort: by score desc                   │
 │  4. Weighted average │  6. $limit: 20                             │
@@ -39,7 +40,11 @@
 │  ┌─────────────┐ ┌─────────────┐ ┌──────────────┐ ┌───────────┐   │
 │  │ jobs        │ │ users       │ │ userEvents   │ │ companies │   │
 │  │ +embedding  │ │ +embedding  │ │ userId,jobId │ │           │   │
-│  │ [vector idx]│ │ +preferences│ │ eventType,wt │ │           │   │
+│  │ [vector idx]│ │ +preferences│ │ eventType:   │ │           │   │
+│  │             │ │             │ │ search=4,    │ │           │   │
+│  │             │ │             │ │ view=1,      │ │           │   │
+│  │             │ │             │ │ bookmark=3,  │ │           │   │
+│  │             │ │             │ │ apply=5      │ │           │   │
 │  └─────────────┘ └─────────────┘ └──────────────┘ └───────────┘   │
 │  ┌──────────────┐                                                 │
 │  │ jobApps      │  existing, no changes needed                    │
@@ -94,9 +99,9 @@
   "userId": "clerk_user_xxx",
   "jobId": "ObjectId → jobs",
   "eventType": "view",
-  // view | bookmark | apply
-  "weight": 1,
-  // view=1, bookmark=3, apply=5
+  // search | view | bookmark | apply
+  "weight": 4,
+  // search=4, view=1, bookmark=3, apply=5
   "timestamp": 1716700000000
 }
 ```
@@ -140,7 +145,7 @@
 |---|---|---|---|
 | GET | `/api/jobs/recommend-feed` | Clerk | Hybrid recommendation feed for user |
 | GET | `/api/jobs/recommend-content` | Clerk | Content-based only (vector search + filters) |
-| POST | `/api/users/events` | Clerk | Log user behavior event (view, bookmark) |
+| POST | `/api/users/events` | Clerk | Log user behavior event (search, view, bookmark) |
 | GET | `/api/users/profile` | Clerk | Get/compute user profile embedding |
 | POST | `/api/users/preferences` | Clerk | Set user onboarding preferences |
 

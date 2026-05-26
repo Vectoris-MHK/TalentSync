@@ -48,7 +48,9 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * `embedding: { type: [Number], default: [] }` - user profile vector (weighted avg of interacted jobs)
   * Lưu ý: `_id` giữ nguyên type `String` (Clerk ID)
 * Tạo model `UserEvent` (MỚI) (Status: To-Do, Assignee: Khiem)
-  * `userId: String`, `jobId: ObjectId`, `eventType: enum("view","bookmark","apply")`, `weight: Number`, `timestamp: Number`
+  * `userId: String`, `jobId: ObjectId`, `eventType: enum("search","view","bookmark","apply")`, `weight: Number`, `timestamp: Number`
+  * Weights: search=4, view=1, bookmark=3, apply=5
+  * **`~MOD`** Added `search` event type — captures explicit user intent from search bar, critical for cold start & interest profiling
   * Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
 
 ### 3.2 Seed Data (Status: TO-DO, Start: 2026-05-26)

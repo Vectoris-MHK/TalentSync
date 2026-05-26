@@ -71,6 +71,25 @@ Not implementing for MVP — only ~20 unique users expected in demo. If scaling:
 - Use in-memory Map with TTL for query text → embedding
 - Typical job titles ("React Developer", "UX Designer") repeat often
 
+## OpenAI API Fallback Strategy
+
+**If API is unavailable or rate-limited during request:**
+1. **Embedding generation failure → degrade to text-based fallback:**
+   - If `generateEmbedding()` throws → catch error, return `null`
+   - On job creation: save job without embedding (batch retry later via `seedEmbeddings.js`)
+   - On `recommend-content` query: if query embedding fails → fallback to text-based `$text` search or regex `$match`
+   - On `recommend-feed`: if user has no embedding → treat as cold start (preferences → popular)
+
+2. **Retry logic for batch processing (`seedEmbeddings.js`):**
+   - Exponential backoff: 1s → 2s → 4s → 8s (max 3 retries per batch)
+   - Log failed job IDs to `scripts/failed_embeddings.json` for manual retry
+   - Batch size: 25 (not 50) when rate limiting is detected
+
+3. **Budget safety:**
+   - `text-embedding-3-large` at $0.13/1M tokens — with 30 jobs × ~500 chars each ≈ 15K tokens ≈ $0.002
+   - Add `MAX_EMBEDDING_COST=1.00` env var — stop if estimated cost exceeds this
+   - Track usage via `openai.usage` in response metadata
+
 ## Compression (Scalar Quantization)
 
 Not implementing for MVP. If needed:

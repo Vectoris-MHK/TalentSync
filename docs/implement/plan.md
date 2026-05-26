@@ -2,9 +2,11 @@
 
 ## Day 1 (Today): Embedding Pipeline + Vector Index
 
+### 1.0 Prerequisites
+- [ ] Install `openai` npm package: `pnpm --filter server add openai`
+- [ ] Add `OPENAI_API_KEY` to `server/.env` (get from https://platform.openai.com/api-keys)
+
 ### 1.1 Setup OpenAI Embedding
-- [ ] Add `OPENAI_API_KEY` to `server/.env`
-- [ ] Install `openai` npm package
 - [ ] Create `server/services/embeddingService.js`:
   - `generateEmbedding(text)` → calls OpenAI `text-embedding-3-large`, returns `Float32Array` (3072d)
   - `generateJobEmbedding(job)` → combines `title + strippedDescription + category + level`, embed
@@ -217,10 +219,15 @@ Else (cold start):
 ## Day 5: Testing, Seed Data, Documentation, Submission
 
 ### 5.1 Seed Data
+- [ ] Crawl data mẫu từ TopCV làm input:
+  - Target: tối thiểu 30 jobs tiếng Việt across categories (IT, Design, Marketing, Finance, Management)
+  - Thu thập: title, description, location, category, level, salary range, company name
+  - Output: JSON/Array dump → làm input cho `seedData.js`
 - [ ] Create `server/scripts/seedData.js`:
+  - Load crawled data → map vào schema → insert vào MongoDB
   - 30 jobs across categories (15 IT, 5 Design, 5 Marketing, 3 Finance, 2 Management)
   - **Job titles + descriptions must be in Vietnamese** (target audience is Vietnamese)
-  - 3 companies (TechCorp, DesignHub, MarketPro)
+  - 3 companies (gộp theo company name từ crawl data)
   - 10 users with Clerk-mocked IDs (for testing)
   - Executable from `node server/scripts/seedData.js`
 

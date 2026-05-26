@@ -49,7 +49,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * Lưu ý: `_id` giữ nguyên type `String` (Clerk ID)
 * Tạo model `UserEvent` (MỚI) (Status: To-Do, Assignee: Khiem)
   * `userId: String`, `jobId: ObjectId`, `eventType: enum("view","bookmark","apply")`, `weight: Number`, `timestamp: Number`
-  * Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`
+  * Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
 
 ### 3.2 Seed Data (Status: TO-DO, Start: 2026-05-26)
 
@@ -57,6 +57,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * Target: tối thiểu 30 jobs tiếng Việt across categories (IT, Design, Marketing, Finance, Management)
   * Thu thập: title, description, location, category, level, salary range, company name
   * Output: JSON/Array dump → làm input cho `seedData.js`
+  * **`~MOD`** Plan.md 5.1 updated to include TopCV crawl as data source
 * Tạo `server/scripts/seedData.js` (Status: To-Do, Assignee: Khiem, depends on: Crawl)
   * Load crawled data → map vào schema → insert vào MongoDB
   * Tạo companies từ crawl data (gộp theo company name)
@@ -66,6 +67,15 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * ~100 events cho 10 users
   * 5 IT-focused users, 3 Design-focused, 2 mixed-interest
   * Event types: view, bookmark, apply với weights tương ứng
+
+### 3.3 Gap Resolution — Docs Sync (Status: Done, Assignee: Khiem, 2026-05-26)
+
+* **`+ADD`** `OPENAI_API_KEY` key added to `server/.env`
+* **`+ADD`** Prerequisites step (1.0) added to `plan.md`: install `openai` npm package + setup API key
+* **`+ADD`** "OpenAI API Fallback Strategy" section added to `decisions.md` (error handling, retry logic, budget safety)
+* **`+ADD`** `$vectorSearch` pipeline ordering constraint note added to `architecture.md` (must be first stage)
+* **`+ADD`** Directory structure created: `server/services/`, `server/scripts/`
+* **`~MOD`** `codebase.md` directory map updated — added `UserEvent.js` entry
 
 ---
 

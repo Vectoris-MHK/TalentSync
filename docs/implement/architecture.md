@@ -182,6 +182,8 @@
 }
 ```
 
+> **Pipeline Ordering Constraint:** `$vectorSearch` MUST be the first stage in the aggregation pipeline. MongoDB Atlas enforces this — any stage placed before `$vectorSearch` (like `$match` or `$lookup`) will cause the pipeline to fail. Move all pre-filtering logic to stages AFTER `$vectorSearch`.
+
 ### numCandidates Tuning Guide
 
 | numCandidates | Trade-off |

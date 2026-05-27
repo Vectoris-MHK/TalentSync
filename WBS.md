@@ -36,7 +36,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
-## 3. Schema & Seed Data (Status: IN-PROGRESS, Start: 2026-05-26)
+## 3. Schema & Seed Data (Status: DONE, Start: 2026-05-26)
 
 ### 3.1 Thiết kế Schema (Status: DONE, Start: 2026-05-26)
 
@@ -54,7 +54,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * **`~MOD`** Added `search` event type — captures explicit user intent from search bar, critical for cold start & interest profiling
   * Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
 
-### 3.2 Seed Data (Status: IN-PROGRESS, Start: 2026-05-26)
+### 3.2 Seed Data (Status: DONE, Start: 2026-05-26)
 
 * Crawl data mẫu từ TopCV (Status: Done, Assignee: Khiem)
   * ~MOD: Crawled 8 jobs from TopCV (AI Engineer, CNC Tech, IT PM, System Admin, IT Senior Manager, Sale Admin, Tester, Fullstack), stored in data_sample.json
@@ -65,8 +65,8 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * Tạo companies từ crawl data (gộp theo company name)
   * Tạo 10 users với Clerk-mocked IDs
   * Chạy: `node server/scripts/seedData.js`
-* Tạo `server/scripts/seedEvents.js` (Status: To-Do, Assignee: Khiem)
-  * ~100 events cho 10 users
+* Tạo `server/scripts/seedEvents.js` (Status: Done, Assignee: Khiem)
+  * 188 events cho 10 users
   * 5 IT-focused users, 3 Design-focused, 2 mixed-interest
   * Event types: view, bookmark, apply với weights tương ứng
 
@@ -81,7 +81,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
-## 4. Semantic Search Engine (P0 Core) (Status: TO-DO, Start: 2026-05-26)
+## 4. Semantic Search Engine (P0 Core) (Status: IN-PROGRESS, Start: 2026-05-26)
 
 ### 4.1 Embedding Pipeline (P0)
 
@@ -127,11 +127,11 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
-## 5. Behavior-Based Recommendation (P1 Enhance) (Status: TO-DO, Start: 2026-05-27)
+## 5. Behavior-Based Recommendation (P1 Enhance) (Status: IN-PROGRESS, Start: 2026-05-27)
 
 ### 5.1 User Behavior Tracking
 
-* Tạo `POST /api/users/events` (Status: To-Do, Assignee: Khiem)
+* Tạo `POST /api/users/events` (Status: Done, Assignee: Khiem)
   * Body: `{ jobId, eventType }` - eventType ∈ {"view", "bookmark", "apply"}
   * Deduplicate: không log view trùng cho cùng jobId/userId trong 30 phút
   * Auto weight: view=1, bookmark=3, apply=5
@@ -142,7 +142,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ### 5.2 User Profile Embedding
 
-* Tạo `GET /api/users/profile` (Status: To-Do, Assignee: Khiem)
+* Tạo `GET /api/users/profile` (Status: Done, Assignee: Khiem)
   * Compute user embedding từ weighted average of interacted job embeddings:
     1. `$match` UserEvent where `userId = req.auth.userId`
     2. `$group` by jobId, sum weights
@@ -151,7 +151,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
     5. Weighted average tất cả job embeddings → normalize to unit vector
     6. Save vào `user.embedding`
   * Nếu user chưa có events → return preferences (cold start)
-* `POST /api/users/preferences` (Status: To-Do, Assignee: Khiem)
+* `POST /api/users/preferences` (Status: Done, Assignee: Khiem)
   * Body: `{ preferences: ["Lập trình", "Thiết kế"] }`
   * Save vào `user.preferences` → dùng cho cold start recommendation
 

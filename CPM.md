@@ -1,9 +1,9 @@
 # Critical Path Method — TalentSync MongoHack 2026
 
 > Generated: 2026-05-27 10:57 ICT
-> Updated: 2026-05-27 16:10 ICT
-> Deadline: 2026-05-31 18:00 ICT (~98h còn lại)
-> Elapsed: 16h (thực hiện: A B C G D I) / ~6h làm việc thực tế
+> Updated: 2026-05-27 16:52 ICT
+> Deadline: 2026-05-31 18:00 ICT (~97h còn lại)
+> Elapsed: 17h (thực hiện: A B C G D I + H seedEvents) / ~7h làm việc thực tế
 > Working hours: ~5h/ngày ≈ 20h thực tế
 
 ---
@@ -35,7 +35,7 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 | E | Tạo Atlas Vector Search Index `idx_jobs_vector` | 0.25 | D | 4.2 | ⬜ Pending |
 | F | `GET /api/jobs/recommend-content` (8-stage pipeline) | 1.00 | B, E | 4.3 | ⬜ Pending |
 | G | Seed jobs + crawl TopCV + merge | 1.00 | A | 3.2 | ✅ Done |
-| H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ⬜ Pending |
+| H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ✅ Done |
 | I | User profile embedding + preferences API | 0.67 | H | 5.2 | ✅ Done |
 | J | Collaborative filtering API | 0.67 | H | 5.3 | ⬜ Pending |
 | K | Hybrid feed API `GET /api/jobs/recommend-feed` | 0.33 | F, I, J | 5.4 | ⬜ Pending |
@@ -50,19 +50,19 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 | ID | ES (h) | EF (h) | Tính toán |
 |----|--------|--------|-----------|
-| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D+I = 2.77h) |
+| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D+I+H = 3.27h) |
 | B | 0.00 | 0.60 | ✅ Done |
 | C | 0.60 | 0.77 | ✅ Done |
-| H | 2.77 | 3.27 | ES = now (2.77) |
+| H | 2.77 | 3.27 | ✅ Done (logUserEvent + applyForJob + seedEvents 188events) |
 | G | 0.77 | 1.44 | ✅ Done |
 | D | 0.77 | 1.10 | ✅ Done |
-| I | 2.77 | 3.44 | ✅ Done (actual: 0.67h from commit 69c6747) |
+| I | 2.77 | 3.44 | ✅ Done |
 | J | 3.27 | 3.94 | ES = EF(H) |
-| E | 2.77 | 3.02 | ES = now (2.77) |
-| **F** | **3.02** | **4.02** | **ES = max(EF(B)=0.77, EF(E)=3.02)** |
-| **K** | **4.02** | **4.35** | **ES = max(EF(F)=4.02, EF(I)=3.44, EF(J)=3.94)** |
-| **L** | **4.35** | **5.85** | **ES = EF(K)** |
-| **M** | **5.85** | **10.85** | **ES = EF(L)** |
+| E | 3.27 | 3.52 | ES = now (3.27) |
+| **F** | **3.52** | **4.52** | **ES = max(EF(B)=0.77, EF(E)=3.52)** |
+| **K** | **4.52** | **4.85** | **ES = max(EF(F)=4.52, EF(I)=3.44, EF(J)=3.94)** |
+| **L** | **4.85** | **6.35** | **ES = EF(K)** |
+| **M** | **6.35** | **11.35** | **ES = EF(L)** |
 
 ---
 
@@ -70,15 +70,15 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 | ID | LF (h) | LS (h) | Tính toán |
 |----|--------|--------|-----------|
-| M | 10.18 | 5.18 | LF = EF(M) |
-| L | 5.18 | 3.68 | LF = LS(M) |
-| K | 3.68 | 3.35 | LF = LS(L) |
-| F | 3.35 | 2.35 | LF = LS(K) |
-| E | 2.35 | 2.10 | LF = LS(F) |
-| D | 2.10 | 1.77 | LF = LS(E) |
-| I | 3.35 | 2.68 | LF = LS(K), float=0.08h |
-| J | 3.35 | 2.68 | LF = LS(K), float=0.08h |
-| H | 2.68 | 2.18 | LF = min(LS(I), LS(J)), float=0.08h |
+| M | 11.35 | 6.35 | LF = EF(M) |
+| L | 6.35 | 4.85 | LF = LS(M) |
+| K | 4.85 | 4.52 | LF = LS(L) |
+| F | 4.52 | 3.52 | LF = LS(K) |
+| E | 3.52 | 3.27 | LF = LS(F) |
+| D | 3.27 | 2.94 | LF = LS(E) |
+| I | 3.44 | 2.77 | LF = min(LS(K)=4.52, EF(I)=3.44), float=0h |
+| J | 4.52 | 3.85 | LF = LS(K), float=0.91h |
+| H | 3.85 | 3.35 | LF = min(LS(I)=2.77, LS(J)=3.85), float=0h |
 | C | 2.35 | 2.18 | LF = LS(F), float=1.41h |
 | B | 0.77 | 0.27 | LF = min(LS(C)=2.18, LS(D)=0.77, LS(F)=1.35) |
 | G | 9.18 | 8.51 | LF = LS(M), float=7.74h |
@@ -88,7 +88,7 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 ## 5. Critical Path (Updated)
 
-> **A, B, C, G, D completed at 2.10h. Critical path now runs from E forward.**
+> **A, B, C, G, D, H, I completed at 3.27h. Critical path now runs from E forward.**
 
 ```
 E ──→ F ──→ K ──→ L ──→ M
@@ -96,18 +96,18 @@ E ──→ F ──→ K ──→ L ──→ M
 
 | Step | Task | ES | EF | Duration |
 |------|------|----|----|----------|
-| **Done** | A+B+C+G+D: Setup, schema, seed data + embeddings | 0.00 | 2.10 | 2.10h |
-| 1 | E: Atlas Vector Search Index | 2.10 | 2.35 | 0.25h |
-| 2 | F: recommend-content API | 2.35 | 3.35 | 1.00h |
-| 3 | K: Hybrid feed API | 3.35 | 3.68 | 0.33h |
-| 4 | L: Frontend components | 3.68 | 5.18 | 1.50h |
-| 5 | M: E2E test + docs + video | 5.18 | 10.18 | 5.00h |
+| **Done** | A+B+C+G+D+H+I: Setup, schema, seed, embedding, behavior, user profile | 0.00 | 3.27 | 3.27h |
+| 1 | E: Atlas Vector Search Index | 3.27 | 3.52 | 0.25h |
+| 2 | F: recommend-content API | 3.52 | 4.52 | 1.00h |
+| 3 | K: Hybrid feed API | 4.52 | 4.85 | 0.33h |
+| 4 | L: Frontend components | 4.85 | 6.35 | 1.50h |
+| 5 | M: E2E test + docs + video | 6.35 | 11.35 | 5.00h |
 
 | Metric | Value |
 |--------|-------|
 | Tổng critical path còn lại | **8.08 giờ** |
-| Đã hoàn thành | 2.10h (A+B+C+G+D) |
-| Buffer đến deadline | ~92h |
+| Đã hoàn thành | 3.27h (A+B+C+G+D+H+I) |
+| Buffer đến deadline | ~89h |
 
 ---
 
@@ -116,10 +116,10 @@ E ──→ F ──→ K ──→ L ──→ M
 | Task | Float | Có thể delay tối đa | Ghi chú |
 |------|-------|---------------------|---------|
 | G (Seed 30 jobs) | 0h | ✅ Done | Crawled 8 TopCV + merged 36 jobs |
-| H (Behavior tracking) | 0.08h | 5 phút | Cần cho I, J |
-| I (User profile) | 0.08h | 5 phút | Cần cho K |
-| J (Collaborative) | 0.08h | 5 phút | Có thể cắt nếu chậm tiến độ |
-| C (postJob embed) | 1.41h | 85 phút | Không blocking |
+| H (Behavior tracking) | 0h | ✅ Done | POST /events + apply auto-event + 188 seed events |
+| I (User profile) | 0h | ✅ Done | Aggregation pipeline + unit vector normalization |
+| J (Collaborative) | 0.91h | 55 phút | Float tăng nhờ H & I done sớm |
+| C (postJob embed) | 1.91h | 115 phút | Không blocking |
 
 ---
 
@@ -162,18 +162,20 @@ E ──→ F ──→ K ──→ L ──→ M
 ## 9. Summary
 
 ```
-Project duration:    10.18h total (8.08h critical path remaining)
-Completed:            2.10h (A+B+C+G+D)
+Project duration:    11.35h total (8.08h critical path remaining)
+Completed:            3.27h (A+B+C+G+D+H+I)
                       - A: Install openai + key
                       - B: embeddingService.js (3072d)
                       - C: postJob auto-embed
-                      - G: Seed 36 jobs (8 crawled TopCV + 28 hardcoded) + 11 companies + 10 users
+                      - G: Seed 36 jobs + 11 companies + 10 users
                       - D: seedEmbeddings — 36/36 jobs embedded
-Available time:      99h (4.1 days to deadline)
-Working buffer:      91h
+                      - H: POST /api/users/events + applyForJob auto-event + 188 seed events
+                      - I: User profile embedding + preferences API (weighted avg, unit vec)
+Available time:      97h (4.0 days to deadline)
+Working buffer:      89h
 
-Task status:         5/13 done
+Task status:         7/13 done
 Next task:           E (Atlas Vector Search Index) — critical path blocker
-Parallel task:       H (User behavior tracking) — float 0.08h, can run in parallel with E+F
-Critical blockers:   NONE — M2 cluster confirmed, 36 vectors in DB
+Parallel task:       J (Collaborative filtering) — float 0.91h, can code without blocks
+Critical blockers:   E requires Atlas UI (browser) to create Vector Search Index
 ```

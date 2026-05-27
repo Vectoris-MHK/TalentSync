@@ -21,14 +21,14 @@ TalentSync/
 │   │   ├── JobApplication.js        ← Application schema
 │   │   └── UserEvent.js             ← NEW: userId, jobId, eventType, weight, timestamp
 │   ├── controller/
-│   │   ├── userController.js        ← User endpoints (modify: add event logging on apply)
-│   │   ├── comapanyController.js    ← Company endpoints (modify: embed on job post)
+│   │   ├── userController.js        ← User endpoints (+logUserEvent, +apply auto-event, +getUserProfile, +updateUserPreferences)
+│   │   ├── comapanyController.js    ← Company endpoints (+auto-embed on postJob)
 │   │   ├── jobController.js         ← Job endpoints (add: recommend routes)
 │   │   └── webhooks.js              ← Clerk webhook handler
 │   ├── routes/
-│   │   ├── userRoutes.js            ← User route definitions
-│   │   ├── jobRoutes.js             ← Job route definitions (add recommend routes here)
-│   │   └── companyRoutes.js         ← Company route definitions
+│   │   ├── userRoutes.js            ← User routes (+GET /profile, +POST /preferences, +POST /events)
+│   │   ├── jobRoutes.js             ← Job routes (add recommend routes here)
+│   │   └── companyRoutes.js         ← Company routes
 │   ├── middleware/
 │   │   └── authMiddleware.js         ← JWT protectCompany middleware
 │   ├── utils/
@@ -37,8 +37,10 @@ TalentSync/
 │   │   └── embeddingService.js       ← OpenAI text-embedding-3-large, 3072d
 │   ├── scripts/
 │   │   ├── testEmbedding.js          ← Verify OpenAI embedding works
-│   │   ├── seedData.js               ← Seed 30 jobs, 3 companies, 10 users
+│   │   ├── seedData.js               ← Seed 36 jobs, 11 companies, 10 users
 │   │   ├── seedEmbeddings.js         ← Batch embed all jobs with OpenAI
+│   │   ├── seedEvents.js             ← Seed 188 behavior events for 10 users
+│   │   ├── testUserProfile.js        ← Test user profile aggregation pipeline
 │   │   └── resolveSrv.js             ← SRV DNS resolver helper
 ├── client/
 │   └── src/

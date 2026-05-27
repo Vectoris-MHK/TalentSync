@@ -6,6 +6,7 @@ import {
   updateUserResume,
   getUserProfile,
   updateUserPreferences,
+  logUserEvent,
 } from "../controller/userController.js";
 import upload from "../config/multer.js";
 
@@ -28,5 +29,8 @@ router.get("/profile", getUserProfile);
 
 // Save user category preferences (cold-start)
 router.post("/preferences", updateUserPreferences);
+
+// Log user behavior event (view, bookmark, apply)
+router.post("/events", logUserEvent);
 
 export default router;

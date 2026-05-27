@@ -52,6 +52,12 @@ export const applyForJob = async (req, res) => {
       date: Date.now(),
     });
 
+    try {
+      await UserEvent.create({ userId, jobId, eventType: "apply", weight: 5, timestamp: Date.now() });
+    } catch (eventErr) {
+      console.warn("Failed to log apply event:", eventErr.message);
+    }
+
     res.json({ success: true, message: "Applied Successfully" });
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -199,6 +205,50 @@ export const updateUserPreferences = async (req, res) => {
     if (!user) return res.json({ success: false, message: "User not found" });
 
     return res.json({ success: true, preferences: user.preferences, user });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// POST /api/users/events
+// Log user behavior event (search, view, bookmark, apply)
+// Weights: search=4, view=1, bookmark=3, apply=5
+export const logUserEvent = async (req, res) => {
+  const userId = req.auth.userId;
+  const { jobId, eventType } = req.body;
+
+  const VALID_TYPES = ["search", "view", "bookmark", "apply"];
+  if (!jobId || !eventType || !VALID_TYPES.includes(eventType)) {
+    return res.json({ success: false, message: "Invalid jobId or eventType" });
+  }
+
+  const WEIGHT_MAP = { search: 4, view: 1, bookmark: 3, apply: 5 };
+
+  try {
+    const job = await Job.findById(jobId);
+    if (!job) return res.json({ success: false, message: "Job not found" });
+
+    if (eventType === "view") {
+      const existing = await UserEvent.findOne({
+        userId,
+        jobId,
+        eventType: "view",
+        timestamp: { $gt: Date.now() - 30 * 60 * 1000 },
+      });
+      if (existing) {
+        return res.json({ success: true, skipped: true, message: "View already logged within 30 minutes" });
+      }
+    }
+
+    const event = await UserEvent.create({
+      userId,
+      jobId,
+      eventType,
+      weight: WEIGHT_MAP[eventType],
+      timestamp: Date.now(),
+    });
+
+    return res.json({ success: true, event });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

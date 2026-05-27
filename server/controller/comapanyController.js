@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import generateToken from "../utils/generateToken.js";
 import Job from "../models/Job.js";
 import JobApplication from "../models/JobApplication.js";
+import { generateJobEmbedding } from "../services/embeddingService.js";
 // Register a new Company
 export const registerCompany = async (req, res) => {
   const { name, email, password } = req.body;
@@ -109,6 +110,14 @@ export const postJob = async (req, res) => {
     });
 
     await newJob.save();
+
+    try {
+      const embedding = await generateJobEmbedding(newJob);
+      newJob.embedding = embedding;
+      await newJob.save();
+    } catch (err) {
+      console.warn("Embedding generation failed, saved without embedding:", err.message);
+    }
 
     res.json({ success: true, newJob });
   } catch (error) {

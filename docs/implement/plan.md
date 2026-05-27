@@ -3,11 +3,11 @@
 ## Day 1 (Today): Embedding Pipeline + Vector Index
 
 ### 1.0 Prerequisites
-- [ ] Install `openai` npm package: `pnpm --filter server add openai`
-- [ ] Add `OPENAI_API_KEY` to `server/.env` (get from https://platform.openai.com/api-keys)
+- [x] Install `openai` npm package: `pnpm --filter server add openai`
+- [x] Add `OPENAI_API_KEY` to `server/.env` (get from https://platform.openai.com/api-keys)
 
 ### 1.1 Setup OpenAI Embedding
-- [ ] Create `server/services/embeddingService.js`:
+- [x] Create `server/services/embeddingService.js`:
   - `generateEmbedding(text)` → calls OpenAI `text-embedding-3-large`, returns `Float32Array` (3072d)
   - `generateJobEmbedding(job)` → combines `title + strippedDescription + category + level`, embed
   - Strip HTML from description before embedding
@@ -21,7 +21,7 @@
   - Run: `node server/scripts/seedEmbeddings.js`
 
 ### 1.3 Embed on Job Creation
-- [ ] Modify `comapanyController.js` → `postJob()`:
+- [x] Modify `comapanyController.js` → `postJob()`:
   - After job save, call `generateJobEmbedding(job)`
   - `job.embedding = embeddingArray`
   - `await job.save()`

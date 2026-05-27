@@ -86,14 +86,14 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ### 4.1 Embedding Pipeline (P0)
 
-* Tạo `server/services/embeddingService.js` (Status: To-Do, Assignee: Khiem)
+* Tạo `server/services/embeddingService.js` (Status: Done, Assignee: Khiem)
   * `generateEmbedding(text)` → gọi OpenAI `text-embedding-3-large` → Float32Array (3072d)
   * `generateJobEmbedding(job)` → strip HTML từ description, combine `title + category + level + cleanDescription`, embed
 * Tạo `server/scripts/seedEmbeddings.js` (Status: To-Do, Assignee: Khiem)
   * Fetch tất cả jobs chưa có embedding
   * Batch 50 jobs/lần, rate-limit safe
   * Update mỗi document với `$set: { embedding }`
-* Sửa `postJob()` + `updateJob()` controller (Status: To-Do, Assignee: Khiem)
+* Sửa `postJob()` + `updateJob()` controller (Status: Done, Assignee: Khiem)
   * `postJob()`: sau khi save job → generate embedding → `job.embedding = vec` → `await job.save()`
   * `updateJob()`: regenerate embedding nếu title/description/category/level thay đổi
 

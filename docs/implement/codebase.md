@@ -33,8 +33,10 @@ TalentSync/
 │   │   └── authMiddleware.js         ← JWT protectCompany middleware
 │   ├── utils/
 │   │   └── generateToken.js         ← JWT token generator for companies
-│   ├── services/                    ← CREATE: embeddingService.js
-│   └── scripts/                     ← CREATE: seed scripts
+│   ├── services/
+│   │   └── embeddingService.js       ← OpenAI text-embedding-3-large, 3072d
+│   ├── scripts/
+│   │   └── testEmbedding.js          ← Verify OpenAI embedding works
 ├── client/
 │   └── src/
 │       ├── main.jsx                 ← React entry (ClerkProvider + BrowserRouter + AppContextProvider)

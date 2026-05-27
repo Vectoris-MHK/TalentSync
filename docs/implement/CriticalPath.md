@@ -30,10 +30,10 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 | A | Install `openai` + set `OPENAI_API_KEY` | 0.10 | — | 4.1 | ✅ Done |
 | B | `server/services/embeddingService.js` | 0.50 | A | 4.1 | ✅ Done |
 | C | Sửa `postJob()` controller auto-embed | 0.17 | B | 4.1 | ✅ Done |
-| D | `server/scripts/seedEmbeddings.js` | 0.33 | B | 4.1 | ⬜ Pending |
+| D | `server/scripts/seedEmbeddings.js` | 0.33 | B | 4.1 | ✅ Done |
 | E | Tạo Atlas Vector Search Index `idx_jobs_vector` | 0.25 | D | 4.2 | ⬜ Pending |
 | F | `GET /api/jobs/recommend-content` (8-stage pipeline) | 1.00 | B, E | 4.3 | ⬜ Pending |
-| G | Seed 30 jobs tiếng Việt | 0.67 | A | 3.2 | ⬜ Pending |
+| G | Seed 30 jobs tiếng Việt | 0.67 | A | 3.2 | ✅ Done |
 | H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ⬜ Pending |
 | I | User profile embedding + preferences API | 0.67 | H | 5.2 | ⬜ Pending |
 | J | Collaborative filtering API | 0.67 | H | 5.3 | ⬜ Pending |
@@ -49,19 +49,19 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 | ID | ES (h) | EF (h) | Tính toán |
 |----|--------|--------|-----------|
-| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C = 0.77h) |
+| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D = 2.10h) |
 | B | 0.00 | 0.60 | ✅ Done |
 | C | 0.60 | 0.77 | ✅ Done |
-| H | 0.77 | 1.27 | ES = now (0.77) |
-| G | 0.77 | 1.44 | ES = now (0.77) |
-| D | 0.77 | 1.10 | ES = now (0.77) |
-| I | 1.27 | 1.94 | ES = EF(H) |
-| J | 1.27 | 1.94 | ES = EF(H) |
-| E | 1.10 | 1.35 | ES = EF(D) |
-| **F** | **1.35** | **2.35** | **ES = max(EF(B)=0.77, EF(E)=1.35)** |
-| **K** | **2.35** | **2.68** | **ES = max(EF(F)=2.35, EF(I)=1.94, EF(J)=1.94)** |
-| **L** | **2.68** | **4.18** | **ES = EF(K)** |
-| **M** | **4.18** | **9.18** | **ES = EF(L)** |
+| H | 2.10 | 2.60 | ES = now (2.10) |
+| G | 0.77 | 1.44 | ✅ Done |
+| D | 0.77 | 1.10 | ✅ Done |
+| I | 2.60 | 3.27 | ES = EF(H) |
+| J | 2.60 | 3.27 | ES = EF(H) |
+| E | 2.10 | 2.35 | ES = now (2.10) |
+| **F** | **2.35** | **3.35** | **ES = max(EF(B)=0.77, EF(E)=2.35)** |
+| **K** | **3.35** | **3.68** | **ES = max(EF(F)=3.35, EF(I)=3.27, EF(J)=3.27)** |
+| **L** | **3.68** | **5.18** | **ES = EF(K)** |
+| **M** | **5.18** | **10.18** | **ES = EF(L)** |
 
 ---
 
@@ -69,15 +69,15 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 | ID | LF (h) | LS (h) | Tính toán |
 |----|--------|--------|-----------|
-| M | 9.18 | 4.18 | LF = EF(M) |
-| L | 4.18 | 2.68 | LF = LS(M) |
-| K | 2.68 | 2.35 | LF = LS(L) |
-| F | 2.35 | 1.35 | LF = LS(K) |
-| E | 1.35 | 1.10 | LF = LS(F) |
-| D | 1.10 | 0.77 | LF = LS(E) |
-| I | 2.35 | 1.68 | LF = LS(K), float=0.41h |
-| J | 2.35 | 1.68 | LF = LS(K), float=0.41h |
-| H | 1.68 | 1.18 | LF = min(LS(I), LS(J)), float=0.41h |
+| M | 10.18 | 5.18 | LF = EF(M) |
+| L | 5.18 | 3.68 | LF = LS(M) |
+| K | 3.68 | 3.35 | LF = LS(L) |
+| F | 3.35 | 2.35 | LF = LS(K) |
+| E | 2.35 | 2.10 | LF = LS(F) |
+| D | 2.10 | 1.77 | LF = LS(E) |
+| I | 3.35 | 2.68 | LF = LS(K), float=0.08h |
+| J | 3.35 | 2.68 | LF = LS(K), float=0.08h |
+| H | 2.68 | 2.18 | LF = min(LS(I), LS(J)), float=0.08h |
 | C | 2.35 | 2.18 | LF = LS(F), float=1.41h |
 | B | 0.77 | 0.27 | LF = min(LS(C)=2.18, LS(D)=0.77, LS(F)=1.35) |
 | G | 9.18 | 8.51 | LF = LS(M), float=7.74h |
@@ -87,28 +87,26 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 ## 5. Critical Path (Updated)
 
-> **A, B, C completed at 0.77h. Critical path now runs from D forward.**
+> **A, B, C, G, D completed at 2.10h. Critical path now runs from E forward.**
 
 ```
-D ──→ E ──→ F ──→ K ──→ L ──→ M
+E ──→ F ──→ K ──→ L ──→ M
 ```
 
 | Step | Task | ES | EF | Duration |
 |------|------|----|----|----------|
-| **Done** | A+B+C: Install, embedService, postJob | 0.00 | 0.77 | 0.77h |
-| 1 | D: seedEmbeddings.js | 0.77 | 1.10 | 0.33h |
-| 2 | E: Atlas Vector Search Index | 1.10 | 1.35 | 0.25h |
-| 3 | F: recommend-content API | 1.35 | 2.35 | 1.00h |
-| 4 | K: Hybrid feed API | 2.35 | 2.68 | 0.33h |
-| 5 | L: Frontend components | 2.68 | 4.18 | 1.50h |
-| 6 | M: E2E test + docs + video | 4.18 | 9.18 | 5.00h |
+| **Done** | A+B+C+G+D: Setup, schema, seed data + embeddings | 0.00 | 2.10 | 2.10h |
+| 1 | E: Atlas Vector Search Index | 2.10 | 2.35 | 0.25h |
+| 2 | F: recommend-content API | 2.35 | 3.35 | 1.00h |
+| 3 | K: Hybrid feed API | 3.35 | 3.68 | 0.33h |
+| 4 | L: Frontend components | 3.68 | 5.18 | 1.50h |
+| 5 | M: E2E test + docs + video | 5.18 | 10.18 | 5.00h |
 
 | Metric | Value |
 |--------|-------|
-| Tổng critical path còn lại | **8.41 giờ** |
-| Đã hoàn thành | 0.77h (A+B+C) |
-| Số ngày làm việc (5h/ngày) | ~1.7 ngày còn lại |
-| Buffer đến deadline | 103h - 8.41h = **94.6h dư** |
+| Tổng critical path còn lại | **8.08 giờ** |
+| Đã hoàn thành | 2.10h (A+B+C+G+D) |
+| Buffer đến deadline | ~92h |
 
 ---
 
@@ -163,12 +161,12 @@ D ──→ E ──→ F ──→ K ──→ L ──→ M
 ## 9. Summary
 
 ```
-Project duration:   9.18h total (8.41h critical path remaining)
-Completed:           0.77h (A+B+C: install, embedService, postJob auto-embed)
-Available time:     103h (4.3 days × 24h)
-Working buffer:     94.6h
+Project duration:   9.18h total (7.08h critical path remaining)
+Completed:           2.10h (A+B+C+G+D: schema, embedService, seed data + embeddings)
+Available time:     ~100h
+Working buffer:     93h
 
-Task status:        3/13 done, 4 schema complete (Job, User, UserEvent added), 1 verified (embedding)
-Next task:          G (Seed 30 jobs) + D (seedEmbeddings) — can run in parallel
-Critical blockers:  NONE — unblocked, full speed ahead
+Task status:        5/13 done, 30 jobs embedded (3072d), 10 users seeded
+Next task:          E (Atlas Vector Search Index) then F (recommend-content API)
+Critical blockers:  NONE
 ```

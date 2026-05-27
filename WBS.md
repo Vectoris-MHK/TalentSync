@@ -54,14 +54,13 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   * **`~MOD`** Added `search` event type — captures explicit user intent from search bar, critical for cold start & interest profiling
   * Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
 
-### 3.2 Seed Data (Status: TO-DO, Start: 2026-05-26)
+### 3.2 Seed Data (Status: IN-PROGRESS, Start: 2026-05-26)
 
-* Crawl data mẫu từ TopCV (Status: To-Do, Assignee: Khiem)
-  * Target: tối thiểu 30 jobs tiếng Việt across categories (IT, Design, Marketing, Finance, Management)
-  * Thu thập: title, description, location, category, level, salary range, company name
-  * Output: JSON/Array dump → làm input cho `seedData.js`
-  * **`~MOD`** Plan.md 5.1 updated to include TopCV crawl as data source
-* Tạo `server/scripts/seedData.js` (Status: To-Do, Assignee: Khiem, depends on: Crawl)
+* Crawl data mẫu từ TopCV (Status: Done, Assignee: Khiem)
+  * ~MOD: Crawled 8 jobs from TopCV (AI Engineer, CNC Tech, IT PM, System Admin, IT Senior Manager, Sale Admin, Tester, Fullstack), stored in data_sample.json
+  * Merged with 28 hardcoded jobs → total 36 jobs across 5 categories (23 IT, 5 Design, 5 Marketing, 3 Finance, 2 Management)
+  * Auto-created 8 companies from crawl data + 3 base companies = 11 total
+* Tạo `server/scripts/seedData.js` (Status: Done, Assignee: Khiem, depends on: Crawl)
   * Load crawled data → map vào schema → insert vào MongoDB
   * Tạo companies từ crawl data (gộp theo company name)
   * Tạo 10 users với Clerk-mocked IDs
@@ -89,7 +88,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 * Tạo `server/services/embeddingService.js` (Status: Done, Assignee: Khiem)
   * `generateEmbedding(text)` → gọi OpenAI `text-embedding-3-large` → Float32Array (3072d)
   * `generateJobEmbedding(job)` → strip HTML từ description, combine `title + category + level + cleanDescription`, embed
-* Tạo `server/scripts/seedEmbeddings.js` (Status: To-Do, Assignee: Khiem)
+* Tạo `server/scripts/seedEmbeddings.js` (Status: Done, Assignee: Khiem)
   * Fetch tất cả jobs chưa có embedding
   * Batch 50 jobs/lần, rate-limit safe
   * Update mỗi document với `$set: { embedding }`

@@ -36,7 +36,10 @@ TalentSync/
 │   ├── services/
 │   │   └── embeddingService.js       ← OpenAI text-embedding-3-large, 3072d
 │   ├── scripts/
-│   │   └── testEmbedding.js          ← Verify OpenAI embedding works
+│   │   ├── testEmbedding.js          ← Verify OpenAI embedding works
+│   │   ├── seedData.js               ← Seed 30 jobs, 3 companies, 10 users
+│   │   ├── seedEmbeddings.js         ← Batch embed all jobs with OpenAI
+│   │   └── resolveSrv.js             ← SRV DNS resolver helper
 ├── client/
 │   └── src/
 │       ├── main.jsx                 ← React entry (ClerkProvider + BrowserRouter + AppContextProvider)

@@ -15,10 +15,11 @@ TalentSync/
 │   │   ├── multer.js                ← File upload middleware
 │   │   └── instrument.js            ← Sentry init
 │   ├── models/
-│   │   ├── User.js                  ← User schema (Clerk _id, name, email, resume, image)
+│   │   ├── User.js                  ← User schema (Clerk _id, +preferences, +embedding)
 │   │   ├── Company.js               ← Company schema (name, email, image, password)
-│   │   ├── Job.js                   ← Job schema (add embedding field here)
-│   │   └── JobApplication.js        ← Application schema
+│   │   ├── Job.js                   ← Job schema (+embedding field: 3072d vector)
+│   │   ├── JobApplication.js        ← Application schema
+│   │   └── UserEvent.js             ← NEW: userId, jobId, eventType, weight, timestamp
 │   ├── controller/
 │   │   ├── userController.js        ← User endpoints (modify: add event logging on apply)
 │   │   ├── comapanyController.js    ← Company endpoints (modify: embed on job post)
@@ -236,6 +237,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   resume: { type: String },
   image: { type: String, required: true },
+  preferences: { type: [String], default: [] },
+  embedding: { type: [Number], default: [] },
 });
 ```
 
@@ -260,6 +263,7 @@ const jobSchema = new mongoose.Schema({
     date: { type: Number, required: true },
     visible: { type: Boolean, default: true },
     companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
+    embedding: { type: [Number], default: [] },
 });
 ```
 

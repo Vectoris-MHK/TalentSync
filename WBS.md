@@ -28,6 +28,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 ---
 
 > **Epic 3-6 scope boundaries:**
+>
 > - **Epic 3 (Schema & Seed Data):** Định nghĩa cấu trúc dữ liệu (Mongoose schema fields) + crawl + tạo raw data mẫu. Không chứa code logic, service, hay API.
 > - **Epic 4 (Semantic Search Engine - P0):** Embedding service, Atlas Vector Search index, content-based recommendation API với `$vectorSearch` + Aggregation Pipeline. Core must-have để nộp bài.
 > - **Epic 5 (Behavior-Based Recommendation - P1):** User behavior tracking, user profile embedding generation, collaborative filtering, hybrid feed blending. Nâng cao chất lượng recommendation.
@@ -37,17 +38,17 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ## 3. Schema & Seed Data (Status: IN-PROGRESS, Start: 2026-05-26)
 
-### 3.1 Thiết kế Schema (Status: IN-PROGRESS, Start: 2026-05-26)
+### 3.1 Thiết kế Schema (Status: DONE, Start: 2026-05-26)
 
 * Khảo sát schema hiện có (Status: Done, Assignee: Khiem)
   * 4 collections: `users`, `companies`, `jobs`, `jobapplications` - tất cả đã có schema
-* Mở rộng `Job` schema (Status: To-Do, Assignee: Khiem)
+* Mở rộng `Job` schema (Status: Done, Assignee: Khiem)
   * `embedding: { type: [Number], default: [] }` - 3072d vector
-* Mở rộng `User` schema (Status: To-Do, Assignee: Khiem)
+* Mở rộng `User` schema (Status: Done, Assignee: Khiem)
   * `preferences: { type: [String], default: [] }` - danh sách category user chọn khi onboard
   * `embedding: { type: [Number], default: [] }` - user profile vector (weighted avg of interacted jobs)
   * Lưu ý: `_id` giữ nguyên type `String` (Clerk ID)
-* Tạo model `UserEvent` (MỚI) (Status: To-Do, Assignee: Khiem)
+* Tạo model `UserEvent` (MỚI) (Status: Done, Assignee: Khiem)
   * `userId: String`, `jobId: ObjectId`, `eventType: enum("search","view","bookmark","apply")`, `weight: Number`, `timestamp: Number`
   * Weights: search=4, view=1, bookmark=3, apply=5
   * **`~MOD`** Added `search` event type — captures explicit user intent from search bar, critical for cold start & interest profiling

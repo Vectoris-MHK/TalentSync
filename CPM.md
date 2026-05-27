@@ -1,9 +1,9 @@
 # Critical Path Method — TalentSync MongoHack 2026
 
 > Generated: 2026-05-27 10:57 ICT
-> Updated: 2026-05-27 15:07 ICT
-> Deadline: 2026-05-31 18:00 ICT (~99h còn lại)
-> Elapsed: 4.1h / thực hiện: A B C G D
+> Updated: 2026-05-27 16:10 ICT
+> Deadline: 2026-05-31 18:00 ICT (~98h còn lại)
+> Elapsed: 16h (thực hiện: A B C G D I) / ~6h làm việc thực tế
 > Working hours: ~5h/ngày ≈ 20h thực tế
 
 ---
@@ -36,7 +36,7 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 | F | `GET /api/jobs/recommend-content` (8-stage pipeline) | 1.00 | B, E | 4.3 | ⬜ Pending |
 | G | Seed jobs + crawl TopCV + merge | 1.00 | A | 3.2 | ✅ Done |
 | H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ⬜ Pending |
-| I | User profile embedding + preferences API | 0.67 | H | 5.2 | ⬜ Pending |
+| I | User profile embedding + preferences API | 0.67 | H | 5.2 | ✅ Done |
 | J | Collaborative filtering API | 0.67 | H | 5.3 | ⬜ Pending |
 | K | Hybrid feed API `GET /api/jobs/recommend-feed` | 0.33 | F, I, J | 5.4 | ⬜ Pending |
 | L | Frontend (RecommendedJobs + Onboarding + event tracking) | 1.50 | K | 6.1 | ⬜ Pending |
@@ -50,19 +50,19 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 
 | ID | ES (h) | EF (h) | Tính toán |
 |----|--------|--------|-----------|
-| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D = 2.10h) |
+| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D+I = 2.77h) |
 | B | 0.00 | 0.60 | ✅ Done |
 | C | 0.60 | 0.77 | ✅ Done |
-| H | 2.10 | 2.60 | ES = now (2.10) |
+| H | 2.77 | 3.27 | ES = now (2.77) |
 | G | 0.77 | 1.44 | ✅ Done |
 | D | 0.77 | 1.10 | ✅ Done |
-| I | 2.60 | 3.27 | ES = EF(H) |
-| J | 2.60 | 3.27 | ES = EF(H) |
-| E | 2.10 | 2.35 | ES = now (2.10) |
-| **F** | **2.35** | **3.35** | **ES = max(EF(B)=0.77, EF(E)=2.35)** |
-| **K** | **3.35** | **3.68** | **ES = max(EF(F)=3.35, EF(I)=3.27, EF(J)=3.27)** |
-| **L** | **3.68** | **5.18** | **ES = EF(K)** |
-| **M** | **5.18** | **10.18** | **ES = EF(L)** |
+| I | 2.77 | 3.44 | ✅ Done (actual: 0.67h from commit 69c6747) |
+| J | 3.27 | 3.94 | ES = EF(H) |
+| E | 2.77 | 3.02 | ES = now (2.77) |
+| **F** | **3.02** | **4.02** | **ES = max(EF(B)=0.77, EF(E)=3.02)** |
+| **K** | **4.02** | **4.35** | **ES = max(EF(F)=4.02, EF(I)=3.44, EF(J)=3.94)** |
+| **L** | **4.35** | **5.85** | **ES = EF(K)** |
+| **M** | **5.85** | **10.85** | **ES = EF(L)** |
 
 ---
 

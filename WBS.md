@@ -39,9 +39,9 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
     - `server/scripts/testCollaborative.js`
     - `server/scripts/testUserProfile.js`
   - [x] **`+ADD`** SRV DNS Resolution Fix: Node.js DNS (c-ares) on Windows failed `querySrv ECONNREFUSED` for new hostname. Fixed by:
-    - Added `dnsSync.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"])` to `resolveSrv.js` and `config/db.js` — forces Google/Cloudflare DNS
+    - Added `dnsSync.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"])` to `resolveSrv.js` — forces Google/Cloudflare DNS
     - Fixed `appName` parameter parsing bug: `URLSearchParams` now correctly parses query string when converting SRV → direct URI
-  - [x] Server `config/db.js` now auto-resolves SRV → direct connection via shared helper logic
+  - [x] **`+ADD`** DRY fix: `config/db.js` now imports `uriFromSrv` from `scripts/resolveSrv.js` — no duplicated SRV resolution logic
 - Lựa chọn Model Embedding (Status: Done, Assignee: Khiem)
   - OpenAI `text-embedding-3-large` 3072d, cosine similarity, best Vietnamese support
 
@@ -49,9 +49,9 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 > **Epic 3-6 scope boundaries:**
 >
-> - **Epic 3 (Schema & Seed Data):** Schema code written. All seed data migrated to new cluster.
-> - **Epic 4 (Semantic Search Engine - P0):** Embedding service DONE. Vector Search index + recommend-content API remaining.
-> - **Epic 5 (Behavior-Based Recommendation - P1):** Behavior tracking, user profile, collaborative filtering all DONE. Hybrid feed API remaining.
+> - **Epic 3 (Schema & Seed Data):** Schema code written. All seed data migrated to new cluster. ✅
+> - **Epic 4 (Semantic Search Engine - P0):** Embedding service ✅, Vector Search index ✅, recommend-content API ✅. **EPIC COMPLETE.**
+> - **Epic 5 (Behavior-Based Recommendation - P1):** Behavior tracking ✅, user profile ✅, collaborative filtering ✅, hybrid feed ✅. **EPIC COMPLETE.**
 > - **Epic 6 (Frontend & Finalization):** Frontend components, onboarding flow, event tracking UI, testing, tài liệu, video demo, nộp bài.
 
 ---
@@ -87,80 +87,134 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
-## 4. Semantic Search Engine (P0 Core) (Status: IN-PROGRESS, Start: 2026-05-28)
+## 4. Semantic Search Engine (P0 Core) (Status: DONE, Completed: 2026-05-28 19:00)
 
 ### 4.1 Embedding Pipeline (P0) — Status: DONE
 
-- `server/services/embeddingService.js` ✅
-- `server/scripts/seedEmbeddings.js` ✅ — 36/36 jobs embedded, 0 failures
-- Auto-embed on `postJob()` + `updateJob()` ✅
+- [x] `server/services/embeddingService.js` — `generateEmbedding(text)`, `generateJobEmbedding(job)`
+- [x] `server/scripts/seedEmbeddings.js` — 36/36 jobs embedded, 0 failures
+- [x] Auto-embed on `postJob()` + `updateJob()`
 
-### 4.2 Vector Search Index (P0) — Status: IN-PROGRESS
+### 4.2 Vector Search Index (P0) — Status: DONE
 
-- [ ] Tạo Atlas Search Index `idx_jobs_vector` on new cluster (Atlas UI ClickOps)
+- [x] Atlas Search Index `idx_jobs_vector` deployed on new cluster
   - Database: `job-portal`, Collection: `jobs`
-  - mappings: `embedding` → type `knnVector`, dimensions `3072`, similarity `cosine`
-  - Dynamic: false
-- [ ] Create `server/scripts/testVectorSearch.js` — embed test query → `$vectorSearch` → verify
+  - Type: `vector`, path: `embedding`, dimensions: `3072`, similarity: `cosine`
+  - Index definition:
+  ```json
+  {
+    "fields": [
+      {
+        "type": "vector",
+        "path": "embedding",
+        "numDimensions": 3072,
+        "similarity": "cosine"
+      }
+    ]
+  }
+  ```
+- [x] `server/scripts/testVectorSearch.js` created and verified
+  - 3/3 Vietnamese test queries PASS:
+    - "Lập trình viên React 3 năm kinh nghiệm" → ReactJS, Full-Stack, Mobile Developer
+    - "Thiết kế đồ họa chuyên nghiệp" → Graphic Designer, Motion Graphics, UI/UX Designer
+    - "Nhân viên Marketing online" → Digital Marketing, SEO, Content Creator
 
-### 4.3 Content-Based Recommendation API (P0) — Status: NOT STARTED
+### 4.3 Content-Based Recommendation API (P0) — Status: DONE
 
-- [ ] `GET /api/jobs/recommend-content` (8-stage $vectorSearch + Aggregation Pipeline)
-  - Route: `routes/jobRoutes.js` → handler: `controller/jobController.js`
-  - numCandidates=200, limit=100 → score + filter → limit=20
+- [x] `GET /api/jobs/recommend-content` implemented
+  - Route: `routes/jobRoutes.js` → handler: `controller/jobController.js::getRecommendContent`
+  - 8-stage `$vectorSearch` + Aggregation Pipeline:
+    1. `$vectorSearch` — idx_jobs_vector, numCandidates=200, limit=100
+    2. `$match` — visible=true, optional location/level/category filters
+    3. `$lookup` — Company (name, email, image)
+    4. `$addFields` — vectorScore (from $meta) + recencyBoost (30-day exponential decay)
+    5. `$addFields` — score = vectorScore×0.6 + recencyBoost×0.2 + skillMatch×0.15 + salaryMatch×0.05
+    6. `$match` — exclude applied + seen jobs
+    7. `$sort` — score descending
+    8. `$limit` — 20, `$project` — clean response shape
+  - Accepts `?query=text` OR uses `user.embedding` as query vector
+  - Optional filters: `location`, `level`, `category`, `exclude`
 
-### 4.4 Verify P0 Readiness — Status: NOT STARTED
+### 4.4 Verify P0 Readiness — Status: DONE
 
-- [ ] E2E test: seed → embed → vector search → recommend-content
-- [ ] Atlas profiler verification
+- [x] E2E: seed → embed → vector index → recommend-content returns ranked, category-correct results
+- [x] `testVectorSearch.js` confirms `$vectorSearch` executing with actual scores
 
 ---
 
-## 5. Behavior-Based Recommendation (P1 Enhance) (Status: CODE DONE, except hybrid feed)
+## 5. Behavior-Based Recommendation (P1 Enhance) (Status: DONE, Completed: 2026-05-28 19:00)
 
 ### 5.1 User Behavior Tracking — Status: DONE
 
-- `POST /api/users/events` ✅ — deduplicate views within 30 min
-- `applyForJob()` auto-creates apply event ✅
-- Frontend event tracking (Epic 6): ApplyJob view on mount + JobListing IntersectionObserver
+- [x] `POST /api/users/events` — deduplicate views within 30 min, auto weight assignment
+- [x] `applyForJob()` auto-creates apply event (weight=5)
+- [ ] Frontend event tracking (Epic 6): ApplyJob view on mount + JobListing IntersectionObserver
 
 ### 5.2 User Profile Embedding — Status: DONE
 
-- `GET /api/users/profile` ✅ — weighted average + unit vector normalization
-- `POST /api/users/preferences` ✅
+- [x] `GET /api/users/profile` — weighted average of interacted job embeddings → unit vector normalization
+- [x] `POST /api/users/preferences` — cold-start category preferences
 
 ### 5.3 Collaborative Filtering API — Status: DONE
 
-- `GET /api/jobs/collaborative` ✅ — 13-stage pipeline, excludes seen jobs, limits 20
+- [x] `GET /api/jobs/collaborative` — 13-stage pipeline: target events → similar users → liked jobs → exclude seen → company lookup → 20 results
 
-### 5.4 Hybrid Recommendation Feed — Status: NOT STARTED
+### 5.4 Hybrid Recommendation Feed — Status: DONE
 
-- [ ] `GET /api/jobs/recommend-feed`
-  - Hot user: 70% vectorSearch + 30% collaborative → deduplicate → 20
-  - Cold start: preferences → category match + recency, or popular jobs
+- [x] `GET /api/jobs/recommend-feed` — 3-mode hybrid blender:
+  - **Hot user** (has embedding): 70% vectorSearch + 30% collaborative → deduplicate → score-sort → 20
+  - **Preferences** (has categories, no embedding): category match + recency sort → 20
+  - **Cold start** (no data): popular jobs (most applications in 30 days) → 20
+- [x] Route mounted in `routes/jobRoutes.js` → `GET /recommend-feed`
+- [x] Response includes `mode` field for frontend routing: `"hybrid"`, `"preferences"`, `"popular"`
+- [x] Server compiles and starts cleanly with all new routes
 
 ---
 
 ## 6. Frontend & Finalization (Status: TO-DO, Start: 2026-05-29)
 
-### 6.1 Frontend Integration
+### 6.1 Frontend Integration (Start: 2026-05-29)
 
 - [ ] Create `RecommendedJobs.jsx` — horizontal scroll, loading skeleton, empty state
-- [ ] Update `Home.jsx` — insert between Hero + JobListing, auth-gated
-- [ ] Replace `findSimilarJobs` in `ApplyJob.jsx` — call recommend-content API, fallback to old
+  - Call `GET /api/jobs/recommend-feed` (Clerk token required)
+  - Section header: "Việc làm gợi ý cho bạn"
+- [ ] Update `Home.jsx` — insert `<RecommendedJobs />` between Hero + JobListing, auth-gated
+- [ ] Replace `findSimilarJobs` in `ApplyJob.jsx` — call `recommend-content` API, fallback to old client-side filter
 - [ ] Create `OnboardingModal.jsx` — first-login category multi-select
-- [ ] Explanation badges on JobCard
+  - Trigger: `user.preferences` is empty
+  - Categories: Lập trình, Thiết kế, Marketing, Tài chính, Quản lý, Kinh doanh
+  - Submit → `POST /api/users/preferences`
+  - "Skip" → fallback to popular jobs
+- [ ] Frontend event tracking:
+  - `ApplyJob.jsx`: `useEffect` → `POST /api/users/events { jobId, eventType: "view" }` on mount
+  - `JobListing.jsx`: IntersectionObserver → fire view events when job cards enter viewport
+- [ ] Explanation badges on JobCard in recommended feed:
+  - "Phù hợp với kỹ năng của bạn" (content)
+  - "Tương tự việc làm bạn đã xem" (collaborative)
+  - "Phổ biến trong lĩnh vực của bạn" (preferences)
+  - "Dựa trên sở thích của bạn" (popular)
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 
-- [ ] Flow 1: New user → onboarding → popular jobs → interaction → personalized
-- [ ] Flow 2: Returning user → profile embedding → vector + collaborative
-- [ ] Flow 3: User A (IT) vs User B (Design) → different recommendations
-- [ ] Atlas profiler + vector index health check
+- [ ] End-to-end test scenarios:
+  - Flow 1: New user → onboarding → popular jobs → interaction → recommendations improve
+  - Flow 2: Returning user → profile embedding → vector + collaborative blend
+  - Flow 3: User A (IT) vs User B (Design) → different recommendations
+  - Verify: Atlas profiler shows aggregation pipeline stages executing
+  - Verify: Vector search index healthy & responding
 
 ### 6.3 Tài liệu & Nộp bài (Start: 2026-05-30)
 
-- [ ] Technical document (`docs/submission/technical-document.md`)
-- [ ] Demo video (10 min, Quốc Hào)
+- [ ] Technical document (`docs/submission/technical-document.md`):
+  - MVP Description, System Architecture (Mermaid diagram), Data Schema (5 collections)
+  - Embedding Pipeline, Vector Search Configuration, Aggregation Pipeline stages
+  - Recommendation Flow (3 modes), Cold Start Strategy, Sample Data overview
+- [ ] Demo video (10 min, Assignee: Quốc Hào):
+  - 00:00-02:00: Problem & TalentSync solution
+  - 02:00-04:30: User onboarding → personalized job feed
+  - 04:30-06:00: User applies → recommendations update real-time
+  - 06:00-07:30: Architecture — Atlas UI → Vector Search → Aggregation Pipeline
+  - 07:30-09:00: MongoDB integration details, scoring explanation
+  - 09:00-10:00: Conclusion — single DB for operational + vector
 - [ ] Submit before 2026-05-31 18:00 VNT
   - Checklist: MongoDB primary DB, $vectorSearch, Aggregation Pipeline, Demo <10min, Architecture docs

@@ -156,3 +156,38 @@ Per workshop speaker, recommendation system layers (confirmed from source):
 - Collaborative filtering: find user's items → find similar users → collect their items → score/rank
 - Cold start: onboarding wizard first, signup metadata second, coarse demographic fallback last
 - Diversity: pure nearest-result ranking over-concentrates → use aggregation to diversify
+
+## Dimension Lock (Vector Search Index Constraint)
+
+The Atlas Lucene storage framework physically binds index definitions to `numDimensions` at creation time. If the embedding model changes dimensions (e.g., swapping `text-embedding-3-large` 3072d → `text-embedding-3-small` 1536d), **in-place index adjustments are impossible**. The entire index must be rebuilt under a new name (e.g., `idx_jobs_vector_v2`).
+
+**Current state:**
+- Index: `idx_jobs_vector`, dimensions: 3072, similarity: cosine
+- Model: OpenAI `text-embedding-3-large` (3072d)
+- Index configured via Atlas UI ClickOps (JSON editor, not CLI/API)
+
+**If model changes:** 1) Create new index with matching `numDimensions`, 2) Re-embed all documents with new model, 3) Update all `$vectorSearch` stage `index` references, 4) Delete old index.
+
+## $vectorSearch.filter (Pre-Filter Optimization)
+
+Per Atlas documentation, metadata filters should be placed inside `$vectorSearch.filter` (compound) rather than as downstream `$match` stages. Atlas resolves filter arguments directly at the Lucene level, discarding irrelevant data **before** KNN vector computation — reducing latency and improving result quality.
+
+**Implementation:**
+- `visible: true` → `{ equals: { path: "visible", value: true } }` in filter
+- `location`/`level`/`category` optional filters → `{ text: { query, path } }` in filter
+- `_id: { $nin: [...] }` exclusion → stays as downstream `$match` (not supported in Atlas Search filter)
+
+## Embedding Cache (LRU)
+
+To avoid redundant OpenAI API calls (50-200ms per round trip), an in-memory LRU cache was added to `embeddingService.js`. Cache size: max 100 entries. Eviction policy: least-recently-used. Same cached vector is returned for identical text input.
+
+**Implementation:** `server/services/embeddingService.js` — `Map`-based LRU with `clearEmbeddingCache()` and `getCacheSize()` exports.
+
+## Atlas Deployment Reference
+
+See `docs/implement/mongodb_atlas.md` for the full ClickOps deployment report including:
+- M10 cluster provisioning on AWS Singapore (`ap-southeast-1`)
+- `talentsync_admin` database user + `0.0.0.0/0` network access
+- Vector Search index `idx_jobs_vector` schema (type: vector, path: embedding, 3072d, cosine)
+- Scalar quantization (4x RAM reduction, 95-98% accuracy)
+- `numCandidates` tuning guidance (100-1000 optimal for 36-job dataset)

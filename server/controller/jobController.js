@@ -234,10 +234,10 @@ export const getRecommendContent = async (req, res) => {
     const seenJobIds = seenEvents.map((e) => e.jobId);
     const allExcluded = [...new Set([...appliedJobIds, ...seenJobIds])];
 
-    const matchStage = { visible: true };
-    if (location) matchStage.location = location;
-    if (level) matchStage.level = level;
-    if (category) matchStage.category = category;
+    const filterClauses = [{ equals: { path: "visible", value: true } }];
+    if (location) filterClauses.push({ text: { query: location, path: "location" } });
+    if (level) filterClauses.push({ text: { query: level, path: "level" } });
+    if (category) filterClauses.push({ text: { query: category, path: "category" } });
 
     const now = Date.now();
     const thirtyDaysMs = 30 * 86400000;
@@ -250,9 +250,10 @@ export const getRecommendContent = async (req, res) => {
           queryVector,
           numCandidates: 200,
           limit: 100,
+          filter: filterClauses.length > 0 ? { compound: { filter: filterClauses } } : undefined,
         },
       },
-      { $match: matchStage },
+      { $match: { _id: { $nin: allExcluded } } },
       {
         $lookup: {
           from: "companies",
@@ -348,9 +349,10 @@ export const getRecommendFeed = async (req, res) => {
               queryVector,
               numCandidates: 200,
               limit: 100,
+              filter: { compound: { filter: [{ equals: { path: "visible", value: true } }] } },
             },
           },
-          { $match: { visible: true, _id: { $nin: allExcluded } } },
+          { $match: { _id: { $nin: allExcluded } } },
           {
             $lookup: {
               from: "companies",

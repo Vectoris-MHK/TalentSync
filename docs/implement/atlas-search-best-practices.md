@@ -90,6 +90,8 @@ Tại sao? Vì mỗi document bị Lucene quét và tính KNN sẽ tiêu tốn *
 
 ### 1.2 Truy vết pipeline thực tế — Tính năng A: "Việc làm tương tự"
 
+> **Trạng thái:** Pipeline bên dưới mô tả code TRƯỚC KHI refactor (không có filter). Code HIỆN TẠI đã được refactor — xem Section 1.5 để biết pattern thực tế.
+
 **Kịch bản cụ thể:** User đang xem job "Lập trình viên ReactJS" (id=`abc123`) tại `ApplyJob.jsx`.
 
 #### Bước 1: Frontend gọi API
@@ -817,16 +819,21 @@ Cấu hình này đã được kiểm chứng: 36 jobs embedded trong 2 batch, 0
 
 ---
 
-## 7. Tổng hợp các thay đổi cần áp dụng
+## 7. Tổng hợp các thay đổi — TRẠNG THÁI TRIỂN KHAI
 
-| # | Ưu tiên | File | Dòng | Thay đổi | Tác động |
-|---|---------|------|------|----------|----------|
-| 1 | **P0** | `controller/jobController.js` | 237-254 | `getRecommendContent`: tách `vectorFilter { visible, category }` + `matchStage { location, level }`; đưa `filter` vào `$vectorSearch` | Đúng best practice Atlas, ban giám khảo đánh giá cao |
-| 2 | **P0** | `controller/jobController.js` | 345-353 | `getRecommendFeed`: thêm `filter: { visible: true }` vào `$vectorSearch` | Pre-filter job ẩn trước KNN |
-| 3 | **P0** | `scripts/testVectorSearch.js` | 30-38 | Thêm `filter: { visible: true }`, bỏ `$match: { visible: true }` | Test script phản ánh đúng production code |
-| 4 | **P1** | `services/embeddingService.js` | 15-23 | Thêm `Map`-based LRU cache (max 100 entries, fingerprint 200 ký tự) | Giảm 70% OpenAI calls, tiết kiệm latency + credit |
-| 5 | **P2** | `controller/jobController.js` | 251, 349 | Giảm `numCandidates: 200` → `100` trong production code (2 vị trí) | Phù hợp dataset 36 jobs |
-| 6 | **P2** | `docs/implement/decisions.md` | — | Ghi nhận Dimension Lock constraint: không thể sửa index tại chỗ nếu đổi model | Tài liệu kiến trúc cho submission |
+| # | Ưu tiên | File | Thay đổi | Trạng thái |
+|---|---------|------|----------|-----------|
+| 1 | **P0** | `controller/jobController.js:getRecommendContent` | Đưa `visible` + `location` + `level` + `category` vào `$vectorSearch.filter` (compound filter: `equals` + `text`) | ✅ ĐÃ ÁP DỤNG |
+| 2 | **P0** | `controller/jobController.js:getRecommendFeed` | Thêm `filter: { compound: { filter: [{ equals: { path: "visible", value: true } }] } }` vào `$vectorSearch` | ✅ ĐÃ ÁP DỤNG |
+| 3 | **P1** | `services/embeddingService.js` | Thêm `Map`-based LRU cache (max 100 entries, text key, evict oldest-first khi đầy) | ✅ ĐÃ ÁP DỤNG |
+| 4 | **P2** | `controller/jobController.js` | Giảm `numCandidates: 200` → `100` | ❌ KHÔNG ÁP DỤNG (quyết định của team) |
+| 5 | **P2** | `docs/implement/decisions.md` | Ghi nhận Dimension Lock, Pre-Filter Optimization, Embedding Cache | ✅ ĐÃ ÁP DỤNG |
+| 6 | **P1** | `docs/implement/plan.md` | Mark tất cả task Days 1-3 là done, cập nhật actual timeline | ✅ ĐÃ ÁP DỤNG |
+| 7 | **P1** | `docs/implement/architecture.md` | Cập nhật index definition thực tế, filter pattern, scoring, blend ratios | ✅ ĐÃ ÁP DỤNG |
+| 8 | **P1** | `docs/implement/codebase.md` | Thêm file mới, SRV resolver pattern, filter pattern | ✅ ĐÃ ÁP DỤNG |
+| 9 | **P1** | `docs/implement/context.md` | Mark tất cả P0+P1 gaps là resolved | ✅ ĐÃ ÁP DỤNG |
+
+> **Tổng kết:** 7/9 thay đổi đã áp dụng. 1 không áp dụng theo quyết định của team (numCandidates giữ 200). 1 không cần thiết (testVectorSearch giữ nguyên vì không ảnh hưởng production).
 
 ---
 

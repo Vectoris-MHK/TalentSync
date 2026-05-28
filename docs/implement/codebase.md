@@ -1,56 +1,68 @@
 # Codebase Reference — File Map & Conventions
 
-> Purpose: Give agent exact file paths, code patterns, and operational details so it can implement without guessing.
+> Updated: 2026-05-28 20:40 ICT — Backend 100% complete, actual files reflected
 
 ## Directory Map
 
 ```
 TalentSync/
+├── docs/
+│   └── implement/
+│       ├── context.md                    ← Current state & gap analysis (P0/P1 resolved)
+│       ├── architecture.md               ← System architecture & data schema
+│       ├── plan.md                       ← 5-day implementation plan (Days 1-3 done)
+│       ├── decisions.md                  ← Technical decisions & trade-offs
+│       ├── codebase.md                   ← This file — file map & conventions
+│       ├── mongodb_atlas.md              ← Atlas deployment report (M10, index topology)
+│       └── atlas-search-best-practices.md ← Pre-filter, cache, dimension lock analysis
 ├── server/
-│   ├── server.js                    ← Express entry point, middleware order, route mounting
-│   ├── .env                         ← Environment variables
+│   ├── server.js                    ← Express entry, middleware order, route mounting
+│   ├── .env                         ← MONGODB_URI, OPENAI_API_KEY, Clerk, Cloudinary, Sentry
+│   ├── data_sample.json             ← Crawled TopCV data (8 jobs)
 │   ├── config/
-│   │   ├── db.js                    ← MongoDB connection (dbName: "job-portal")
+│   │   ├── db.js                    ← MongoDB connection (uses uriFromSrv resolvers)
 │   │   ├── cloudinary.js            ← Cloudinary init
 │   │   ├── multer.js                ← File upload middleware
 │   │   └── instrument.js            ← Sentry init
 │   ├── models/
-│   │   ├── User.js                  ← User schema (Clerk _id, +preferences, +embedding)
-│   │   ├── Company.js               ← Company schema (name, email, image, password)
-│   │   ├── Job.js                   ← Job schema (+embedding field: 3072d vector)
+│   │   ├── User.js                  ← Clerk _id (String), +preferences [+embedding]
+│   │   ├── Company.js               ← name, email, image, password
+│   │   ├── Job.js                   ← +embedding field (3072d vector)
 │   │   ├── JobApplication.js        ← Application schema
 │   │   └── UserEvent.js             ← NEW: userId, jobId, eventType, weight, timestamp
 │   ├── controller/
 │   │   ├── userController.js        ← User endpoints (+logUserEvent, +apply auto-event, +getUserProfile, +updateUserPreferences)
 │   │   ├── comapanyController.js    ← Company endpoints (+auto-embed on postJob)
-│   │   ├── jobController.js         ← Job endpoints (add: recommend routes)
+│   │   ├── jobController.js         ← +getRecommendContent, +getCollaborativeJobs, +getRecommendFeed
 │   │   └── webhooks.js              ← Clerk webhook handler
 │   ├── routes/
-│   │   ├── userRoutes.js            ← User routes (+GET /profile, +POST /preferences, +POST /events)
-│   │   ├── jobRoutes.js             ← Job routes (add recommend routes here)
+│   │   ├── userRoutes.js            ← +GET /profile, +POST /preferences, +POST /events
+│   │   ├── jobRoutes.js             ← +GET /recommend-content, +GET /collaborative, +GET /recommend-feed
 │   │   └── companyRoutes.js         ← Company routes
 │   ├── middleware/
 │   │   └── authMiddleware.js         ← JWT protectCompany middleware
 │   ├── utils/
 │   │   └── generateToken.js         ← JWT token generator for companies
 │   ├── services/
-│   │   └── embeddingService.js       ← OpenAI text-embedding-3-large, 3072d
+│   │   └── embeddingService.js       ← OpenAI text-embedding-3-large, 3072d, LRU cache
 │   ├── scripts/
 │   │   ├── testEmbedding.js          ← Verify OpenAI embedding works
+│   │   ├── testVectorSearch.js       ← NEW: verify $vectorSearch + 3 Vietnamese queries
+│   │   ├── testCollaborative.js      ← NEW: verify collaborative filtering pipeline
+│   │   ├── testUserProfile.js        ← NEW: verify user profile embedding pipeline
 │   │   ├── seedData.js               ← Seed 36 jobs, 11 companies, 10 users
 │   │   ├── seedEmbeddings.js         ← Batch embed all jobs with OpenAI
-│   │   ├── seedEvents.js             ← Seed 188 behavior events for 10 users
-│   │   ├── testUserProfile.js        ← Test user profile aggregation pipeline
-│   │   └── resolveSrv.js             ← SRV DNS resolver helper
+│   │   ├── seedEvents.js             ← Seed 215 behavior events for 10 users
+│   │   └── resolveSrv.js             ← NEW: SRV DNS resolver (Google DNS), shared helper
 ├── client/
 │   └── src/
 │       ├── main.jsx                 ← React entry (ClerkProvider + BrowserRouter + AppContextProvider)
-│       ├── App.jsx                  ← Route definitions (add new routes here)
+│       ├── App.jsx                  ← Route definitions
 │       ├── index.css                ← Tailwind + custom styles
 │       ├── context/
-│       │   └── AppContext.jsx        ← Global state (add: recommendedJobs, userPreferences)
+│       │   └── AppContext.jsx        ← Global state
 │       ├── pages/
-│       │   ├── Home.jsx             ← Landing page (add RecommendedJobs section)
+│       │   ├── Home.jsx             ← Landing (add RecommendedJobs section here)
 │       │   ├── ApplyJob.jsx         ← Job detail (replace findSimilarJobs with API)
 │       │   ├── Applications.jsx     ← User dashboard
 │       │   ├── Dashboard.jsx        ← Recruiter layout
@@ -67,7 +79,7 @@ TalentSync/
 │       │   ├── AppDownload.jsx
 │       │   ├── Calltoaction.jsx
 │       │   └── Loading.jsx
-│       └── assets/                  ← SVGs, images, static files
+│       └── assets/
 ```
 
 ## Code Conventions
@@ -174,37 +186,30 @@ export default MyComponent;
 5. Routes (mounted below)
 ```
 
-## Route Mounting
+## Route Mounting (server.js)
 
 ```
-app.get("/", ...)                # Health check
-app.get("/debug-sentry", ...)    # Sentry test
-app.post("/webhooks", ...)       # Clerk webhooks (Svix signature verified)
-app.use("/api/company", companyRoutes)    # Company routes (/api/company/register, /login, /company, ...)
-app.use("/api/jobs", jobRoutes)          # Job routes (/api/jobs, /api/jobs/:id)
-app.use("/api/users", userRoutes)        # User routes (/api/users/user, /apply, /applications, ...)
+app.get("/", ...)
+app.get("/debug-sentry", ...)
+app.post("/webhooks", clerkWebhooks)
+app.use("/api/company", companyRoutes)
+app.use("/api/jobs", jobRoutes)          ← /recommend-content, /recommend-feed, /collaborative, /, /:id
+app.use("/api/users", userRoutes)        ← /user, /apply, /applications, /profile, /preferences, /events
 ```
-
-**When adding new job routes**, add handlers to `controller/jobController.js`, then mount in `routes/jobRoutes.js`.
-**When adding new user routes**, add handlers to `controller/userController.js`, then mount in `routes/userRoutes.js`.
 
 ## Environment Variables (server/.env)
 
 ```
-MONGODB_URI=mongodb+srv://talentsync_db_user:...@talentsyncdb.39cwlbk.mongodb.net/
+MONGODB_URI=mongodb+srv://talentsync_admin:...@talentsyncdb.yyz4uc.mongodb.net/?appName=TalentSyncDB
 CLERK_SECRET_KEY=sk_...
 JWT_SECRET=...
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
-SENTRY_DSN=https://af49cd78e34e869e5c3fcd47018a17dc@o4508646666141696.ingest.us.sentry.io/4508646670663680
+SENTRY_DSN=...
 CLERK_WEBHOOK_SECRET=...
 PORT=5000
-```
-
-**To add for hackathon:**
-```
-OPENAI_API_KEY=your_openai_api_key
+OPENAI_API_KEY=sk-proj-...
 ```
 
 ## Client Environment Variables (client/.env)
@@ -217,12 +222,26 @@ VITE_BACKEND_URL=http://localhost:5000/api
 ## How to Run Scripts
 
 ```bash
-# Run a seed/utility script
+# Seed data
+node server/scripts/seedData.js
+
+# Generate embeddings (requires OPENAI_API_KEY)
 node server/scripts/seedEmbeddings.js
 
+# Seed behavior events
+node server/scripts/seedEvents.js
+
+# Test vector search
+node server/scripts/testVectorSearch.js
+
+# Test collaborative filtering
+node server/scripts/testCollaborative.js
+
+# Test user profile embedding
+node server/scripts/testUserProfile.js
+
 # Run server
-npm run dev  # or: pnpm dev:server
-# (package.json scripts: "server": "node server.js" or "dev:server": "nodemon server.js")
+npm run dev   # or: pnpm dev:server
 
 # Run client
 pnpm dev:client   # Vite dev server on :5173
@@ -230,65 +249,51 @@ pnpm dev:client   # Vite dev server on :5173
 
 ## Database
 
-- **Name:** `job-portal` (set in `server/config/db.js` line 11)
-- **URI:** From `MONGODB_URI` env var (Atlas connection string)
+- **Name:** `job-portal` (set in `server/config/db.js`)
+- **URI:** From `MONGODB_URI` env var — auto-resolved from SRV via `uriFromSrv()`
+- **Connection:** Google DNS (8.8.8.8, 8.8.4.4) + Cloudflare (1.1.1.1) for SRV resolution on Windows
 
-## Existing User Model (full — DO NOT break Clerk integration)
+## SRV DNS Resolution
 
-```js
-// server/models/User.js
-import mongoose from "mongoose";
-const userSchema = new mongoose.Schema({
-  _id: { type: String, required: true },    // Clerk user ID — DO NOT change type
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  resume: { type: String },
-  image: { type: String, required: true },
-  preferences: { type: [String], default: [] },
-  embedding: { type: [Number], default: [] },
-});
-```
+`server/scripts/resolveSrv.js` exports `uriFromSrv()` — converts `mongodb+srv://` to direct `mongodb://` URI:
+- Used by: `config/db.js`, all 5 seed/test scripts
+- Forces Google/Cloudflare DNS servers (fixes Node.js c-ares bug on Windows)
+- Correctly handles `appName` and other query parameters via `URLSearchParams`
 
-**When adding fields (preferences, embedding):**
-- Add after `image` field
-- Make optional (no `required: true`)
-- `_id` must remain String type for Clerk compatibility
-- Clerk webhook (`webhooks.js`) creates users with `_id: data.id` — do NOT break this
+## Embedding Service
 
-## Existing Job Model (full)
+`server/services/embeddingService.js`:
+- Model: OpenAI `text-embedding-3-large`, 3072 dimensions
+- LRU cache: 100 entries max, 200-char text fingerprint, instant cache-hit returns
+- Input limit: 7000 chars max (OpenAI token limit)
+- Exports: `generateEmbedding(text)`, `generateJobEmbedding(job)`, `clearEmbeddingCache()`, `getCacheSize()`
+
+## Vector Search Pipeline Pattern (current)
 
 ```js
-// server/models/Job.js
-import mongoose from "mongoose";
-const jobSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },  // HTML from Quill editor
-    location: { type: String, required: true },
-    category: { type: String, required: true },
-    level: { type: String, required: true },
-    salary: { type: Number, required: true },
-    date: { type: Number, required: true },
-    visible: { type: Boolean, default: true },
-    companyId: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
-    embedding: { type: [Number], default: [] },
-});
-```
+// Pre-filter at Lucene level — metadata filters before KNN computation
+const vectorFilter = [
+  { equals: { path: "visible", value: true } },
+  // Optional: { text: { query: location, path: "location" } },
+  // Optional: { text: { query: category, path: "category" } },
+];
 
-**When adding embedding field:**
-- Add after `companyId`
-- Type: `[Number]`, not required, default: `[]`
-
-## Client Routing (App.jsx)
-
-```
-"/"                            → Home.jsx (public)
-"/apply-job/:id"               → ApplyJob.jsx (public)
-"/applications"                → Applications.jsx (user, Clerk auth)
-"/recruiter-login"             → RecruiterLogin.jsx (modal overlay)
-"/dashboard"                   → Dashboard.jsx (recruiter layout wrapper)
-  "/dashboard/add-job"         → AddJob.jsx
-  "/dashboard/manage-job"      → ManageJobs.jsx
-  "/dashboard/view-applications" → ViewApplications.jsx
+const results = await Job.aggregate([
+  {
+    $vectorSearch: {
+      index: "idx_jobs_vector",
+      path: "embedding",
+      queryVector,
+      numCandidates: 200,
+      limit: 100,
+      filter: { compound: { filter: vectorFilter } },
+    },
+  },
+  // Exclusion (not supported in Lucene filter — must be downstream)
+  { $match: { _id: { $nin: allExcluded } } },
+  // Enrichment + scoring + sort + limit + project
+  // ...
+]);
 ```
 
 ## Key Design Patterns to Follow
@@ -298,6 +303,9 @@ const jobSchema = new mongoose.Schema({
 3. **Clerk middleware auto-injected** — `req.auth.userId` available in all user routes
 4. **Controller files export named functions** — `export const getJobs`, NOT `module.exports`
 5. **Separate route + controller** — routes define HTTP method + path, controllers define logic
-6. **New services go in `server/services/`** — create directory if missing
-7. **Scripts go in `server/scripts/`** — create directory if missing
-8. **Aggregation pipelines use `Model.aggregate([...])`** not `Model.aggregate().match()...`
+6. **New services go in `server/services/`**
+7. **Scripts go in `server/scripts/`**
+8. **Aggregation pipelines use `Model.aggregate([...])`**
+9. **$vectorSearch.filter for metadata** — visible/location/category/level at Lucene level
+10. **$match for exclusions** — `_id: { $nin }` must stay at MongoDB Query Engine level
+11. **SRV resolution** — all scripts use `uriFromSrv(process.env.MONGODB_URI)` pattern

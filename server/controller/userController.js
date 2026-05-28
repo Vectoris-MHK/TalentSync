@@ -20,7 +20,8 @@ export const getUserData = async (req, res) => {
     res.json({ success: true, user });
   } catch (error) {
     console.log("Error fetching user:", error.message); // Log any errors
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -60,7 +61,8 @@ export const applyForJob = async (req, res) => {
 
     res.json({ success: true, message: "Applied Successfully" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -74,16 +76,14 @@ export const getUserJobApplications = async (req, res) => {
       .populate("jobId", "title description location level salary")
       .exec();
 
-    if (!applications) {
-      return res.json({
-        success: false,
-        message: "No applications found for this User",
-      });
+    if (applications.length === 0) {
+      return res.json({ success: true, applications: [] });
     }
 
     return res.json({ success: true, applications });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -97,6 +97,10 @@ export const updateUserResume = async (req, res) => {
 
     const userData = await User.findById(userId);
 
+    if (!userData) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
     if (resumeFile) {
       const resumeUpload = await v2.uploader.upload(resumeFile.path);
       userData.resume = resumeUpload.secure_url;
@@ -105,7 +109,8 @@ export const updateUserResume = async (req, res) => {
 
     return res.json({ success: true, message: "Resume Updated Successfully" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -178,7 +183,8 @@ export const getUserProfile = async (req, res) => {
 
     return res.json({ success: true, coldStart: false, user });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -206,7 +212,8 @@ export const updateUserPreferences = async (req, res) => {
 
     return res.json({ success: true, preferences: user.preferences, user });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -250,6 +257,7 @@ export const logUserEvent = async (req, res) => {
 
     return res.json({ success: true, event });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };

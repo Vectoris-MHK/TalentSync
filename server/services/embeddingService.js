@@ -17,11 +17,12 @@ function stripHtml(html) {
 
 export async function generateEmbedding(text) {
   const trimmed = text.slice(0, MAX_CHARS);
+  const cacheKey = text.slice(0, 200);
 
-  if (cache.has(trimmed)) {
-    const cached = cache.get(trimmed);
-    cache.delete(trimmed);
-    cache.set(trimmed, cached);
+  if (cache.has(cacheKey)) {
+    const cached = cache.get(cacheKey);
+    cache.delete(cacheKey);
+    cache.set(cacheKey, cached);
     return cached;
   }
 
@@ -37,7 +38,7 @@ export async function generateEmbedding(text) {
     const firstKey = cache.keys().next().value;
     cache.delete(firstKey);
   }
-  cache.set(trimmed, embedding);
+  cache.set(cacheKey, embedding);
 
   return embedding;
 }

@@ -11,7 +11,14 @@ const jobSchema = new mongoose.Schema({
     date: {type:Number,required:true},
     visible: {type:Boolean, default: true},
     companyId: {type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true},
-    embedding: { type: [Number], default: [] },
+    embedding: {
+        type: [Number],
+        default: [],
+        validate: {
+            validator: v => v.length === 0 || v.length === 3072,
+            message: "Embedding must be 0 or 3072 dimensions",
+        },
+    },
 
 });
 

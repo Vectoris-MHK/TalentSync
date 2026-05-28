@@ -15,6 +15,7 @@ const userEventSchema = new mongoose.Schema({
 userEventSchema.index({ userId: 1, timestamp: -1 });
 userEventSchema.index({ jobId: 1 });
 userEventSchema.index({ eventType: 1 });
+userEventSchema.index({ userId: 1, jobId: 1, eventType: 1, timestamp: -1 });
 
 const UserEvent = mongoose.model("UserEvent", userEventSchema);
 

@@ -21,10 +21,6 @@ const baseCompanies = [
   { name: "Công ty TNHH Sáng tạo Việt", email: "hr@sangtaoviet.com.vn", image: "https://res.cloudinary.com/dnzqfiqtz/image/upload/v1748328800/companies/sangtaoviet.png" },
 ];
 
-function normalizeSlug(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
 function parseLevel(levelStr) {
   const match = levelStr.match(/(\d+)/);
   if (!match) return "Trung cấp";

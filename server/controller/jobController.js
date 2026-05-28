@@ -16,7 +16,8 @@ export const getJobs = async (req, res) => {
         res.json({success: true, jobs})
 
     } catch (error) {
-        res.json({success: false, message: error.message})
+        console.error("Controller error:", error);
+        res.json({success: false, message: "An unexpected error occurred"})
     }
 };
 
@@ -45,8 +46,70 @@ export const getJobById = async (req, res) => {
         })
 
     } catch (error) {
-        res.json({success:false, message:error.message})
+        console.error("Controller error:", error);
+        res.json({success:false, message:"An unexpected error occurred"})
     }
+}
+
+// Shared collaborative filtering pipeline
+// Returns jobs that similar users liked, excluding seenJobIds
+async function getCollaborativeResults(userId, excludedJobIds, limit = 20) {
+  const positiveEvents = await UserEvent.find({
+    userId,
+    eventType: { $in: ["bookmark", "apply"] },
+  }).select("jobId").lean();
+
+  if (positiveEvents.length === 0) return [];
+
+  return UserEvent.aggregate([
+    { $match: { userId, eventType: { $in: ["bookmark", "apply"] } } },
+    {
+      $lookup: {
+        from: "userevents",
+        let: { targetJobId: "$jobId" },
+        pipeline: [
+          { $match: { $expr: { $and: [{ $eq: ["$jobId", "$$targetJobId"] }, { $ne: ["$userId", userId] }] } } },
+          { $project: { userId: 1, _id: 0 } },
+        ],
+        as: "similarUserEvents",
+      },
+    },
+    { $unwind: "$similarUserEvents" },
+    { $group: { _id: "$similarUserEvents.userId" } },
+    {
+      $lookup: {
+        from: "userevents",
+        let: { similarUserId: "$_id" },
+        pipeline: [
+          { $match: { $expr: { $and: [{ $eq: ["$userId", "$$similarUserId"] }, { $in: ["$eventType", ["bookmark", "apply"]] }] } } },
+          { $project: { jobId: 1, weight: 1, _id: 0 } },
+        ],
+        as: "likedJobs",
+      },
+    },
+    { $unwind: "$likedJobs" },
+    { $group: { _id: "$likedJobs.jobId", interactionScore: { $sum: "$likedJobs.weight" }, interactionCount: { $sum: 1 } } },
+    { $match: { _id: { $nin: excludedJobIds } } },
+    { $sort: { interactionScore: -1 } },
+    { $limit: 40 },
+    { $lookup: { from: "jobs", localField: "_id", foreignField: "_id", as: "job" } },
+    { $unwind: "$job" },
+    { $match: { "job.visible": true } },
+    { $lookup: { from: "companies", localField: "job.companyId", foreignField: "_id", as: "company" } },
+    { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+    {
+      $project: {
+        _id: "$job._id", title: "$job.title", description: "$job.description",
+        location: "$job.location", category: "$job.category", level: "$job.level",
+        salary: "$job.salary", date: "$job.date",
+        companyId: { _id: "$company._id", name: "$company.name", email: "$company.email", image: "$company.image" },
+        interactionScore: 1, interactionCount: 1,
+        score: { $divide: ["$interactionScore", 8] },
+        source: { $literal: "collaborative" },
+      },
+    },
+    { $limit: limit },
+  ]);
 }
 
 // GET /api/jobs/collaborative
@@ -56,181 +119,7 @@ export const getCollaborativeJobs = async (req, res) => {
   const userId = req.auth.userId;
 
   try {
-    // Collect all jobIds the target user has interacted with (to exclude from results)
-    const seenEvents = await UserEvent.find({ userId }).select("jobId").lean();
-    const seenJobIds = seenEvents.map((e) => e.jobId);
-
-    if (seenJobIds.length === 0) {
-      return res.json({ success: true, jobs: [], reason: "no_events" });
-    }
-
-    const results = await UserEvent.aggregate([
-      // Stage 1: target user's strong positive signals (bookmark + apply)
-      {
-        $match: {
-          userId,
-          eventType: { $in: ["bookmark", "apply"] },
-        },
-      },
-
-      // Stage 2: find other users who interacted with the same jobs
-      {
-        $lookup: {
-          from: "userevents",
-          let: { targetJobId: "$jobId" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$jobId", "$$targetJobId"] },
-                    { $ne: ["$userId", userId] }, // exclude target user
-                  ],
-                },
-              },
-            },
-            { $project: { userId: 1, _id: 0 } },
-          ],
-          as: "similarUserEvents",
-        },
-      },
-
-      // Stage 3: flatten to get distinct similar user IDs
-      { $unwind: "$similarUserEvents" },
-      {
-        $group: {
-          _id: "$similarUserEvents.userId", // similar user
-        },
-      },
-
-      // Stage 4: get jobs those similar users liked (bookmark + apply)
-      {
-        $lookup: {
-          from: "userevents",
-          let: { similarUserId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$userId", "$$similarUserId"] },
-                    { $in: ["$eventType", ["bookmark", "apply"]] },
-                  ],
-                },
-              },
-            },
-            { $project: { jobId: 1, weight: 1, _id: 0 } },
-          ],
-          as: "likedJobs",
-        },
-      },
-
-      // Stage 5: flatten liked jobs
-      { $unwind: "$likedJobs" },
-
-      // Stage 6: group by jobId — aggregate interaction score across all similar users
-      {
-        $group: {
-          _id: "$likedJobs.jobId",
-          interactionScore: { $sum: "$likedJobs.weight" },
-          interactionCount: { $sum: 1 },
-        },
-      },
-
-      // Stage 7: exclude jobs the target user has already seen
-      {
-        $match: {
-          _id: { $nin: seenJobIds },
-        },
-      },
-
-      // Stage 8: sort by interaction score desc
-      { $sort: { interactionScore: -1 } },
-
-      // Stage 9: limit candidates before lookup
-      { $limit: 40 },
-
-      // Stage 10: lookup full job data
-      {
-        $lookup: {
-          from: "jobs",
-          localField: "_id",
-          foreignField: "_id",
-          as: "job",
-        },
-      },
-      { $unwind: "$job" },
-
-      // Stage 11: only visible jobs
-      { $match: { "job.visible": true } },
-
-      // Stage 12: lookup company (exclude password)
-      {
-        $lookup: {
-          from: "companies",
-          localField: "job.companyId",
-          foreignField: "_id",
-          as: "company",
-        },
-      },
-      { $unwind: { path: "$company", preserveNullAndEmpty: true } },
-
-      // Stage 13: final shape
-      {
-        $project: {
-          _id: "$job._id",
-          title: "$job.title",
-          description: "$job.description",
-          location: "$job.location",
-          category: "$job.category",
-          level: "$job.level",
-          salary: "$job.salary",
-          date: "$job.date",
-          companyId: {
-            _id: "$company._id",
-            name: "$company.name",
-            image: "$company.image",
-            email: "$company.email",
-          },
-          interactionScore: 1,
-          interactionCount: 1,
-        },
-      },
-
-      { $limit: 20 },
-    ]);
-
-    return res.json({ success: true, jobs: results });
-  } catch (error) {
-    res.json({ success: false, message: error.message });
-  }
-};
-
-// GET /api/jobs/recommend-content
-// Content-based recommendation via $vectorSearch + Aggregation Pipeline
-// Query: ?query=text OR use user.embedding; optional filters: location, level, category, exclude
-export const getRecommendContent = async (req, res) => {
-  const userId = req.auth.userId;
-  const { query, location, level, category, exclude } = req.query;
-
-  try {
-    let queryVector;
-
-    if (query) {
-      queryVector = await generateEmbedding(query);
-    } else {
-      const user = await User.findById(userId);
-      if (!user || !user.embedding || user.embedding.length === 0) {
-        return res.json({ success: false, message: "No query text and no user embedding available" });
-      }
-      queryVector = user.embedding;
-    }
-
-    const appliedJobs = await JobApplication.find({ userId }).select("jobId").lean();
-    const appliedJobIds = appliedJobs.map((a) => a.jobId);
-    if (exclude) appliedJobIds.push(exclude);
-
-    const seenEvents = await UserEvent.find({ userId }).select("jobId").lean();
+    const seenEvents = await UserEvent.find({ userId }).select("jobId").sort({ timestamp: -1 }).limit(500).lean();
     const seenJobIds = seenEvents.map((e) => e.jobId);
     const allExcluded = [...new Set([...appliedJobIds, ...seenJobIds])];
 
@@ -283,7 +172,6 @@ export const getRecommendContent = async (req, res) => {
           },
         },
       },
-      { $match: { _id: { $nin: allExcluded } } },
       { $sort: { score: -1 } },
       { $limit: 20 },
       {
@@ -311,7 +199,8 @@ export const getRecommendContent = async (req, res) => {
 
     return res.json({ success: true, jobs: results, queryVectorSize: queryVector.length });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };
 
@@ -328,7 +217,7 @@ export const getRecommendFeed = async (req, res) => {
     const appliedJobs = await JobApplication.find({ userId }).select("jobId").lean();
     const appliedJobIds = appliedJobs.map((a) => a.jobId);
 
-    const seenEvents = await UserEvent.find({ userId }).select("jobId").lean();
+    const seenEvents = await UserEvent.find({ userId }).select("jobId").sort({ timestamp: -1 }).limit(500).lean();
     const seenJobIds = seenEvents.map((e) => e.jobId);
     const allExcluded = [...new Set([...appliedJobIds, ...seenJobIds])];
 
@@ -374,10 +263,8 @@ export const getRecommendFeed = async (req, res) => {
             $addFields: {
               score: {
                 $add: [
-                  { $multiply: ["$vectorScore", 0.6] },
-                  { $multiply: ["$recencyBoost", 0.2] },
-                  { $multiply: [{ $cond: [{ $eq: ["$category", "$category"] }, 1, 0.5] }, 0.15] },
-                  { $multiply: [{ $cond: [{ $gte: ["$salary", 0] }, 1, 0] }, 0.05] },
+                  { $multiply: ["$vectorScore", 0.70] },
+                  { $multiply: ["$recencyBoost", 0.30] },
                 ],
               },
             },
@@ -393,70 +280,7 @@ export const getRecommendFeed = async (req, res) => {
           },
         ]),
 
-        // Collaborative filtering (internal pipeline, avoid route conflict)
-        (async () => {
-          const positiveEvents = await UserEvent.find({
-            userId,
-            eventType: { $in: ["bookmark", "apply"] },
-          }).select("jobId").lean();
-
-          if (positiveEvents.length === 0) return [];
-
-          const collabResults = await UserEvent.aggregate([
-            { $match: { userId, eventType: { $in: ["bookmark", "apply"] } } },
-            {
-              $lookup: {
-                from: "userevents",
-                let: { targetJobId: "$jobId" },
-                pipeline: [
-                  { $match: { $expr: { $and: [{ $eq: ["$jobId", "$$targetJobId"] }, { $ne: ["$userId", userId] }] } } },
-                  { $project: { userId: 1, _id: 0 } },
-                ],
-                as: "similarUserEvents",
-              },
-            },
-            { $unwind: "$similarUserEvents" },
-            { $group: { _id: "$similarUserEvents.userId" } },
-            {
-              $lookup: {
-                from: "userevents",
-                let: { similarUserId: "$_id" },
-                pipeline: [
-                  { $match: { $expr: { $and: [{ $eq: ["$userId", "$$similarUserId"] }, { $in: ["$eventType", ["bookmark", "apply"]] }] } } },
-                  { $project: { jobId: 1, weight: 1, _id: 0 } },
-                ],
-                as: "likedJobs",
-              },
-            },
-            { $unwind: "$likedJobs" },
-            { $group: { _id: "$likedJobs.jobId", interactionScore: { $sum: "$likedJobs.weight" }, interactionCount: { $sum: 1 } } },
-            { $match: { _id: { $nin: allExcluded } } },
-            { $sort: { interactionScore: -1 } },
-            { $limit: 20 },
-            {
-              $lookup: { from: "jobs", localField: "_id", foreignField: "_id", as: "job" },
-            },
-            { $unwind: "$job" },
-            { $match: { "job.visible": true } },
-            {
-              $lookup: { from: "companies", localField: "job.companyId", foreignField: "_id", as: "company" },
-            },
-            { $unwind: { path: "$company", preserveNullAndEmpty: true } },
-            {
-              $project: {
-                _id: "$job._id", title: "$job.title", description: "$job.description",
-                location: "$job.location", category: "$job.category", level: "$job.level",
-                salary: "$job.salary", date: "$job.date",
-                companyId: { _id: "$company._id", name: "$company.name", email: "$company.email", image: "$company.image" },
-                score: { $divide: ["$interactionScore", 8] },
-                interactionScore: 1, interactionCount: 1,
-                source: { $literal: "collaborative" },
-              },
-            },
-          ]);
-
-          return collabResults;
-        })(),
+        getCollaborativeResults(userId, allExcluded, 20),
       ]);
 
       // Merge: 70% content (14 items) + 30% collaborative (6 items)
@@ -491,9 +315,9 @@ export const getRecommendFeed = async (req, res) => {
       return res.json({ success: true, jobs: prefJobs, mode: "preferences", category: user.preferences });
     }
 
-    // ── FALLBACK: popular jobs (most applications in last 30 days) ─
+    // FALLBACK: popular jobs (most applications, no date restriction)
     const popularJobs = await Job.aggregate([
-      { $match: { visible: true, date: { $gte: now - thirtyDaysMs }, _id: { $nin: allExcluded } } },
+      { $match: { visible: true, _id: { $nin: allExcluded } } },
       {
         $lookup: {
           from: "jobapplications",
@@ -520,6 +344,7 @@ export const getRecommendFeed = async (req, res) => {
 
     return res.json({ success: true, jobs: popularJobs, mode: "popular" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
   }
 };

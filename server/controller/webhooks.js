@@ -6,11 +6,13 @@ export const clerkWebhooks = async (req, res) => {
     const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
     const reqBody = req.body;
     if (!reqBody) {
-      return res.status(400).json({ error: "Missing request body" });
+      console.error("Webhook: Missing request body");
+      return res.status(200).json({ success: false, message: "Missing request body" });
     }
     const { data, type } = reqBody;
     if (!data || !type) {
-      return res.status(400).json({ error: "Invalid request body" });
+      console.error("Webhook: Invalid request body");
+      return res.status(200).json({ success: false, message: "Invalid request body" });
     }
     await webhook.verify(JSON.stringify(reqBody), {
       "svix-id": req.headers["svix-id"],
@@ -47,11 +49,11 @@ export const clerkWebhooks = async (req, res) => {
         break;
       }
       default:
-        res.status(400).json({ error: "Unhandled event type" });
+        res.status(200).json({ success: false, message: "Unhandled event type" });
         break;
     }
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ success: false, message: "Webhooks Error" });
+    console.error("Webhook error:", error.message);
+    res.status(200).json({ success: false, message: "Webhooks Error" });
   }
 };

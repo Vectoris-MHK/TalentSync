@@ -8,7 +8,7 @@ import {
   loginCompany,
   postJob,
   registerCompany,
-} from "../controller/comapanyController.js";
+} from "../controller/companyController.js";
 import upload from "../config/multer.js";
 import { protectCompany } from "../middleware/authMiddleware.js";
 

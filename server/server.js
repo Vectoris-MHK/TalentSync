@@ -1,7 +1,6 @@
 import './config/instrument.js'
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import 'dotenv/config'
 import connectDB from "./config/db.js";
 import * as Sentry from "@sentry/node";
@@ -26,15 +25,17 @@ app.use(clerkMiddleware());
 // Routes
 app.get("/", (req, res) => res.send("API Working"));
 
-Sentry.setupExpressErrorHandler(app);
-
-app.get("/debug-sentry", function mainHandler(req, res) {
+if (process.env.NODE_ENV !== 'production') {
+  app.get("/debug-sentry", function mainHandler(req, res) {
     throw new Error("My first Sentry error!");
   });
+}
 app.post('/webhooks',clerkWebhooks)
 app.use('/api/company',companyRoutes)
 app.use('/api/jobs', JobRoutes)
 app.use('/api/users', userRoutes)
+
+Sentry.setupExpressErrorHandler(app);
 
 // Start the server
 const port = process.env.PORT || 3000;

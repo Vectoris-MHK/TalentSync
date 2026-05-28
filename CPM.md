@@ -37,7 +37,7 @@ A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33)
 | G | Seed jobs + crawl TopCV + merge | 1.00 | A | 3.2 | ✅ Done |
 | H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ✅ Done |
 | I | User profile embedding + preferences API | 0.67 | H | 5.2 | ✅ Done |
-| J | Collaborative filtering API | 0.67 | H | 5.3 | ⬜ Pending |
+| J | Collaborative filtering API | 0.67 | H | 5.3 | ✅ Done  |
 | K | Hybrid feed API `GET /api/jobs/recommend-feed` | 0.33 | F, I, J | 5.4 | ⬜ Pending |
 | L | Frontend (RecommendedJobs + Onboarding + event tracking) | 1.50 | K | 6.1 | ⬜ Pending |
 | M | E2E test + technical doc + demo video | 5.00 | L | 6.2-6.3 | ⬜ Pending |

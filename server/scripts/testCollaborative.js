@@ -7,8 +7,9 @@ import mongoose from "mongoose";
 import UserEvent from "../models/UserEvent.js";
 import Job from "../models/Job.js";
 
-const MONGODB_URI =
-  "mongodb://talentsync_db_user:nNjJVX9OniDO0nUK@ac-p4yywo1-shard-00-01.39cwlbk.mongodb.net:27017/?authSource=admin&directConnection=true&ssl=true";
+import { uriFromSrv } from "./resolveSrv.js";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 async function runCollaborative(userId) {
   const seenEvents = await UserEvent.find({ userId }).select("jobId").lean();
@@ -81,7 +82,7 @@ async function runCollaborative(userId) {
 }
 
 async function run() {
-  await mongoose.connect(MONGODB_URI, { dbName: "job-portal", serverSelectionTimeoutMS: 15000 });
+  await mongoose.connect(await uriFromSrv(MONGODB_URI), { dbName: "job-portal", serverSelectionTimeoutMS: 15000 });
   console.log("Connected to MongoDB\n");
 
   // ── Test 1: IT user (user_seed_1) should get non-IT or cross-user IT recs ──

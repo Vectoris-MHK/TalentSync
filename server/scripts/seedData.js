@@ -11,7 +11,9 @@ import { dirname, resolve } from "path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const crawlData = JSON.parse(readFileSync(resolve(__dirname, "../../data_sample.json"), "utf-8"));
 
-const MONGODB_URI = "mongodb://talentsync_db_user:nNjJVX9OniDO0nUK@ac-p4yywo1-shard-00-01.39cwlbk.mongodb.net:27017/?authSource=admin&directConnection=true&ssl=true";
+import { uriFromSrv } from "./resolveSrv.js";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const baseCompanies = [
   { name: "FPT Software", email: "hr@fpt.com.vn", image: "https://res.cloudinary.com/dnzqfiqtz/image/upload/v1748328800/companies/fpt_software.png" },
@@ -109,7 +111,7 @@ const usersData = Array.from({ length: 10 }, (_, i) => ({
 }));
 
 async function seed() {
-  await mongoose.connect(MONGODB_URI, { dbName: "job-portal", serverSelectionTimeoutMS: 15000, connectTimeoutMS: 15000 });
+  await mongoose.connect(await uriFromSrv(MONGODB_URI), { dbName: "job-portal", serverSelectionTimeoutMS: 15000, connectTimeoutMS: 15000 });
   console.log("Connected to MongoDB");
 
   await Job.deleteMany({});

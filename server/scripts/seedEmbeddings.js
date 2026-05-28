@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import Job from "../models/Job.js";
 import { generateJobEmbedding } from "../services/embeddingService.js";
 
-const MONGODB_URI = "mongodb://talentsync_db_user:nNjJVX9OniDO0nUK@ac-p4yywo1-shard-00-01.39cwlbk.mongodb.net:27017/?authSource=admin&directConnection=true&ssl=true";
+import { uriFromSrv } from "./resolveSrv.js";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 const BATCH_SIZE = 25;
 const MAX_RETRIES = 3;
 const DELAY_BETWEEN_BATCHES = 2000;
@@ -27,7 +29,7 @@ async function embedWithRetry(job, retries = MAX_RETRIES) {
 }
 
 async function seedEmbeddings() {
-  await mongoose.connect(MONGODB_URI, {
+  await mongoose.connect(await uriFromSrv(MONGODB_URI), {
     dbName: "job-portal",
     serverSelectionTimeoutMS: 15000,
     connectTimeoutMS: 15000,

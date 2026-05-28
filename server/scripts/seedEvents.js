@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import Job from "../models/Job.js";
 import UserEvent from "../models/UserEvent.js";
 
-const MONGODB_URI = "mongodb://talentsync_db_user:nNjJVX9OniDO0nUK@ac-p4yywo1-shard-00-01.39cwlbk.mongodb.net:27017/?authSource=admin&directConnection=true&ssl=true";
+import { uriFromSrv } from "./resolveSrv.js";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 const USER_PROFILES = {
   IT: { ids: ["user_seed_1", "user_seed_2", "user_seed_3", "user_seed_4", "user_seed_5"], categories: ["Lập trình"], count: 5 },
@@ -21,7 +23,7 @@ function randomBetween(min, max) {
 }
 
 async function seed() {
-  await mongoose.connect(MONGODB_URI, { dbName: "job-portal", serverSelectionTimeoutMS: 15000, connectTimeoutMS: 15000 });
+  await mongoose.connect(await uriFromSrv(MONGODB_URI), { dbName: "job-portal", serverSelectionTimeoutMS: 15000, connectTimeoutMS: 15000 });
   console.log("Connected to MongoDB");
 
   await UserEvent.deleteMany({ userId: /^user_seed_/ });

@@ -9,6 +9,10 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
+> **Atlas Restart Notice (2026-05-28):** New Atlas account (fresh, $50 credit, M10). Old cluster `talentsyncdb.39cwlbk.mongodb.net` is abandoned. Restart completed — all code + data migrated to new cluster `talentsyncdb.yyz4uc.mongodb.net`.
+
+---
+
 ## 1. Phân tích Requirement (Status: DONE, Start: 2026-05-24)
 
 - Platform tìm việc (Status: Done, Assignee: Quốc Hào)
@@ -16,239 +20,147 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   - Link: [https://github.com/mzherx/Job-Portal-Prodigy](https://github.com/mzherx/Job-Portal-Prodigy)
 - Tích hợp deepwiki vào NotebookLM (Status: Done)
 
-## 2. Hạ tầng tính toán (Status: DONE, Start: 2026-05-24)
+## 2. Hạ tầng tính toán (Status: DONE, Completed: 2026-05-28 18:30)
 
-- Mongo Atlas Infra (Status: Done)
-  - Đăng ký account MongoDB (Status: Done, Assignee: Quốc Hào)
-  - Mail ban tổ chức xin credit (Status: Done, Assignee: Quốc Hào)
-  - Xác minh Atlas M0 hỗ trợ Vector Search; nếu không → M10 trial (Status: Done, Assignee: Quốc Hào)
-- Lựa chọn Model Embedding (Status: Done, Assignee: Khiem, Start: 2026-05-26)
+> **`~MOD`** Old Atlas account abandoned. New account: fresh registration, $50 credit. Atlas infrastructure rebuilt from scratch.
+
+- **`~MOD`** Mongo Atlas Infra (NEW ACCOUNT) (Status: Done, Assignee: Khiem, Completed: 2026-05-28 18:30)
+  - [x] Account created — $50 credit
+  - [x] M10 dedicated cluster created (guarantees Vector Search support)
+  - [x] Database user `talentsync_admin` created
+  - [x] Network access: `0.0.0.0/0` added
+  - [x] Connection string obtained: `talentsyncdb.yyz4uc.mongodb.net`
+- **`~MOD`** Update connection URIs (Status: Done, Assignee: Khiem)
+  - [x] Updated `server/.env` with new `MONGODB_URI`
+  - [x] **`+ADD`** Refactored 5 scripts to use `process.env.MONGODB_URI` + shared `uriFromSrv()` helper:
+    - `server/scripts/seedData.js`
+    - `server/scripts/seedEmbeddings.js`
+    - `server/scripts/seedEvents.js`
+    - `server/scripts/testCollaborative.js`
+    - `server/scripts/testUserProfile.js`
+  - [x] **`+ADD`** SRV DNS Resolution Fix: Node.js DNS (c-ares) on Windows failed `querySrv ECONNREFUSED` for new hostname. Fixed by:
+    - Added `dnsSync.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"])` to `resolveSrv.js` and `config/db.js` — forces Google/Cloudflare DNS
+    - Fixed `appName` parameter parsing bug: `URLSearchParams` now correctly parses query string when converting SRV → direct URI
+  - [x] Server `config/db.js` now auto-resolves SRV → direct connection via shared helper logic
+- Lựa chọn Model Embedding (Status: Done, Assignee: Khiem)
   - OpenAI `text-embedding-3-large` 3072d, cosine similarity, best Vietnamese support
 
 ---
 
 > **Epic 3-6 scope boundaries:**
 >
-> - **Epic 3 (Schema & Seed Data):** Định nghĩa cấu trúc dữ liệu (Mongoose schema fields) + crawl + tạo raw data mẫu. Không chứa code logic, service, hay API.
-> - **Epic 4 (Semantic Search Engine - P0):** Embedding service, Atlas Vector Search index, content-based recommendation API với `$vectorSearch` + Aggregation Pipeline. Core must-have để nộp bài.
-> - **Epic 5 (Behavior-Based Recommendation - P1):** User behavior tracking, user profile embedding generation, collaborative filtering, hybrid feed blending. Nâng cao chất lượng recommendation.
+> - **Epic 3 (Schema & Seed Data):** Schema code written. All seed data migrated to new cluster.
+> - **Epic 4 (Semantic Search Engine - P0):** Embedding service DONE. Vector Search index + recommend-content API remaining.
+> - **Epic 5 (Behavior-Based Recommendation - P1):** Behavior tracking, user profile, collaborative filtering all DONE. Hybrid feed API remaining.
 > - **Epic 6 (Frontend & Finalization):** Frontend components, onboarding flow, event tracking UI, testing, tài liệu, video demo, nộp bài.
 
 ---
 
-## 3. Schema & Seed Data (Status: DONE, Start: 2026-05-26)
+## 3. Schema & Seed Data (Status: DONE, Completed: 2026-05-28 18:35)
 
-### 3.1 Thiết kế Schema (Status: DONE, Start: 2026-05-26)
+### 3.1 Thiết kế Schema (Status: DONE)
 
-- Khảo sát schema hiện có (Status: Done, Assignee: Khiem)
-  - 4 collections: `users`, `companies`, `jobs`, `jobapplications` - tất cả đã có schema
-- Mở rộng `Job` schema (Status: Done, Assignee: Khiem)
+- Khảo sát schema hiện có (Status: Done)
+  - 5 collections: `users`, `companies`, `jobs`, `jobapplications`, `userevents`
+- Mở rộng `Job` schema (Status: Done)
   - `embedding: { type: [Number], default: [] }` - 3072d vector
-- Mở rộng `User` schema (Status: Done, Assignee: Khiem)
-  - `preferences: { type: [String], default: [] }` - danh sách category user chọn khi onboard
-  - `embedding: { type: [Number], default: [] }` - user profile vector (weighted avg of interacted jobs)
-  - Lưu ý: `_id` giữ nguyên type `String` (Clerk ID)
-- Tạo model `UserEvent` (MỚI) (Status: Done, Assignee: Khiem)
-  - `userId: String`, `jobId: ObjectId`, `eventType: enum("search","view","bookmark","apply")`, `weight: Number`, `timestamp: Number`
-  - Weights: search=4, view=1, bookmark=3, apply=5
-  - **`~MOD`** Added `search` event type — captures explicit user intent from search bar, critical for cold start & interest profiling
-  - Index: `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
+- Mở rộng `User` schema (Status: Done)
+  - `preferences: { type: [String], default: [] }`
+  - `embedding: { type: [Number], default: [] }`
+- Tạo model `UserEvent` (MỚI) (Status: Done)
+  - `userId: String`, `jobId: ObjectId`, `eventType: enum`, `weight: Number`, `timestamp: Number`
 
-### 3.2 Seed Data (Status: DONE, Start: 2026-05-26)
+### 3.2 Seed Data (Status: DONE, Completed: 2026-05-28 18:35)
 
-- Crawl data mẫu từ TopCV (Status: Done, Assignee: Khiem)
-  - ~MOD: Crawled 8 jobs from TopCV (AI Engineer, CNC Tech, IT PM, System Admin, IT Senior Manager, Sale Admin, Tester, Fullstack), stored in data_sample.json
-  - Merged with 28 hardcoded jobs → total 36 jobs across 5 categories (23 IT, 5 Design, 5 Marketing, 3 Finance, 2 Management)
-  - Auto-created 8 companies from crawl data + 3 base companies = 11 total
-- Tạo `server/scripts/seedData.js` (Status: Done, Assignee: Khiem, depends on: Crawl)
-  - Load crawled data → map vào schema → insert vào MongoDB
-  - Tạo companies từ crawl data (gộp theo company name)
-  - Tạo 10 users với Clerk-mocked IDs
-  - Chạy: `node server/scripts/seedData.js`
-- Tạo `server/scripts/seedEvents.js` (Status: Done, Assignee: Khiem)
-  - 188 events cho 10 users
-  - 5 IT-focused users, 3 Design-focused, 2 mixed-interest
-  - Event types: view, bookmark, apply với weights tương ứng
+- Crawl data mẫu từ TopCV (Status: Done)
+- [x] Re-run `seedData.js` on new cluster → 11 companies, 36 jobs, 10 users
+- [x] Re-run `seedEmbeddings.js` → 36/36 jobs embedded (OpenAI text-embedding-3-large, 3072d)
+- [x] Re-run `seedEvents.js` → 215 events for 10 users (5 IT-focused, 3 Design-focused, 2 mixed-interest)
 
-### 3.3 Gap Resolution — Docs Sync (Status: Done, Assignee: Khiem, 2026-05-26)
+### 3.3 Gap Resolution — Docs Sync (Status: DONE)
 
-- **`+ADD`** `OPENAI_API_KEY` key added to `server/.env`
-- **`+ADD`** Prerequisites step (1.0) added to `plan.md`: install `openai` npm package + setup API key
-- **`+ADD`** "OpenAI API Fallback Strategy" section added to `decisions.md` (error handling, retry logic, budget safety)
-- **`+ADD`** `$vectorSearch` pipeline ordering constraint note added to `architecture.md` (must be first stage)
-- **`+ADD`** Directory structure created: `server/services/`, `server/scripts/`
-- **`~MOD`** `codebase.md` directory map updated — added `UserEvent.js` entry
+- `OPENAI_API_KEY` in `.env`
+- Prerequisites in `plan.md`
+- OpenAI fallback strategy in `decisions.md`
+- `$vectorSearch` constraint in `architecture.md`
+- Directory structure: `server/services/`, `server/scripts/`
 
 ---
 
-## 4. Semantic Search Engine (P0 Core) (Status: IN-PROGRESS, Start: 2026-05-26)
+## 4. Semantic Search Engine (P0 Core) (Status: IN-PROGRESS, Start: 2026-05-28)
 
-### 4.1 Embedding Pipeline (P0)
+### 4.1 Embedding Pipeline (P0) — Status: DONE
 
-- Tạo `server/services/embeddingService.js` (Status: Done, Assignee: Khiem)
-  - `generateEmbedding(text)` → gọi OpenAI `text-embedding-3-large` → Float32Array (3072d)
-  - `generateJobEmbedding(job)` → strip HTML từ description, combine `title + category + level + cleanDescription`, embed
-- Tạo `server/scripts/seedEmbeddings.js` (Status: Done, Assignee: Khiem)
-  - Fetch tất cả jobs chưa có embedding
-  - Batch 50 jobs/lần, rate-limit safe
-  - Update mỗi document với `$set: { embedding }`
-- Sửa `postJob()` + `updateJob()` controller (Status: Done, Assignee: Khiem)
-  - `postJob()`: sau khi save job → generate embedding → `job.embedding = vec` → `await job.save()`
-  - `updateJob()`: regenerate embedding nếu title/description/category/level thay đổi
+- `server/services/embeddingService.js` ✅
+- `server/scripts/seedEmbeddings.js` ✅ — 36/36 jobs embedded, 0 failures
+- Auto-embed on `postJob()` + `updateJob()` ✅
 
-### 4.2 Vector Search Index (P0)
+### 4.2 Vector Search Index (P0) — Status: IN-PROGRESS
 
-- Tạo Atlas Search Index `idx_jobs_vector` (Status: To-Do, Assignee: Khiem)
-  - Atlas UI → Search → Create Index → JSON Editor → collection `jobs`
+- [ ] Tạo Atlas Search Index `idx_jobs_vector` on new cluster (Atlas UI ClickOps)
+  - Database: `job-portal`, Collection: `jobs`
   - mappings: `embedding` → type `knnVector`, dimensions `3072`, similarity `cosine`
   - Dynamic: false
-- Verify với `server/scripts/testVectorSearch.js` (Status: To-Do, Assignee: Khiem)
-  - Embed test query "Lập trình viên React 3 năm kinh nghiệm" → `$vectorSearch` → verify có kết quả
+- [ ] Create `server/scripts/testVectorSearch.js` — embed test query → `$vectorSearch` → verify
 
-### 4.3 Content-Based Recommendation API (P0)
+### 4.3 Content-Based Recommendation API (P0) — Status: NOT STARTED
 
-- `GET /api/jobs/recommend-content` (Status: To-Do, Assignee: Khiem)
-  - Query params: `?query=text` hoặc dùng `user.embedding` làm query vector
-  - Flow:
-    1. `$vectorSearch`: index=`idx_jobs_vector`, path=`embedding`, queryVector, numCandidates=`200`, limit=`100`
-    2. `$match`: visible=true, optional filters (location, level, category)
-    3. `$lookup`: Company (name, image, email) - exclude password
-    4. `$addFields`: score = vectorScore*0.6 + recencyBoost*0.2 + skillMatch*0.15 + salaryMatch*0.05
-    5. `$match`: `_id` NOT IN user's applied job IDs
-    6. `$sort`: score desc
-    7. `$limit`: 20
-    8. `$project`: clean response shape
-- Recency formula: `exp(-(now - date) / (30 * 86400000))` - 1.0 today, ~0.37 at 30 days
+- [ ] `GET /api/jobs/recommend-content` (8-stage $vectorSearch + Aggregation Pipeline)
+  - Route: `routes/jobRoutes.js` → handler: `controller/jobController.js`
+  - numCandidates=200, limit=100 → score + filter → limit=20
 
-### 4.4 Verify P0 Readiness
+### 4.4 Verify P0 Readiness — Status: NOT STARTED
 
-- End-to-end test: seed data → embed → vector search → `recommend-content` returns ranked results (Status: To-Do, Assignee: Khiem)
-- Verify Atlas profiler shows aggregation pipeline stages executing (Status: To-Do, Assignee: Khiem)
+- [ ] E2E test: seed → embed → vector search → recommend-content
+- [ ] Atlas profiler verification
 
 ---
 
-## 5. Behavior-Based Recommendation (P1 Enhance) (Status: IN-PROGRESS, Start: 2026-05-27)
+## 5. Behavior-Based Recommendation (P1 Enhance) (Status: CODE DONE, except hybrid feed)
 
-### 5.1 User Behavior Tracking
+### 5.1 User Behavior Tracking — Status: DONE
 
-- Tạo `POST /api/users/events` (Status: Done, Assignee: Khiem)
-  - Body: `{ jobId, eventType }` - eventType ∈ {"view", "bookmark", "apply"}
-  - Deduplicate: không log view trùng cho cùng jobId/userId trong 30 phút
-  - Auto weight: view=1, bookmark=3, apply=5
-  - Modify `applyForJob()` controller → tự động tạo event type "apply"
-- Gắn event tracking vào frontend (Status: To-Do, Assignee: Khiem, Start: 2026-05-28)
-  - `ApplyJob.jsx`: fire view event on mount (`useEffect`)
-  - `JobListing.jsx`: fire view events khi job card vào viewport (IntersectionObserver)
+- `POST /api/users/events` ✅ — deduplicate views within 30 min
+- `applyForJob()` auto-creates apply event ✅
+- Frontend event tracking (Epic 6): ApplyJob view on mount + JobListing IntersectionObserver
 
-### 5.2 User Profile Embedding
+### 5.2 User Profile Embedding — Status: DONE
 
-- Tạo `GET /api/users/profile` (Status: Done, Assignee: Minh)
-  - Compute user embedding từ weighted average of interacted job embeddings:
-    1. `$match` UserEvent where `userId = req.auth.userId`
-    2. `$group` by jobId, sum weights
-    3. `$sort` by sum weight desc → `$limit` 50
-    4. `$lookup` jobs để lấy embeddings
-    5. Weighted average tất cả job embeddings → normalize to unit vector
-    6. Save vào `user.embedding`
-  - Nếu user chưa có events → return preferences (cold start)
-- `POST /api/users/preferences` (Status: Done, Assignee: Khiem)
-  - Body: `{ preferences: ["Lập trình", "Thiết kế"] }`
-  - Save vào `user.preferences` → dùng cho cold start recommendation
+- `GET /api/users/profile` ✅ — weighted average + unit vector normalization
+- `POST /api/users/preferences` ✅
 
-### 5.3 Collaborative Filtering API
+### 5.3 Collaborative Filtering API — Status: DONE
 
-- `GET /api/jobs/collaborative` (Status: Done, Assignee: Minh)
-  - "Users who liked what you liked also liked..." pipeline:
-    1. `$match` UserEvent: target user's positive events (bookmark + apply)
-    2. `$lookup` UserEvent: find other users who interacted with same jobs
-    3. `$group` by userId → "similar users"
-    4. `$lookup` UserEvent again: get jobs liked by similar users
-    5. `$group` by jobId, count interactions, sum weights
-    6. `$lookup` jobs: get full job data
-    7. `$match`: exclude already seen/applied jobs
-    8. `$sort` by interaction score desc
-    9. `$limit`: 20
+- `GET /api/jobs/collaborative` ✅ — 13-stage pipeline, excludes seen jobs, limits 20
 
-### 5.4 Hybrid Recommendation Feed
+### 5.4 Hybrid Recommendation Feed — Status: NOT STARTED
 
-- `GET /api/jobs/recommend-feed` (Status: To-Do, Assignee: Khiem)
-  - Logic:
-    - Nếu `user.embedding` tồn tại:
-      - 70% content-based: `$vectorSearch` với user.embedding
-      - 30% collaborative: lấy từ collaborative pipeline
-      - Merge → deduplicate → sort by score → limit 20
-    - Nếu cold start (chưa có embedding):
-      - Có `user.preferences` → `$match` category IN preferences → `$sort` by date desc
-      - Không có → popular jobs (most applications in last 30 days)
+- [ ] `GET /api/jobs/recommend-feed`
+  - Hot user: 70% vectorSearch + 30% collaborative → deduplicate → 20
+  - Cold start: preferences → category match + recency, or popular jobs
 
 ---
 
-## 6. Frontend & Finalization (Status: TO-DO, Start: 2026-05-28)
+## 6. Frontend & Finalization (Status: TO-DO, Start: 2026-05-29)
 
-### 6.1 Frontend Integration (Start: 2026-05-28)
+### 6.1 Frontend Integration
 
-- Tạo component `RecommendedJobs.jsx` (Status: To-Do, Assignee: Khiem)
-  - Gọi `GET /api/jobs/recommend-feed` (cần Clerk token trong Authorization header)
-  - Section header: "Việc làm gợi ý cho bạn"
-  - Render JobCard components dạng horizontal scrollable
-  - Loading skeleton state
-  - Empty state: "Hoàn thiện hồ sơ để nhận gợi ý việc làm phù hợp"
-- Cập nhật `Home.jsx` (Status: To-Do, Assignee: Khiem)
-  - Chèn `<RecommendedJobs />` giữa Hero và JobListing sections
-  - Chỉ hiển thị khi user đã đăng nhập (Clerk authenticated)
-  - Không hiển thị cho recruiter/company users
-- Thay thế `findSimilarJobs` trong `ApplyJob.jsx` (Status: To-Do, Assignee: Khiem)
-  - Xóa client-side filter hiện tại
-  - Gọi `GET /api/jobs/recommend-content?query=[job.title]&exclude=[currentJobId]`
-  - Fallback về `findSimilarJobs` cũ nếu API fail
-- Tạo `OnboardingModal.jsx` (Status: To-Do, Assignee: Khiem)
-  - Hiển thị khi user đăng nhập lần đầu (`user.preferences` rỗng)
-  - Category multi-select: Lập trình, Thiết kế, Marketing, Tài chính, Quản lý, Kinh doanh
-  - Nút "Bỏ qua" → fallback về popular jobs
-  - Submit: `POST /api/users/preferences { preferences: [...] }`
-- Explanation badge trên JobCard (Status: To-Do, Assignee: Khiem)
-  - Trong RecommendedJobs feed, mỗi card hiển thị badge nhỏ:
-    - "Phù hợp với kỹ năng của bạn"
-    - "Tương tự việc làm bạn đã xem"
-    - "Phổ biến trong lĩnh vực của bạn"
-    - "Dựa trên sở thích của bạn"
+- [ ] Create `RecommendedJobs.jsx` — horizontal scroll, loading skeleton, empty state
+- [ ] Update `Home.jsx` — insert between Hero + JobListing, auth-gated
+- [ ] Replace `findSimilarJobs` in `ApplyJob.jsx` — call recommend-content API, fallback to old
+- [ ] Create `OnboardingModal.jsx` — first-login category multi-select
+- [ ] Explanation badges on JobCard
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 
-- End-to-end test scenarios (Status: To-Do, Assignee: Khiem)
-  - Flow 1: New user → onboarding → popular jobs → interaction → recommendations improve
-  - Flow 2: Returning user có profile embedding → content-based recommendations khác biệt
-  - Flow 3: User A (IT) vs User B (Design) → recommendations khác nhau rõ rệt
-  - Verify: Atlas profiler shows aggregation pipeline stages running
-  - Verify: Vector search index healthy & responding
+- [ ] Flow 1: New user → onboarding → popular jobs → interaction → personalized
+- [ ] Flow 2: Returning user → profile embedding → vector + collaborative
+- [ ] Flow 3: User A (IT) vs User B (Design) → different recommendations
+- [ ] Atlas profiler + vector index health check
 
 ### 6.3 Tài liệu & Nộp bài (Start: 2026-05-30)
 
-- Soạn Tài liệu Kỹ thuật (Status: To-Do, Assignee: Khiem, Start: 2026-05-30)
-  - File: `docs/submission/technical-document.md`
-  - MVP Description: Hệ thống gợi ý việc làm dùng Vector Search + Aggregation Pipeline
-  - System Architecture: Mermaid diagram + component description
-  - Data Schema: 5 collections với fields, types, indexes
-  - Embedding Pipeline: model (text-embedding-3-large), dimensions (3072), generation flow
-  - Vector Search Configuration: index definition, $vectorSearch params, numCandidates
-  - Aggregation Pipeline: all stages explained (8 stages với scoring logic)
-  - Recommendation Flow: content-based + collaborative + hybrid blending strategy
-  - Cold Start Strategy: onboarding wizard → preferences → popular fallback
-  - Sample Data overview
-- Quay Video Demo (Status: To-Do, Assignee: Quốc Hào, Start: 2026-05-30)
-  - 00:00-02:00: Problem introduction - job matching is broken, TalentSync giải quyết
-  - 02:00-04:30: Demo - user onboarding → personalized job feed
-  - 04:30-06:00: Demo - user applies → recommendations update real-time
-  - 06:00-07:30: Architecture - Atlas UI → Vector Search index → Aggregation Pipeline
-  - 07:30-09:00: Results - MongoDB integration details, scoring explanation
-  - 09:00-10:00: Conclusion - 1 DB for operational + vector, next steps
-- Nộp bài (Status: To-Do, Deadline: 2026-05-31 18:00 VNT)
-  - Upload video lên YouTube (unlisted) hoặc Google Drive
-  - Điền form nộp bài với team info + các link
-  - Checklist trước nộp:
-    - [ ] MongoDB là database chính
-    - [ ] Vector Search (`$vectorSearch`) được sử dụng rõ ràng
-    - [ ] Aggregation Pipeline được sử dụng rõ ràng
-    - [ ] Video demo dưới 10 phút
-    - [ ] Tài liệu kiến trúc + data schema hoàn chỉnh
-    - [ ] Mô tả rõ cách áp dụng Vector Search & Aggregation Pipeline
+- [ ] Technical document (`docs/submission/technical-document.md`)
+- [ ] Demo video (10 min, Quốc Hào)
+- [ ] Submit before 2026-05-31 18:00 VNT
+  - Checklist: MongoDB primary DB, $vectorSearch, Aggregation Pipeline, Demo <10min, Architecture docs

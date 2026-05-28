@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { uriFromSrv } from "../scripts/resolveSrv.js";
 
 const connectDB = async () => {
     if (!process.env.MONGODB_URI) {
@@ -7,7 +8,9 @@ const connectDB = async () => {
 
     mongoose.connection.on("connected", () => console.log("Database Connected"));
 
-    await mongoose.connect(process.env.MONGODB_URI, {
+    const uri = await uriFromSrv(process.env.MONGODB_URI);
+
+    await mongoose.connect(uri, {
         dbName: "job-portal",
         serverSelectionTimeoutMS: 5000,
         connectTimeoutMS: 5000,

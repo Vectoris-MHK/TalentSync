@@ -1,181 +1,172 @@
 # Critical Path Method — TalentSync MongoHack 2026
 
-> Generated: 2026-05-27 10:57 ICT
-> Updated: 2026-05-27 16:52 ICT
-> Deadline: 2026-05-31 18:00 ICT (~97h còn lại)
-> Elapsed: 17h (thực hiện: A B C G D I + H seedEvents) / ~7h làm việc thực tế
-> Working hours: ~5h/ngày ≈ 20h thực tế
+> Generated: 2026-05-28 16:30 ICT
+> Updated: 2026-05-28 18:38 ICT **(Phase 1+2 DONE — E is active blocker)**
+> Deadline: 2026-05-31 18:00 ICT (~71.4h còn lại)
+> Elapsed this session: ~2h (R1→R4 + SRV DNS fix)
+> Working hours: ~5h/ngày ≈ 15h thực tế còn lại
+
+---
+
+## 0. Context Change: Atlas Restart (COMPLETED)
+
+**New cluster:** M10, $50 credit, operational
+**Data:** 11 companies, 36 jobs (3072d embedded), 10 users, 215 events — all seeded
+
+**SRV DNS Fix (resolved):** Node.js DNS (c-ares) on Windows failed `querySrv ECONNREFUSED` for all non-39cwlbk hostnames. Fixed by forcing Google/Cloudflare DNS servers in `resolveSrv.js` and `config/db.js`. Also fixed `appName` query param handling in URI builder.
 
 ---
 
 ## 1. Task Network
 
 ```
-H(0.5) ──┬── I(0.67) ──┐
-         │              │
-         └── J(0.67) ───┤
-                        │
-A(0.1) ──┬── B(0.5) ──┬── C(0.17)          ├── K(0.33) ── L(1.5) ── M(5.0)
-         │             │                    │
-         │             ├── D(0.33) ── E(0.25) ── F(1.0)
-         │             │
-         └── G(0.67)
+✅ R1→R2→R3→R4.1→R4.2→R4.3 (ALL DONE — 2.0h actual)
+                              │
+                              ▼
+        E(0.33) ──→ T(0.17) ──→ F(1.0) ──→ K(0.5) ──→ L(2.0) ──→ M(5.0)
+              (F can be coded in parallel — only needs E for runtime)
 ```
 
 ---
 
 ## 2. Task List with Dependencies & Duration
 
-| ID | Task | Duration (h) | Dependencies | Epic | Status |
-|----|------|-------------|--------------|------|--------|
-| A | Install `openai` + set `OPENAI_API_KEY` | 0.10 | — | 4.1 | ✅ Done |
-| B | `server/services/embeddingService.js` | 0.50 | A | 4.1 | ✅ Done |
-| C | Sửa `postJob()` controller auto-embed | 0.17 | B | 4.1 | ✅ Done |
-| D | `server/scripts/seedEmbeddings.js` | 0.33 | B | 4.1 | ✅ Done |
-| E | Tạo Atlas Vector Search Index `idx_jobs_vector` | 0.25 | D | 4.2 | ⬜ Pending |
-| F | `GET /api/jobs/recommend-content` (8-stage pipeline) | 1.00 | B, E | 4.3 | ⬜ Pending |
-| G | Seed jobs + crawl TopCV + merge | 1.00 | A | 3.2 | ✅ Done |
-| H | User behavior tracking (POST /events + sửa apply) | 0.50 | — (UserEvent done) | 5.1 | ✅ Done |
-| I | User profile embedding + preferences API | 0.67 | H | 5.2 | ✅ Done |
-| J | Collaborative filtering API | 0.67 | H | 5.3 | ✅ Done  |
-| K | Hybrid feed API `GET /api/jobs/recommend-feed` | 0.33 | F, I, J | 5.4 | ⬜ Pending |
-| L | Frontend (RecommendedJobs + Onboarding + event tracking) | 1.50 | K | 6.1 | ⬜ Pending |
-| M | E2E test + technical doc + demo video | 5.00 | L | 6.2-6.3 | ⬜ Pending |
-
-**Total work:** 12.48h (có thể parallel, thực tế ~8h critical path còn lại)
+| ID          | Task                                                             | Duration (h) | Dependencies          | Epic    | Status          |
+| ----------- | ---------------------------------------------------------------- | ------------ | --------------------- | ------- | --------------- |
+| R1          | Create M10 cluster + DB user + network access + get URI          | 0.33         | —                    | 2       | ✅ Done         |
+| R2          | Update `server/.env` MONGODB_URI                               | 0.08         | R1                    | 2       | ✅ Done         |
+| R3          | Refactor 5 scripts: hardcoded URI →`process.env.MONGODB_URI`  | 0.17         | R2                    | 2       | ✅ Done         |
+| R3.1        | SRV DNS fix: force Google DNS + fix URLSearchParams              | 0.25         | R3                    | 2       | ✅ Done         |
+| R4.1        | Re-run `seedData.js` (11 companies, 36 jobs, 10 users)         | 0.17         | R3.1                  | 3.2     | ✅ Done         |
+| R4.2        | Re-run `seedEmbeddings.js` (36/36 embedded, 0 fails)           | 0.33         | R4.1                  | 3.2     | ✅ Done         |
+| R4.3        | Re-run `seedEvents.js` (215 events, 10 users)                  | 0.17         | R4.1                  | 3.2     | ✅ Done         |
+| B           | `embeddingService.js`                                          | 0.50         | —                    | 4.1     | ✅ Done         |
+| C           | Auto-embed on postJob()                                          | 0.17         | B                     | 4.1     | ✅ Done         |
+| H           | User behavior tracking API                                       | 0.50         | —                    | 5.1     | ✅ Done         |
+| I           | User profile embedding + preferences API                         | 0.67         | H                     | 5.2     | ✅ Done         |
+| J           | Collaborative filtering API                                      | 0.67         | H                     | 5.3     | ✅ Done         |
+| **E** | **Atlas Vector Search Index `idx_jobs_vector`**          | 0.33         | R4.2                  | 4.2     | ⬜ To-Do        |
+| **T** | **Create + run `testVectorSearch.js`**                   | 0.17         | E (runtime), B (code) | 4.2     | 🔶 Can code now |
+| **F** | **`GET /api/jobs/recommend-content` (8-stage pipeline)** | 1.00         | E (runtime), B (code) | 4.3     | 🔶 Can code now |
+| **K** | **`GET /api/jobs/recommend-feed` (hybrid blender)**      | 0.50         | F, I, J               | 5.4     | ⬜ Pending      |
+| **L** | **Frontend (RecommendedJobs + Onboarding + tracking)**     | 2.00         | K                     | 6.1     | ⬜ Pending      |
+| **M** | **E2E test + technical doc + demo video**                  | 5.00         | L                     | 6.2-6.3 | ⬜ Pending      |
 
 ---
 
 ## 3. Forward Pass (Earliest Start / Earliest Finish)
 
-| ID | ES (h) | EF (h) | Tính toán |
-|----|--------|--------|-----------|
-| A | 0.00 | 0.77 | ✅ Done (actual: A+B+C+G+D+I+H = 3.27h) |
-| B | 0.00 | 0.60 | ✅ Done |
-| C | 0.60 | 0.77 | ✅ Done |
-| H | 2.77 | 3.27 | ✅ Done (logUserEvent + applyForJob + seedEvents 188events) |
-| G | 0.77 | 1.44 | ✅ Done |
-| D | 0.77 | 1.10 | ✅ Done |
-| I | 2.77 | 3.44 | ✅ Done |
-| J | 3.27 | 3.94 | ES = EF(H) |
-| E | 3.27 | 3.52 | ES = now (3.27) |
-| **F** | **3.52** | **4.52** | **ES = max(EF(B)=0.77, EF(E)=3.52)** |
-| **K** | **4.52** | **4.85** | **ES = max(EF(F)=4.52, EF(I)=3.44, EF(J)=3.94)** |
-| **L** | **4.85** | **6.35** | **ES = EF(K)** |
-| **M** | **6.35** | **11.35** | **ES = EF(L)** |
+| ID          | ES (h)         | EF (h)          | Notes                                                       |
+| ----------- | -------------- | --------------- | ----------------------------------------------------------- |
+| R1→R4.3    | 0.00           | 1.50            | ✅ Actual: ~2h (included SRV DNS debugging)                 |
+| E           | 1.50           | 1.83            | Atlas ClickOps (can do T + F code in parallel)              |
+| T           | 1.83           | 2.00            | testVectorSearch runtime (relies on E)                      |
+| **F** | **1.83** | **2.83**  | **F code can start now — only runtime depends on E** |
+| **K** | **2.83** | **3.33**  | **Hybrid feed (needs F done + I/J done)**             |
+| **L** | **3.33** | **5.33**  | **Frontend**                                          |
+| **M** | **5.33** | **10.33** | **E2E test + docs + video**                           |
+
+> **Parallel strategy:** T and F code can be written NOW while waiting for E (Atlas ClickOps). Only their runtime tests need E.
 
 ---
 
-## 4. Backward Pass (Latest Start / Latest Finish)
-
-| ID | LF (h) | LS (h) | Tính toán |
-|----|--------|--------|-----------|
-| M | 11.35 | 6.35 | LF = EF(M) |
-| L | 6.35 | 4.85 | LF = LS(M) |
-| K | 4.85 | 4.52 | LF = LS(L) |
-| F | 4.52 | 3.52 | LF = LS(K) |
-| E | 3.52 | 3.27 | LF = LS(F) |
-| D | 3.27 | 2.94 | LF = LS(E) |
-| I | 3.44 | 2.77 | LF = min(LS(K)=4.52, EF(I)=3.44), float=0h |
-| J | 4.52 | 3.85 | LF = LS(K), float=0.91h |
-| H | 3.85 | 3.35 | LF = min(LS(I)=2.77, LS(J)=3.85), float=0h |
-| C | 2.35 | 2.18 | LF = LS(F), float=1.41h |
-| B | 0.77 | 0.27 | LF = min(LS(C)=2.18, LS(D)=0.77, LS(F)=1.35) |
-| G | 9.18 | 8.51 | LF = LS(M), float=7.74h |
-| A | 0.77 | 0.67 | LF = min(LS(B)=0.27, LS(G)=8.51) |
-
----
-
-## 5. Critical Path (Updated)
-
-> **A, B, C, G, D, H, I completed at 3.27h. Critical path now runs from E forward.**
+## 4. Critical Path
 
 ```
-E ──→ F ──→ K ──→ L ──→ M
+E ──→ T ──→ F ──→ K ──→ L ──→ M
 ```
 
-| Step | Task | ES | EF | Duration |
-|------|------|----|----|----------|
-| **Done** | A+B+C+G+D+H+I: Setup, schema, seed, embedding, behavior, user profile | 0.00 | 3.27 | 3.27h |
-| 1 | E: Atlas Vector Search Index | 3.27 | 3.52 | 0.25h |
-| 2 | F: recommend-content API | 3.52 | 4.52 | 1.00h |
-| 3 | K: Hybrid feed API | 4.52 | 4.85 | 0.33h |
-| 4 | L: Frontend components | 4.85 | 6.35 | 1.50h |
-| 5 | M: E2E test + docs + video | 6.35 | 11.35 | 5.00h |
+| Step | Task                                                        | ES   | EF    | Duration |
+| ---- | ----------------------------------------------------------- | ---- | ----- | -------- |
+| 1    | E: Atlas Vector Search Index idx_jobs_vector                | 1.50 | 1.83  | 0.33h    |
+| 2    | T: testVectorSearch.js + verify                             | 1.83 | 2.00  | 0.17h    |
+| 3    | F: recommend-content API ($vectorSearch + 8-stage pipeline) | 2.00 | 3.00  | 1.00h    |
+| 4    | K: recommend-feed hybrid blender API                        | 3.00 | 3.50  | 0.50h    |
+| 5    | L: Frontend (RecommendedJobs + Onboarding + tracking)       | 3.50 | 5.50  | 2.00h    |
+| 6    | M: E2E test + technical doc + demo video                    | 5.50 | 10.50 | 5.00h    |
 
-| Metric | Value |
-|--------|-------|
-| Tổng critical path còn lại | **8.08 giờ** |
-| Đã hoàn thành | 3.27h (A+B+C+G+D+H+I) |
-| Buffer đến deadline | ~89h |
-
----
-
-## 6. Non-Critical Tasks (Có Float/Slack)
-
-| Task | Float | Có thể delay tối đa | Ghi chú |
-|------|-------|---------------------|---------|
-| G (Seed 30 jobs) | 0h | ✅ Done | Crawled 8 TopCV + merged 36 jobs |
-| H (Behavior tracking) | 0h | ✅ Done | POST /events + apply auto-event + 188 seed events |
-| I (User profile) | 0h | ✅ Done | Aggregation pipeline + unit vector normalization |
-| J (Collaborative) | 0.91h | 55 phút | Float tăng nhờ H & I done sớm |
-| C (postJob embed) | 1.91h | 115 phút | Không blocking |
+| Metric                     | Value                                                |
+| -------------------------- | ---------------------------------------------------- |
+| Elapsed (actual)           | ~2.0h (R1→R4 + SRV DNS debugging)                   |
+| Critical path remaining    | **8.67h** (from 1.83h mark = E→T→F→K→L→M) |
+| Working buffer to deadline | ~69h                                                 |
+| Deadline risk              | **LOW** — 69h buffer vs 8.67h remaining work  |
 
 ---
 
-## 7. Recommended Execution Order (2-Phase)
+## 5. Non-Critical Tasks (Float)
 
-### Phase 1 — Song song (Ngay bây giờ, không chờ OPENAI_API_KEY)
-
-| Step | Task | Người làm |
-|------|------|-----------|
-| P1.1 | G: Seed 30 jobs (dùng data cứng, không embed) | Khiem |
-| P1.2 | H: User behavior tracking API | Khiem |
-
-> Lý do: G và H không cần OPENAI_API_KEY, đều có float lớn, làm xong sớm để unblock I+J.
-
-### Phase 2 — Critical path (Khi có OPENAI_API_KEY)
-
-| Step | Task | Duration |
-|------|------|----------|
-| P2.1 | A: Install openai + set key | 0.10h |
-| P2.2 | B: embeddingService.js | 0.50h |
-| P2.3 | D: seedEmbeddings.js | 0.33h |
-| P2.4 | E: Atlas Vector Search Index | 0.25h |
-| P2.5 | F: recommend-content API | 1.00h |
-| P2.6 | I → J → K → L → M | 7.84h |
+| Task                   | Float | Notes                                               |
+| ---------------------- | ----- | --------------------------------------------------- |
+| R3.1 (SRV DNS fix)     | 0h    | ✅ Done — unblocked everything                     |
+| F code (can start now) | 0h    | Write code while E is pending; runtime test after E |
+| T code (can start now) | 0h    | Write code while E is pending; runtime test after E |
+| B, C, H, I, J          | ∞    | Done — no changes needed                           |
 
 ---
 
-## 8. Rủi ro & Mitigation
+## 6. Execution Order (2 Parallel Tracks + 2 Phases)
 
-| Rủi ro | Impact | Hành động |
-|--------|--------|-----------|
-| ~~`OPENAI_API_KEY` chưa có~~ | ~~Block toàn bộ B→M~~ | ✅ Key đã có, verified với tiếng Việt 3072d |
-| Atlas M0 không hỗ trợ Vector Search | Showstopper | Verify ngay sau E; fallback M10 trial. Current: M2 cluster, ready |
-| OpenAI rate limit | Đã pass | Batch 25 jobs x 36, 0 fails |
-| Còn ~4 ngày, critical path còn 8.08h | An toàn | Buffer >90h |
-| Collaborative filtering (J) phức tạp | Float 0.08h | Có thể cắt J nếu chậm |
+### Track A — Atlas ClickOps (waiting on you)
+
+| Step | Task                                                               | Duration |
+| ---- | ------------------------------------------------------------------ | -------- |
+| E    | Create Vector Search Index via Atlas UI (see browser agent prompt) | 0.33h    |
+
+### Track B — Code (I can do NOW in parallel)
+
+| Step | Task                                                          | Duration | Can test after E? |
+| ---- | ------------------------------------------------------------- | -------- | ----------------- |
+| T    | Create `server/scripts/testVectorSearch.js`                 | 0.17h    | Yes               |
+| F    | Create `GET /api/jobs/recommend-content` controller + route | 1.00h    | Yes               |
+
+### After Tracks A+B converge
+
+| Step | Task                                                        | Duration |
+| ---- | ----------------------------------------------------------- | -------- |
+| K    | `GET /api/jobs/recommend-feed` hybrid blender             | 0.50h    |
+| L    | Frontend (RecommendedJobs, OnboardingModal, event tracking) | 2.00h    |
+| M    | E2E test (1.5h) + technical doc (1.5h) + demo video (2.0h)  | 5.00h    |
 
 ---
 
-## 9. Summary
+## 7. Rủi ro & Mitigation
+
+| Rủi ro                                    | Impact                     | Mitigation                                               |
+| ------------------------------------------ | -------------------------- | -------------------------------------------------------- |
+| ~~SRV DNS fails for new cluster~~         | ~~Block all connections~~ | ✅ Fixed — force Google DNS + fix URI builder           |
+| ~~IP whitelist blocks scripts~~           | ~~Block seeding~~         | ✅ 0.0.0.0/0 configured                                  |
+| ~~OpenAI rate limit~~                     | ~~Slow embedding~~        | ✅ 36/36 embedded in 2 batches, 0 failures               |
+| E: Atlas Search Index not available on M10 | Showstopper                | Verify M10 tier selected; M10 definitely supports search |
+| Frontend complexity                        | Medium                     | Can cut explanation badges if late                       |
+| Còn ~71h, critical path 8.67h             | LOW risk                   | Buffer ~69h                                              |
+
+---
+
+## 8. Summary
 
 ```
-Project duration:    11.35h total (8.08h critical path remaining)
-Completed:            3.27h (A+B+C+G+D+H+I)
-                      - A: Install openai + key
-                      - B: embeddingService.js (3072d)
-                      - C: postJob auto-embed
-                      - G: Seed 36 jobs + 11 companies + 10 users
-                      - D: seedEmbeddings — 36/36 jobs embedded
-                      - H: POST /api/users/events + applyForJob auto-event + 188 seed events
-                      - I: User profile embedding + preferences API (weighted avg, unit vec)
-Available time:      97h (4.0 days to deadline)
-Working buffer:      89h
-
-Task status:         7/13 done
-Next task:           E (Atlas Vector Search Index) — critical path blocker
-Parallel task:       J (Collaborative filtering) — float 0.91h, can code without blocks
-Critical blockers:   E requires Atlas UI (browser) to create Vector Search Index
+Project duration:    10.50h total (8.67h critical path remaining)
+Completed this sess: R1+R2+R3+R3.1+R4.1+R4.2+R4.3 = ~2.0h actual
+  - M10 cluster created, DB user + network + URI obtained
+  - .env updated, 5 scripts refactored to use process.env.MONGODB_URI
+  - SRV DNS fix: force Google DNS resolver + fix appName param
+  - 36 jobs embedded (OpenAI text-embedding-3-large, 3072d)
+  - 215 events for 10 users (5 IT + 3 Design + 2 mixed)
+  - Server db.js auto-resolves SRV → direct connection
+Code completed:      B+C+H+I+J+R3.1 = embedding + auto-embed + events + profile + collab + DNS fix
+Blocker:             E (Atlas Vector Search Index — ClickOps needed)
+Can do now:          F (recommend-content) + T (testVectorSearch) code in parallel
+Available time:      71.4h (2.98 days to deadline)
+Working buffer:      ~69h
 ```
+
+## 9. What Changed Since Last CPM Update
+
+| Change                             | Reason                                                                                  |
+| ---------------------------------- | --------------------------------------------------------------------------------------- |
+| **R1→R4 all ✅**            | Atlas restart completed: M10 cluster + re-seed runs succeeded                           |
+| **+R3.1 SRV DNS fix**        | Node.js c-ares DNS fails non-39cwlbk hostnames on Windows; forced Google/Cloudflare DNS |
+| **Critical path -1.41h**     | R1→R4 no longer on critical path (already done); E is now step 1                       |
+| **Parallel coding possible** | F + T logic can be written independent of E (only runtime needs index)                  |
+| **Buffer ~69h**              | 71.4h total - 2.0h elapsed = still extremely safe                                       |

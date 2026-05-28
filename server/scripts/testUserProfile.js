@@ -10,8 +10,9 @@ import User from "../models/User.js";
 import UserEvent from "../models/UserEvent.js";
 import Job from "../models/Job.js";
 
-const MONGODB_URI =
-  "mongodb://talentsync_db_user:nNjJVX9OniDO0nUK@ac-p4yywo1-shard-00-01.39cwlbk.mongodb.net:27017/?authSource=admin&directConnection=true&ssl=true";
+import { uriFromSrv } from "./resolveSrv.js";
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // ─── helpers (same logic as controller) ──────────────────────────────────────
 
@@ -33,7 +34,7 @@ function computeUnitEmbedding(validJobs) {
 // ─── test runner ─────────────────────────────────────────────────────────────
 
 async function run() {
-  await mongoose.connect(MONGODB_URI, {
+  await mongoose.connect(await uriFromSrv(MONGODB_URI), {
     dbName: "job-portal",
     serverSelectionTimeoutMS: 15000,
   });

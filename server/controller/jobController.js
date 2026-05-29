@@ -112,13 +112,30 @@ async function getCollaborativeResults(userId, excludedJobIds, limit = 20) {
   ]);
 }
 
-// GET /api/jobs/collaborative
-// "Users who liked what you liked also liked..." collaborative filtering pipeline
-// Requires Clerk auth (req.auth.userId)
-export const getCollaborativeJobs = async (req, res) => {
+// GET /api/jobs/recommend-content
+// Content-based recommendation via $vectorSearch + Aggregation Pipeline
+// Query: ?query=text OR use user.embedding; optional filters: location, level, category, exclude
+export const getRecommendContent = async (req, res) => {
   const userId = req.auth.userId;
+  const { query, location, level, category, exclude } = req.query;
 
   try {
+    let queryVector;
+
+    if (query) {
+      queryVector = await generateEmbedding(query);
+    } else {
+      const user = await User.findById(userId);
+      if (!user || !user.embedding || user.embedding.length === 0) {
+        return res.json({ success: false, message: "No query text and no user embedding available" });
+      }
+      queryVector = user.embedding;
+    }
+
+    const appliedJobs = await JobApplication.find({ userId }).select("jobId").lean();
+    const appliedJobIds = appliedJobs.map((a) => a.jobId);
+    if (exclude) appliedJobIds.push(exclude);
+
     const seenEvents = await UserEvent.find({ userId }).select("jobId").sort({ timestamp: -1 }).limit(500).lean();
     const seenJobIds = seenEvents.map((e) => e.jobId);
     const allExcluded = [...new Set([...appliedJobIds, ...seenJobIds])];
@@ -198,6 +215,29 @@ export const getCollaborativeJobs = async (req, res) => {
     ]);
 
     return res.json({ success: true, jobs: results, queryVectorSize: queryVector.length });
+  } catch (error) {
+    console.error("Controller error:", error);
+    res.json({ success: false, message: "An unexpected error occurred" });
+  }
+};
+
+// GET /api/jobs/collaborative
+// "Users who liked what you liked also liked..." collaborative filtering pipeline
+// Requires Clerk auth (req.auth.userId)
+export const getCollaborativeJobs = async (req, res) => {
+  const userId = req.auth.userId;
+
+  try {
+    const seenEvents = await UserEvent.find({ userId }).select("jobId").sort({ timestamp: -1 }).limit(500).lean();
+    const seenJobIds = seenEvents.map((e) => e.jobId);
+
+    if (seenJobIds.length === 0) {
+      return res.json({ success: true, jobs: [], reason: "no_events" });
+    }
+
+    const results = await getCollaborativeResults(userId, seenJobIds);
+
+    return res.json({ success: true, jobs: results });
   } catch (error) {
     console.error("Controller error:", error);
     res.json({ success: false, message: "An unexpected error occurred" });

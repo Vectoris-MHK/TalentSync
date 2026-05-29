@@ -1,6 +1,6 @@
 # Codebase Reference — File Map & Conventions
 
-> Updated: 2026-05-28 20:40 ICT — Backend 100% complete, actual files reflected
+> Updated: 2026-05-29 10:35 ICT — Audit fixes applied, DRY refactor, error sanitization
 
 ## Directory Map
 
@@ -32,8 +32,8 @@ TalentSync/
 │   │   └── UserEvent.js             ← NEW: userId, jobId, eventType, weight, timestamp
 │   ├── controller/
 │   │   ├── userController.js        ← User endpoints (+logUserEvent, +apply auto-event, +getUserProfile, +updateUserPreferences)
-│   │   ├── comapanyController.js    ← Company endpoints (+auto-embed on postJob)
-│   │   ├── jobController.js         ← +getRecommendContent, +getCollaborativeJobs, +getRecommendFeed
+│   │   ├── companyController.js     ← Company endpoints (+auto-embed on postJob, null-check guard)
+│   │   ├── jobController.js         ← +getRecommendContent, +getCollaborativeJobs, +getRecommendFeed, +shared getCollaborativeResults()
 │   │   └── webhooks.js              ← Clerk webhook handler
 │   ├── routes/
 │   │   ├── userRoutes.js            ← +GET /profile, +POST /preferences, +POST /events
@@ -105,7 +105,7 @@ export const getJobs = async (req, res) => {
 
 Key conventions:
 - Always `res.json({ success: true/false, ... })` — NOT `res.send()`, NOT `res.status().json()`
-- Error: `res.json({ success: false, message: error.message })`
+- Error: `console.error("handler error:", error); res.json({ success: false, message: "An unexpected error occurred" })`
 - Success: `res.json({ success: true, [dataKey]: dataValue })`
 
 ### Route Pattern
@@ -309,3 +309,8 @@ const results = await Job.aggregate([
 9. **$vectorSearch.filter for metadata** — visible/location/category/level at Lucene level
 10. **$match for exclusions** — `_id: { $nin }` must stay at MongoDB Query Engine level
 11. **SRV resolution** — all scripts use `uriFromSrv(process.env.MONGODB_URI)` pattern
+12. **Error sanitization** — `console.error` + generic `"An unexpected error occurred"` message (never leak `error.message` to client)
+13. **Null-check guard** — always verify Mongoose query results before accessing properties (`if (!doc) return res.json(...)`)
+14. **Shared pipeline functions** — extract reusable aggregation logic (e.g. `getCollaborativeResults()`) to avoid copy-paste
+15. **$nin size limit** — cap exclusion arrays to `.limit(500)` to prevent unbounded growth beyond 16MB BSON limit
+16. **Multer limits** — 5MB file size, JPEG/PNG/WebP/PDF file filter

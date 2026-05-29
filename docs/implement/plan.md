@@ -1,6 +1,6 @@
 # 5-Day Implementation Plan
 
-> Updated: 2026-05-28 20:40 ICT — **Days 1-3 BACKEND COMPLETE (15/15 tasks). Day 4 Frontend remaining.**
+> Updated: 2026-05-29 10:35 ICT — Codebase audit resolved, backend hardened
 
 ## Day 1 (2026-05-26): Embedding Pipeline + Vector Index — ✅ DONE
 
@@ -20,7 +20,7 @@
   - Verified: 36/36 jobs embedded, 0 failures on new M10 cluster
 
 ### 1.3 Embed on Job Creation — ✅ DONE
-- [x] `comapanyController.js` → `postJob()` + `updateJob()` auto-embed
+- [x] `companyController.js` (renamed from `comapanyController.js`) → `postJob()` + `updateJob()` auto-embed
 
 ### 1.4 Create Atlas Vector Search Index — ✅ DONE
 - [x] Atlas UI → Search → Create Index → JSON Editor on M10 cluster `TalentSyncDB`

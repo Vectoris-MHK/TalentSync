@@ -110,7 +110,7 @@
 }
 ```
 
-**Indexes:** `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`
+**Indexes:** `{ userId: 1, timestamp: -1 }`, `{ jobId: 1 }`, `{ eventType: 1 }`, `{ userId: 1, jobId: 1, eventType: 1, timestamp: -1 }` (compound — covers view dedup query)
 
 ### `jobapplications` (UNCHANGED)
 
@@ -145,7 +145,7 @@
 |--------|------|------|---------|--------|
 | GET | `/api/jobs/recommend-content` | Clerk | Content-based recommendation via $vectorSearch + Aggregation Pipeline | ✅ Done |
 | GET | `/api/jobs/recommend-feed` | Clerk | Hybrid feed: 70% vectorSearch + 30% collaborative | ✅ Done |
-| GET | `/api/jobs/collaborative` | Clerk | Collaborative filtering: "users who liked what you liked" | ✅ Done |
+| GET | `/api/jobs/collaborative` | Clerk | Collaborative filtering via shared `getCollaborativeResults()` helper | ✅ Done |
 | POST | `/api/users/events` | Clerk | Log user behavior event (search, view, bookmark) | ✅ Done |
 | GET | `/api/users/profile` | Clerk | Get/compute user profile embedding | ✅ Done |
 | POST | `/api/users/preferences` | Clerk | Set user onboarding preferences | ✅ Done |
@@ -211,10 +211,19 @@ Database: `job-portal`, Collection: `jobs`, Index: `idx_jobs_vector`
 ### Scoring Formula
 
 ```
+// recommend-content (query-based): full multi-factor scoring
 score = vectorScore × 0.60         // Semantic relevance (primary signal)
       + recencyBoost × 0.20         // Freshness: exponential 30-day decay
-      + skillMatch × 0.15           // Category match
+      + skillMatch × 0.15           // Category match (from req.query.category)
       + salaryMatch × 0.05          // Salary provided
+
+// recommend-feed content branch (user embedding): simplified dual-factor
+// skillMatch/salaryMatch omitted — no category context from query params
+score = vectorScore × 0.70
+      + recencyBoost × 0.30
+
+// recommend-feed collaborative branch:
+score = interactionScore / 8        // Normalized weighted interaction sum
 
 recencyBoost = exp(-(now - date) / (30 × 86400000))
 // 1.0 today, ~0.37 at 30 days, ~0.14 at 60 days
@@ -226,7 +235,7 @@ recencyBoost = exp(-(now - date) / (30 × 86400000))
 |------|---------|-----------|-----------------|----------|
 | **Hybrid** | User has 3072d embedding | 70% (14 items) | 30% (6 items) | — |
 | **Preferences** | User has categories, no embedding | — | — | Category match + recency |
-| **Popular** | User has no embedding, no preferences | — | — | Most applications in 30 days |
+| **Popular** | User has no embedding, no preferences | — | — | Most applications (all-time, no date restriction) |
 
 ### numCandidates Tuning
 

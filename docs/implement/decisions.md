@@ -191,3 +191,26 @@ See `docs/implement/mongodb_atlas.md` for the full ClickOps deployment report in
 - Vector Search index `idx_jobs_vector` schema (type: vector, path: embedding, 3072d, cosine)
 - Scalar quantization (4x RAM reduction, 95-98% accuracy)
 - `numCandidates` tuning guidance (100-1000 optimal for 36-job dataset)
+
+## Shared Pipeline Function (Codebase Audit 2026-05-29)
+
+The `recommend-feed` endpoint originally contained a ~90-line inline IIFE duplicating the `getCollaborativeJobs` pipeline. This was extracted into a shared `getCollaborativeResults(userId, excludedJobIds, limit)` function used by both `getCollaborativeJobs` and `getRecommendFeed`. Changes to the collaborative pipeline now apply universally — one source of truth.
+
+## Error Message Sanitization (Codebase Audit 2026-05-29)
+
+All 18 catch blocks across 4 controllers previously returned `error.message` directly to the client, exposing internal stack traces, DB queries, and OpenAI API errors. All were replaced with `console.error("handler error:", error)` + generic `"An unexpected error occurred"` message. Clerk webhook endpoints now return HTTP 200 for all outcomes (prevents Clerk retry loops on 400/500 responses).
+
+## Null-Safety Guards (Codebase Audit 2026-05-29)
+
+Three null-pointer crash vectors identified and fixed:
+- `loginCompany`: `Company.findOne()` returns null → added `if (!company)` guard before `bcrypt.compare`
+- `changeVisiblity`: `Job.findById(id)` returns null → added `if (!job)` guard
+- `updateUserResume`: `User.findById(userId)` returns null → added `if (!userData)` guard
+
+## Exclusion Array Size Cap (Codebase Audit 2026-05-29)
+
+`allExcluded` arrays in recommendation endpoints previously fetched ALL UserEvent documents without limit. Capped to `.sort({ timestamp: -1 }).limit(500)` to prevent unbounded growth that would eventually exceed MongoDB's 16MB BSON document limit when passed to `$nin`.
+
+## Multer Configuration Hardening (Codebase Audit 2026-05-29)
+
+Added `limits: { fileSize: 5 * 1024 * 1024 }` and `fileFilter` restricting uploads to JPEG/PNG/WebP/PDF MIME types. Previously any file type or size was accepted.

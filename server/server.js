@@ -37,6 +37,10 @@ app.use('/api/users', userRoutes)
 
 Sentry.setupExpressErrorHandler(app);
 
-// Start the server
+// Export for Vercel serverless; only listen locally
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => console.log(`Server running on port ${port}`));
+}
+
+export default app;

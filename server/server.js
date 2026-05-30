@@ -10,20 +10,33 @@ import connectCloudinary from './config/cloudinary.js';
 import JobRoutes from './routes/jobRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { clerkMiddleware } from '@clerk/express';
-// Initialize Express
+
 const app = express();
 
-// Connect to MongoDB
-await connectDB();
-await connectCloudinary();
+let ready = false;
+let readyPromise = null;
 
-// Middleware
+async function init() {
+  await connectDB();
+  await connectCloudinary();
+  ready = true;
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  readyPromise = init();
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
-// Routes
-app.get("/", (req, res) => res.send("API Working"));
+app.get("/", async (req, res) => {
+  if (!ready) {
+    if (!readyPromise) readyPromise = init();
+    await readyPromise;
+  }
+  res.send("API Working");
+});
 
 if (process.env.NODE_ENV !== 'production') {
   app.get("/debug-sentry", function mainHandler(req, res) {
@@ -37,7 +50,6 @@ app.use('/api/users', userRoutes)
 
 Sentry.setupExpressErrorHandler(app);
 
-// Export for Vercel serverless; only listen locally
 const port = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== 'production') {
   app.listen(port, () => console.log(`Server running on port ${port}`));

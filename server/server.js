@@ -13,6 +13,7 @@ import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
 
+// ── DB readiness guard ──────────────────────────────────────────
 let ready = false;
 let readyPromise = null;
 
@@ -22,20 +23,41 @@ async function init() {
   ready = true;
 }
 
+// Fire-and-forget in production; block in dev
 if (process.env.NODE_ENV !== 'production') {
-  readyPromise = init();
+  await init();
+} else {
+  init();
 }
+
+function dbReady(req, res, next) {
+  if (ready) return next();
+
+  if (!readyPromise) readyPromise = init();
+
+  readyPromise
+    .then(() => next())
+    .catch((err) => {
+      console.error("DB init failed:", err);
+      res.status(503).json({
+        success: false,
+        message: "Service temporarily unavailable. Please try again."
+      });
+    });
+}
+// ─────────────────────────────────────────────────────────────────
 
 app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 
-app.get("/", async (req, res) => {
-  if (!ready) {
-    if (!readyPromise) readyPromise = init();
-    await readyPromise;
-  }
-  res.send("API Working");
+// Routes that DON'T need database (respond instantly)
+app.get("/", (req, res) => res.send("API Working"));
+app.get("/health", async (req, res) => {
+  const mongoose = (await import("mongoose")).default;
+  const state = mongoose.connection.readyState;
+  const states = { 0: "disconnected", 1: "connected", 2: "connecting", 3: "disconnecting" };
+  res.json({ status: "ok", db: states[state] || "unknown" });
 });
 
 if (process.env.NODE_ENV !== 'production') {
@@ -43,10 +65,14 @@ if (process.env.NODE_ENV !== 'production') {
     throw new Error("My first Sentry error!");
   });
 }
-app.post('/webhooks',clerkWebhooks)
-app.use('/api/company',companyRoutes)
-app.use('/api/jobs', JobRoutes)
-app.use('/api/users', userRoutes)
+
+// Clerk webhooks — no DB guard (webhook handler manages its own DB calls)
+app.post('/webhooks', clerkWebhooks);
+
+// API routes — gated behind dbReady (wait for MongoDB pool)
+app.use('/api/company', dbReady, companyRoutes);
+app.use('/api/jobs', dbReady, JobRoutes);
+app.use('/api/users', dbReady, userRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 

@@ -16,6 +16,6 @@
     "clean": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "catalog:"
   }
 }

@@ -1,9 +1,15 @@
 import { promises as dns } from "dns";
 import dnsSync from "dns";
 
-dnsSync.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+const isWindows = process.platform === "win32";
+
+if (isWindows) {
+  dnsSync.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+}
 
 export async function uriFromSrv(srvUri) {
+  if (!isWindows) return srvUri;
+
   const match = srvUri.match(/^mongodb\+srv:\/\/(.*)@([^/]+)\/(.*)$/);
   if (!match) return srvUri;
 

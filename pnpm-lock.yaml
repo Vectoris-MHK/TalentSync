@@ -4,140 +4,264 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@clerk/clerk-react':
+      specifier: ^5.21.0
+      version: 5.61.3
+    '@clerk/express':
+      specifier: ^1.7.80
+      version: 1.7.80
+    '@eslint/js':
+      specifier: ^9.17.0
+      version: 9.39.4
+    '@sentry/node':
+      specifier: ^8.55.2
+      version: 8.55.2
+    '@tailwindcss/forms':
+      specifier: ^0.5.10
+      version: 0.5.11
+    '@types/react':
+      specifier: ^18.3.18
+      version: 18.3.29
+    '@types/react-dom':
+      specifier: ^18.3.5
+      version: 18.3.7
+    '@vitejs/plugin-react':
+      specifier: ^4.3.4
+      version: 4.7.0
+    autoprefixer:
+      specifier: ^10.4.20
+      version: 10.5.0
+    axios:
+      specifier: ^1.7.9
+      version: 1.16.1
+    bcryptjs:
+      specifier: ^2.4.3
+      version: 2.4.3
+    cloudinary:
+      specifier: ^2.10.0
+      version: 2.10.0
+    concurrently:
+      specifier: ^9.2.1
+      version: 9.2.1
+    cors:
+      specifier: ^2.8.6
+      version: 2.8.6
+    dotenv:
+      specifier: ^16.6.1
+      version: 16.6.1
+    eslint:
+      specifier: ^9.17.0
+      version: 9.39.4
+    eslint-plugin-react:
+      specifier: ^7.37.2
+      version: 7.37.5
+    eslint-plugin-react-hooks:
+      specifier: ^5.0.0
+      version: 5.2.0
+    eslint-plugin-react-refresh:
+      specifier: ^0.4.16
+      version: 0.4.26
+    express:
+      specifier: ^4.22.2
+      version: 4.22.2
+    framer-motion:
+      specifier: ^12.23.12
+      version: 12.40.0
+    globals:
+      specifier: ^15.14.0
+      version: 15.15.0
+    jsonwebtoken:
+      specifier: ^9.0.3
+      version: 9.0.3
+    k-convert:
+      specifier: ^1.0.6
+      version: 1.0.6
+    lucide-react:
+      specifier: ^0.503.0
+      version: 0.503.0
+    moment:
+      specifier: ^2.30.1
+      version: 2.30.1
+    mongoose:
+      specifier: ^8.24.0
+      version: 8.24.0
+    multer:
+      specifier: ^1.4.5-lts.2
+      version: 1.4.5-lts.2
+    nodemon:
+      specifier: ^3.1.14
+      version: 3.1.14
+    openai:
+      specifier: ^6.39.0
+      version: 6.39.0
+    postcss:
+      specifier: ^8.4.49
+      version: 8.5.15
+    quill:
+      specifier: ^2.0.3
+      version: 2.0.3
+    react:
+      specifier: ^18.3.1
+      version: 18.3.1
+    react-dom:
+      specifier: ^18.3.1
+      version: 18.3.1
+    react-icons:
+      specifier: ^5.5.0
+      version: 5.6.0
+    react-router-dom:
+      specifier: ^7.1.1
+      version: 7.15.1
+    react-toastify:
+      specifier: ^11.0.3
+      version: 11.1.0
+    svix:
+      specifier: ^1.94.0
+      version: 1.94.0
+    tailwindcss:
+      specifier: ^3.4.17
+      version: 3.4.19
+    vite:
+      specifier: ^6.0.5
+      version: 6.4.2
+
 importers:
 
   .:
     devDependencies:
       concurrently:
-        specifier: ^9.2.1
+        specifier: 'catalog:'
         version: 9.2.1
 
   client:
     dependencies:
       '@clerk/clerk-react':
-        specifier: ^5.21.0
+        specifier: 'catalog:'
         version: 5.61.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tailwindcss/forms':
-        specifier: ^0.5.10
+        specifier: 'catalog:'
         version: 0.5.11(tailwindcss@3.4.19)
       axios:
-        specifier: ^1.7.9
+        specifier: 'catalog:'
         version: 1.16.1
       framer-motion:
-        specifier: ^12.23.12
+        specifier: 'catalog:'
         version: 12.40.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       k-convert:
-        specifier: ^1.0.6
+        specifier: 'catalog:'
         version: 1.0.6
       lucide-react:
-        specifier: ^0.503.0
+        specifier: 'catalog:'
         version: 0.503.0(react@18.3.1)
       moment:
-        specifier: ^2.30.1
+        specifier: 'catalog:'
         version: 2.30.1
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
       quill:
-        specifier: ^2.0.3
+        specifier: 'catalog:'
         version: 2.0.3
       react:
-        specifier: ^18.3.1
+        specifier: 'catalog:'
         version: 18.3.1
       react-dom:
-        specifier: ^18.3.1
+        specifier: 'catalog:'
         version: 18.3.1(react@18.3.1)
       react-icons:
-        specifier: ^5.5.0
+        specifier: 'catalog:'
         version: 5.6.0(react@18.3.1)
       react-router-dom:
-        specifier: ^7.1.1
+        specifier: 'catalog:'
         version: 7.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-toastify:
-        specifier: ^11.0.3
+        specifier: 'catalog:'
         version: 11.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@eslint/js':
-        specifier: ^9.17.0
+        specifier: 'catalog:'
         version: 9.39.4
       '@types/react':
-        specifier: ^18.3.18
+        specifier: 'catalog:'
         version: 18.3.29
       '@types/react-dom':
-        specifier: ^18.3.5
+        specifier: 'catalog:'
         version: 18.3.7(@types/react@18.3.29)
       '@vitejs/plugin-react':
-        specifier: ^4.3.4
+        specifier: 'catalog:'
         version: 4.7.0(vite@6.4.2(@types/node@25.9.1)(jiti@1.21.7))
       autoprefixer:
-        specifier: ^10.4.20
+        specifier: 'catalog:'
         version: 10.5.0(postcss@8.5.15)
       eslint:
-        specifier: ^9.17.0
+        specifier: 'catalog:'
         version: 9.39.4(jiti@1.21.7)
       eslint-plugin-react:
-        specifier: ^7.37.2
+        specifier: 'catalog:'
         version: 7.37.5(eslint@9.39.4(jiti@1.21.7))
       eslint-plugin-react-hooks:
-        specifier: ^5.0.0
+        specifier: 'catalog:'
         version: 5.2.0(eslint@9.39.4(jiti@1.21.7))
       eslint-plugin-react-refresh:
-        specifier: ^0.4.16
+        specifier: 'catalog:'
         version: 0.4.26(eslint@9.39.4(jiti@1.21.7))
       globals:
-        specifier: ^15.14.0
+        specifier: 'catalog:'
         version: 15.15.0
       postcss:
-        specifier: ^8.4.49
+        specifier: 'catalog:'
         version: 8.5.15
       tailwindcss:
-        specifier: ^3.4.17
+        specifier: 'catalog:'
         version: 3.4.19
       vite:
-        specifier: ^6.0.5
+        specifier: 'catalog:'
         version: 6.4.2(@types/node@25.9.1)(jiti@1.21.7)
 
   server:
     dependencies:
       '@clerk/express':
-        specifier: ^1.3.38
+        specifier: 'catalog:'
         version: 1.7.80(express@4.22.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@sentry/node':
-        specifier: ^8.50.0
+        specifier: 'catalog:'
         version: 8.55.2
       bcryptjs:
-        specifier: ^2.4.3
+        specifier: 'catalog:'
         version: 2.4.3
       cloudinary:
-        specifier: ^2.5.1
+        specifier: 'catalog:'
         version: 2.10.0
       cors:
-        specifier: ^2.8.5
+        specifier: 'catalog:'
         version: 2.8.6
       dotenv:
-        specifier: ^16.4.7
+        specifier: 'catalog:'
         version: 16.6.1
       express:
-        specifier: ^4.21.2
+        specifier: 'catalog:'
         version: 4.22.2
       jsonwebtoken:
-        specifier: ^9.0.2
+        specifier: 'catalog:'
         version: 9.0.3
       mongoose:
-        specifier: ^8.9.5
+        specifier: 'catalog:'
         version: 8.24.0
       multer:
-        specifier: ^1.4.5-lts.1
+        specifier: 'catalog:'
         version: 1.4.5-lts.2
-      nodemon:
-        specifier: ^3.1.9
-        version: 3.1.14
       openai:
-        specifier: ^6.39.0
+        specifier: 'catalog:'
         version: 6.39.0
       svix:
-        specifier: ^1.45.1
+        specifier: 'catalog:'
         version: 1.94.0
+    devDependencies:
+      nodemon:
+        specifier: 'catalog:'
+        version: 3.1.14
 
 packages:
 

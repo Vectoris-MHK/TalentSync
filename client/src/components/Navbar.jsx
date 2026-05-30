@@ -97,19 +97,11 @@ const Navbar = () => {
         </nav>
       </div>
 
-      {/* Add this to your tailwind.config.js or CSS file */}
-      <style jsx>{`
+      <style>{`
         @keyframes slideDown {
-          from {
-            transform: translateY(-100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
+          from { transform: translateY(-100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
-        
         .animate-slideDown {
           animation: slideDown 0.4s ease-out forwards;
         }

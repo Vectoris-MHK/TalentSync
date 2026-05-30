@@ -171,28 +171,37 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 ---
 
-## 6. Frontend & Finalization (Status: TO-DO, Start: 2026-05-29)
+## 6. Frontend & Finalization (Status: IN PROGRESS, Start: 2026-05-29)
 
-### 6.1 Frontend Integration (Start: 2026-05-29)
+### 6.1 Frontend Integration (Status: DONE, Completed: 2026-05-30)
 
-- [ ] Create `RecommendedJobs.jsx` — horizontal scroll, loading skeleton, empty state
+- [x] Create `RecommendedJobs.jsx` — horizontal scroll, loading skeleton, empty state
   - Call `GET /api/jobs/recommend-feed` (Clerk token required)
   - Section header: "Việc làm gợi ý cho bạn"
-- [ ] Update `Home.jsx` — insert `<RecommendedJobs />` between Hero + JobListing, auth-gated
-- [ ] Replace `findSimilarJobs` in `ApplyJob.jsx` — call `recommend-content` API, fallback to old client-side filter
-- [ ] Create `OnboardingModal.jsx` — first-login category multi-select
+  - Per-card badge: MODE_BADGE map (hybrid/collaborative/preferences/popular)
+- [x] Update `Home.jsx` — insert `<RecommendedJobs />` between Hero + JobListing, auth-gated
+  - OnboardingModal trigger: `user.preferences.length === 0` + 800ms delay
+  - Optimistic update: `setUserData` after preferences saved
+- [x] Replace `findSimilarJobs` in `ApplyJob.jsx` — call `recommend-content` API, fallback to client-side filter
+- [x] Create `OnboardingModal.jsx` — first-login category multi-select
   - Trigger: `user.preferences` is empty
   - Categories: Lập trình, Thiết kế, Marketing, Tài chính, Quản lý, Kinh doanh
   - Submit → `POST /api/users/preferences`
   - "Skip" → fallback to popular jobs
-- [ ] Frontend event tracking:
+- [x] Frontend event tracking:
   - `ApplyJob.jsx`: `useEffect` → `POST /api/users/events { jobId, eventType: "view" }` on mount
-  - `JobListing.jsx`: IntersectionObserver → fire view events when job cards enter viewport
-- [ ] Explanation badges on JobCard in recommended feed:
-  - "Phù hợp với kỹ năng của bạn" (content)
+  - `JobListing.jsx`: IntersectionObserver → fire view events when job cards enter viewport (deduplicated via `viewedJobIds` ref)
+- [x] Explanation badges on JobCard in recommended feed:
+  - "Phù hợp với kỹ năng của bạn" (hybrid/content)
   - "Tương tự việc làm bạn đã xem" (collaborative)
-  - "Phổ biến trong lĩnh vực của bạn" (preferences)
-  - "Dựa trên sở thích của bạn" (popular)
+  - "Dựa trên sở thích của bạn" (preferences)
+  - "Phổ biến trong lĩnh vực của bạn" (popular)
+- [x] **`+ADD`** Fix `requireAuth()` middleware on all protected routes (`jobRoutes.js`, `userRoutes.js`)
+- [x] **`+ADD`** Fix `CLERK_PUBLISHABLE_KEY` missing in `server/.env`
+- [x] **`+ADD`** Fix `VITE_BACKEND_URL` in `client/.env` (was `VITE_API_BASE_URL`)
+- [x] **`+ADD`** Fix `MONGODB_URI` duplicate key bug in `server/.env` (autofix introduced `MONGODB_URI=MONGODB_URI=...`)
+- [x] **`+ADD`** Fix `<style jsx>` → `<style>` in `Navbar.jsx` and `Footer.jsx` (Next.js syntax not supported in Vite)
+- [x] **`+ADD`** `JobCategories` + `JobLocations` Việt hóa — 6 categories khớp seed data, 63 tỉnh thành VN
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 

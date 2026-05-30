@@ -1,8 +1,8 @@
 # Critical Path Method — TalentSync MongoHack 2026
 
 > Generated: 2026-05-28 16:30 ICT
-> Updated: 2026-05-28 19:12 ICT **(ALL BACKEND DONE — Frontend + Submission only)**
-> Deadline: 2026-05-31 18:00 ICT (~46.8h còn lại)
+> Updated: 2026-05-30 18:40 ICT **(FRONTEND DONE — E2E Test + Docs + Video only)**
+> Deadline: 2026-05-31 18:00 ICT (~23h còn lại)
 > Elapsed this session: ~3h (R1→R4 + SRV DNS fix + E + T + F + K + DRY fix)
 > Working hours: ~5h/ngày ≈ 15h thực tế còn lại
 

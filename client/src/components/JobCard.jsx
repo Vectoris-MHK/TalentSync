@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiBookmark, FiMapPin, FiBriefcase, FiDollarSign, FiClock } from "react-icons/fi";
 
-const JobCard = ({ job }) => {
+const JobCard = ({ job, recommendBadge }) => {
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -130,6 +130,13 @@ const JobCard = ({ job }) => {
             </div>
           )}
 
+          {/* Recommendation badge */}
+          {recommendBadge && (
+            <div className={`mx-6 mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}>
+              <span>✨</span> {recommendBadge.label}
+            </div>
+          )}
+
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
             <span className="text-xs text-gray-500">Posted {getTimePassed(job.postedAt)}</span>
@@ -173,6 +180,7 @@ JobCard.defaultProps = {
     postedAt: null,
     _id: "",
   },
+  recommendBadge: null,
 };
 
 export default JobCard;

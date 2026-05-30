@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FiBookmark, FiMapPin, FiBriefcase, FiDollarSign, FiClock } from "react-icons/fi";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
+import PropTypes from "prop-types";
+import { AppContext } from "../context/AppContext";
 
 const JobCard = ({ job, recommendBadge }) => {
   const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const { backendUrl, userData } = useContext(AppContext);
   const [isSaved, setIsSaved] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const stripHtmlTags = (html) => {
-    return html ? html.replace(/<[^>]*>?/gm, '') : 'No description provided';
+    return html ? html.replace(/<[^>]*>?/gm, "") : "No description provided";
   };
 
   const getTimePassed = (date) => {
@@ -27,8 +33,25 @@ const JobCard = ({ job, recommendBadge }) => {
   const formatSalary = (salary) => {
     if (!salary) return "Salary available";
     if (typeof salary === "string") return salary;
-    if (salary.min && salary.max) return `$${salary.min} - $${salary.max}`;
-    return `$${salary.amount}`;
+    if (salary.min && salary.max) return `${salary.min} - ${salary.max}`;
+    return `${salary.amount}`;
+  };
+
+  // Fire bookmark event (weight=3) — only on first bookmark, no un-bookmark
+  const handleBookmark = async () => {
+    if (isSaved) return;
+    setIsSaved(true); // optimistic UI
+    if (!userData) return; // not logged in — UI only
+    try {
+      const token = await getToken();
+      await axios.post(
+        `${backendUrl}/api/users/events`,
+        { jobId: job._id, eventType: "bookmark" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch {
+      // non-critical — silently ignore
+    }
   };
 
   return (
@@ -67,10 +90,10 @@ const JobCard = ({ job, recommendBadge }) => {
               </div>
             </div>
             <button
-              onClick={() => setIsSaved(!isSaved)}
-              className={`p-2 rounded-full text-xl ${
+              onClick={handleBookmark}
+              className={`p-2 rounded-full text-xl transition ${
                 isSaved ? "text-indigo-500" : "text-gray-400 hover:text-indigo-600"
-              } transition`}
+              }`}
               title={isSaved ? "Saved" : "Save job"}
             >
               <FiBookmark />
@@ -132,7 +155,9 @@ const JobCard = ({ job, recommendBadge }) => {
 
           {/* Recommendation badge */}
           {recommendBadge && (
-            <div className={`mx-6 mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}>
+            <div
+              className={`mx-6 mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}
+            >
               <span>✨</span> {recommendBadge.label}
             </div>
           )}
@@ -167,6 +192,28 @@ const JobCard = ({ job, recommendBadge }) => {
   );
 };
 
+JobCard.propTypes = {
+  job: PropTypes.shape({
+    _id: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    location: PropTypes.string,
+    level: PropTypes.string,
+    salary: PropTypes.oneOfType([PropTypes.number, PropTypes.string, PropTypes.object]),
+    type: PropTypes.string,
+    skills: PropTypes.arrayOf(PropTypes.string),
+    postedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    companyId: PropTypes.shape({
+      name: PropTypes.string,
+      image: PropTypes.string,
+    }),
+  }),
+  recommendBadge: PropTypes.shape({
+    label: PropTypes.string,
+    color: PropTypes.string,
+  }),
+};
+
 JobCard.defaultProps = {
   job: {
     title: "",
@@ -184,4 +231,3 @@ JobCard.defaultProps = {
 };
 
 export default JobCard;
-  

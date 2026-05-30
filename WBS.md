@@ -148,7 +148,7 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 
 - [x] `POST /api/users/events` — deduplicate views within 30 min, auto weight assignment
 - [x] `applyForJob()` auto-creates apply event (weight=5)
-- [ ] Frontend event tracking (Epic 6): ApplyJob view on mount + JobListing IntersectionObserver
+- [x] Frontend event tracking (Epic 6): ApplyJob view on mount + JobListing IntersectionObserver
 
 ### 5.2 User Profile Embedding — Status: DONE
 
@@ -202,9 +202,15 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 - [x] **`+ADD`** Fix `MONGODB_URI` duplicate key bug in `server/.env` (autofix introduced `MONGODB_URI=MONGODB_URI=...`)
 - [x] **`+ADD`** Fix `<style jsx>` → `<style>` in `Navbar.jsx` and `Footer.jsx` (Next.js syntax not supported in Vite)
 - [x] **`+ADD`** `JobCategories` + `JobLocations` Việt hóa — 6 categories khớp seed data, 63 tỉnh thành VN
+- [x] **`+ADD`** Event tracking audit — 4 event types reviewed:
+  - `view` (weight=1): ✅ Done — ApplyJob mount + JobListing IntersectionObserver
+  - `apply` (weight=5): ✅ Done — auto server-side in `applyForJob()`
+  - `bookmark` (weight=3): ⬜ **To-Do** — `JobCard.jsx` bookmark button fires UI toggle only, no API call
+  - `search` (weight=4): ❌ Intentionally skipped — Hero search has no `jobId` context; `view` events serve as proxy
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 
+- [x] **`+ADD`** L6: `JobCard.jsx` bookmark event — wire `FiBookmark` button to `POST /api/users/events { eventType: "bookmark" }` (weight=3); optimistic UI toggle; only fire on bookmark (not un-bookmark)
 - [ ] End-to-end test scenarios:
   - Flow 1: New user → onboarding → popular jobs → interaction → recommendations improve
   - Flow 2: Returning user → profile embedding → vector + collaborative blend

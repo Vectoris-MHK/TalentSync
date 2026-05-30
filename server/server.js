@@ -57,7 +57,10 @@ app.get("/health", async (req, res) => {
   const mongoose = (await import("mongoose")).default;
   const state = mongoose.connection.readyState;
   const states = { 0: "disconnected", 1: "connected", 2: "connecting", 3: "disconnecting" };
-  res.json({ status: "ok", db: states[state] || "unknown" });
+  if (state !== 1) {
+    return res.status(503).json({ status: "unavailable", db: states[state] || "unknown" });
+  }
+  res.json({ status: "ok", db: "connected" });
 });
 
 if (process.env.NODE_ENV !== 'production') {

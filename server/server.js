@@ -49,9 +49,8 @@ function dbReady(req, res, next) {
 
 app.use(cors());
 app.use(express.json());
-app.use(clerkMiddleware());
 
-// Routes that DON'T need database (respond instantly)
+// Public routes — MUST come before clerkMiddleware
 app.get("/", (req, res) => res.send("API Working"));
 app.get("/health", async (req, res) => {
   const mongoose = (await import("mongoose")).default;
@@ -69,8 +68,11 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// Clerk webhooks — no DB guard (webhook handler manages its own DB calls)
-app.post('/webhooks', clerkWebhooks);
+// Auth middleware — after public routes, before protected routes
+app.use(clerkMiddleware());
+
+// Clerk webhooks MUST use raw body before express.json() parses it
+app.post('/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks);
 
 // API routes — gated behind dbReady (wait for MongoDB pool)
 app.use('/api/company', dbReady, companyRoutes);

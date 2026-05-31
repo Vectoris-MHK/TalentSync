@@ -54,7 +54,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-tr from-[#f5f7fa] via-[#ebedfb] to-[#dce3ff] font-[Poppins]">
+    <div className="flex h-screen bg-gradient-to-tr from-[#f5f7fa] via-[#ebedfb] to-[#dce3ff] font-primary">
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarOpen && (

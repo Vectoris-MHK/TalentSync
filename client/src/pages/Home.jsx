@@ -5,6 +5,7 @@ import JobListing from "../components/JobListing";
 import AppDownload from "../components/AppDownload";
 import Footer from "../components/Footer";
 import Calltoaction from "../components/Calltoaction";
+import TrustedBy from "../components/TrustedBy";
 import RecommendedJobs from "../components/RecommendedJobs";
 import OnboardingModal from "../components/OnboardingModal";
 import { AppContext } from "../context/AppContext";
@@ -43,6 +44,7 @@ const Home = () => {
       <JobListing />
       <AppDownload />
       <Calltoaction />
+      <TrustedBy />
       <Footer />
 
       {showOnboarding && (

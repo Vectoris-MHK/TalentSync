@@ -14,8 +14,8 @@ export default {
         textBgSoft: "#FFEBC1", // Soft background for text
       },
       fontFamily: {
-        primary: ["Syne", "serif"], // Add "Roboto" as your primary font
-        secondary: ["Outfit", "serif"],   // Add "Lobster" as a secondary font
+        primary: ["Inter", "Be Vietnam Pro", "system-ui", "sans-serif"],
+        secondary: ["Be Vietnam Pro", "Inter", "system-ui", "sans-serif"],
       },
     },
   },

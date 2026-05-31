@@ -27,13 +27,11 @@ const MODE_BADGE = {
 };
 
 const SkeletonCard = () => (
-  <div className="min-w-[300px] max-w-[300px] rounded-2xl border border-gray-200 bg-white p-6 shadow-sm animate-pulse">
-    <div className="flex items-center gap-3 mb-4">
-      <div className="w-12 h-12 rounded-xl bg-gray-200" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-gray-200 rounded w-3/4" />
-        <div className="h-3 bg-gray-100 rounded w-1/2" />
-      </div>
+  <div className="min-w-[340px] max-w-[340px] rounded-2xl border border-gray-200 bg-white p-6 shadow-sm animate-pulse">
+    <div className="mb-3 space-y-2">
+      <div className="h-5 bg-gray-200 rounded w-3/4" />
+      <div className="h-4 bg-gray-200 rounded w-1/2" />
+      <div className="h-3 bg-gray-200 rounded w-1/3" />
     </div>
     <div className="space-y-2 mb-4">
       <div className="h-3 bg-gray-100 rounded w-full" />
@@ -125,7 +123,7 @@ const RecommendedJobs = () => {
             {jobs.map((job, index) => (
               <motion.div
                 key={job._id}
-                className="min-w-[300px] max-w-[300px]"
+                className="min-w-[340px] max-w-[340px] h-full"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.07 }}

@@ -159,7 +159,7 @@ const Applications = () => {
           className="mb-12 text-center"
         >
           <h1 className="text-6xl mt-20 font-bold text-white mb-4">
-            Bảng điều khiển ứng tuyển
+            Hồ sơ tìm việc của tôi
           </h1>
           <p className="text-slate-400 text-lg">Theo dõi hành trình sự nghiệp của bạn một cách chính xác</p>
         </motion.div>

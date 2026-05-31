@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FiBookmark, FiMapPin, FiBriefcase, FiDollarSign, FiClock } from "react-icons/fi";
+import { FiBookmark, FiMapPin, FiBriefcase, FiClock } from "react-icons/fi";
 import axios from "axios";
 import { useAuth } from "@clerk/clerk-react";
 import PropTypes from "prop-types";
@@ -15,7 +15,13 @@ const JobCard = ({ job, recommendBadge }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const stripHtmlTags = (html) => {
-    return html ? html.replace(/<[^>]*>?/gm, "") : "Chưa có mô tả";
+    if (!html) return "Chưa có mô tả";
+    return html
+      .replace(/<\/(p|h[1-6]|li|div|br|tr)\s*>/gi, "\n")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
   };
 
   const getTimePassed = (date) => {
@@ -30,11 +36,17 @@ const JobCard = ({ job, recommendBadge }) => {
     return "Vừa xong";
   };
 
+  const formatValue = (v) =>
+    typeof v === "number" ? v.toLocaleString("vi-VN") : v;
+
   const formatSalary = (salary) => {
     if (!salary) return "Lương thỏa thuận";
     if (typeof salary === "string") return salary;
-    if (salary.min && salary.max) return `${salary.min} - ${salary.max}`;
-    return `${salary.amount}`;
+    if (typeof salary === "number") return salary.toLocaleString("vi-VN");
+    if (salary.min && salary.max)
+      return `${formatValue(salary.min)} - ${formatValue(salary.max)}`;
+    if (salary.amount) return formatValue(salary.amount);
+    return "Lương thỏa thuận";
   };
 
   // Fire bookmark event (weight=3) — only on first bookmark, no un-bookmark
@@ -56,6 +68,7 @@ const JobCard = ({ job, recommendBadge }) => {
 
   return (
     <motion.div
+      className="h-full"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
@@ -64,53 +77,28 @@ const JobCard = ({ job, recommendBadge }) => {
       <motion.div
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="relative group p-1 rounded-2xl bg-gradient-to-tr from-white to-[#f9f9f9] border border-gray-200 hover:border-indigo-400 shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300"
+        className="relative group p-1 rounded-2xl bg-gradient-to-tr from-white to-[#f9f9f9] border border-gray-200 hover:border-indigo-400 shadow-xl hover:shadow-2xl backdrop-blur-md transition-all duration-300 h-full"
       >
-        <div className="bg-white rounded-2xl overflow-hidden">
-          {/* Ribbon */}
-          {getTimePassed(job.date) === "Vừa xong" && (
-            <span className="absolute top-4 right-4 bg-indigo-500 text-white text-[10px] px-2 py-1 rounded-full font-semibold shadow-md z-10 animate-pulse">
-              MỚI
-            </span>
-          )}
-
+        <div className="bg-white rounded-2xl overflow-hidden h-full flex flex-col">
           {/* Header */}
-          <div className="p-6 pb-3 flex justify-between items-start">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
-                <img
-                  src={job.companyId?.image || "/default-company.png"}
-                  alt="logo"
-                  className="w-full h-full object-contain p-1"
-                />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-zinc-800">{job.title || "Chức danh"}</h3>
-                <p className="text-sm text-gray-500">{job.companyId?.name || "Công ty"}</p>
-              </div>
+          <div className="px-6 pt-6 pb-3 shrink-0">
+            <h3 className="text-lg font-bold text-zinc-800 line-clamp-2">{job.title || "Chức danh"}</h3>
+            <p className="text-sm text-gray-500 mt-0.5">{job.companyId?.name || "Công ty"}</p>
+            <div className="flex items-center gap-3 mt-1">
+              <p className="text-xs text-gray-400">Đăng {getTimePassed(job.date)}</p>
+              <span className="text-xs text-emerald-600 font-medium">₫ {formatSalary(job.salary)}</span>
             </div>
-            <button
-              onClick={handleBookmark}
-              className={`p-2 rounded-full text-xl transition ${
-                isSaved ? "text-indigo-500" : "text-gray-400 hover:text-indigo-600"
-              }`}
-              title={isSaved ? "Đã lưu" : "Lưu việc làm"}
-              aria-label={isSaved ? "Đã lưu" : "Lưu việc làm"}
-            >
-              <FiBookmark />
-            </button>
           </div>
 
+          {/* Body: expands to fill space, footer pinned to bottom */}
+          <div className="flex-1 px-6">
           {/* Tags */}
-          <div className="px-6 pb-4 flex flex-wrap gap-2 text-xs font-medium">
+          <div className="pb-4 flex flex-wrap gap-2 text-xs font-medium">
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">
               <FiMapPin className="text-sm" /> {job.location || "Từ xa"}
             </span>
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-pink-50 text-pink-600">
               <FiBriefcase className="text-sm" /> {job.level || "Trung cấp"}
-            </span>
-            <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600">
-              <FiDollarSign className="text-sm" /> {formatSalary(job.salary)}
             </span>
             {job.type && (
               <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-orange-50 text-orange-600">
@@ -119,8 +107,17 @@ const JobCard = ({ job, recommendBadge }) => {
             )}
           </div>
 
+          {/* Recommendation badge */}
+          {recommendBadge && (
+            <div
+              className={`mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}
+            >
+              <span>✨</span> {recommendBadge.label}
+            </div>
+          )}
+
           {/* Description */}
-          <div className="px-6 pb-4">
+          <div className="pb-4">
             <p
               className={`text-sm text-gray-600 leading-relaxed ${
                 isExpanded ? "" : "line-clamp-3"
@@ -134,7 +131,7 @@ const JobCard = ({ job, recommendBadge }) => {
 
           {/* Skills */}
           {job.skills?.length > 0 && (
-            <div className="px-6 pb-4">
+            <div className="pb-4">
               <div className="flex flex-wrap gap-2">
                 {job.skills.slice(0, 4).map((skill, index) => (
                   <motion.span
@@ -157,26 +154,35 @@ const JobCard = ({ job, recommendBadge }) => {
           {/* Recommendation badge */}
           {recommendBadge && (
             <div
-              className={`mx-6 mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}
+              className={`mb-3 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border ${recommendBadge.color}`}
             >
               <span>✨</span> {recommendBadge.label}
             </div>
           )}
 
+          </div>{/* end flex-1 body */}
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
-            <span className="text-xs text-gray-500">Đăng {getTimePassed(job.date)}</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  navigate(`/apply-job/${job._id}`);
-                  window.scrollTo(0, 0);
-                }}
-                className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 rounded-md hover:shadow-md"
-              >
-                Ứng tuyển ngay
-              </button>
-            </div>
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center shrink-0">
+            <button
+              onClick={handleBookmark}
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md transition border ${
+                isSaved
+                  ? "text-indigo-600 bg-indigo-50 border-indigo-200"
+                  : "text-gray-500 bg-white border-gray-200 hover:text-indigo-600 hover:border-indigo-300"
+              }`}
+            >
+              <FiBookmark className="text-sm" />
+              {isSaved ? "Đã lưu" : "Lưu tin"}
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/apply-job/${job._id}`);
+                window.scrollTo(0, 0);
+              }}
+              className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 rounded-md hover:shadow-md"
+            >
+              Ứng tuyển ngay
+            </button>
           </div>
         </div>
       </motion.div>

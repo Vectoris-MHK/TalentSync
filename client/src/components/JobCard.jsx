@@ -68,7 +68,7 @@ const JobCard = ({ job, recommendBadge }) => {
       >
         <div className="bg-white rounded-2xl overflow-hidden">
           {/* Ribbon */}
-          {getTimePassed(job.postedAt) === "Just now" && (
+          {getTimePassed(job.date) === "Just now" && (
             <span className="absolute top-4 right-4 bg-indigo-500 text-white text-[10px] px-2 py-1 rounded-full font-semibold shadow-md z-10 animate-pulse">
               NEW
             </span>
@@ -95,6 +95,7 @@ const JobCard = ({ job, recommendBadge }) => {
                 isSaved ? "text-indigo-500" : "text-gray-400 hover:text-indigo-600"
               }`}
               title={isSaved ? "Saved" : "Save job"}
+              aria-label={isSaved ? "Saved" : "Save job"}
             >
               <FiBookmark />
             </button>
@@ -164,17 +165,8 @@ const JobCard = ({ job, recommendBadge }) => {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
-            <span className="text-xs text-gray-500">Posted {getTimePassed(job.postedAt)}</span>
+            <span className="text-xs text-gray-500">Posted {getTimePassed(job.date)}</span>
             <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  navigate(`/apply-job/${job._id}`);
-                  window.scrollTo(0, 0);
-                }}
-                className="px-4 py-2 text-xs font-semibold text-indigo-600 border border-indigo-500 rounded-md hover:bg-indigo-50 transition"
-              >
-                Learn More
-              </button>
               <button
                 onClick={() => {
                   navigate(`/apply-job/${job._id}`);

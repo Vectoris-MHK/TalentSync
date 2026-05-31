@@ -45,7 +45,7 @@ const Navbar = () => {
               <Zap size={24} className="text-white" />
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Prodigy
+              TalentSync
             </span>
           </div>
 
@@ -96,16 +96,6 @@ const Navbar = () => {
           </div>
         </nav>
       </div>
-
-      <style>{`
-        @keyframes slideDown {
-          from { transform: translateY(-100%); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .animate-slideDown {
-          animation: slideDown 0.4s ease-out forwards;
-        }
-      `}</style>
     </>
   );
 };

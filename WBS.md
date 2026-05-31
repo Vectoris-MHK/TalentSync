@@ -205,8 +205,54 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 - [x] **`+ADD`** Event tracking audit — 4 event types reviewed:
   - `view` (weight=1): ✅ Done — ApplyJob mount + JobListing IntersectionObserver
   - `apply` (weight=5): ✅ Done — auto server-side in `applyForJob()`
-  - `bookmark` (weight=3): ⬜ **To-Do** — `JobCard.jsx` bookmark button fires UI toggle only, no API call
+  - `bookmark` (weight=3): ✅ Done — FiBookmark button wired to POST /api/users/events
   - `search` (weight=4): ❌ Intentionally skipped — Hero search has no `jobId` context; `view` events serve as proxy
+
+### 6.4 UI/UX Audit Fixes (Status: ✅ PROTOTYPE 1 COMPLETE, Start: 2026-05-31, Completed: 2026-05-31 12:10)
+
+> **`+ADD`** Comprehensive UI/UX audit completed 2026-05-31. Task inventory: `docs/implement/ui-ux-audit.md`. Execution plan: `docs/implement/ui-ux-plan.md`. 30 issues identified across P0–P3 priorities. **Prototype 1 (17 LOW-risk tasks, 1.60h) executed 2026-05-31 11:23–12:10 — build passes, zero regressions.**
+
+#### 6.4.1 P0 — Critical Brand & Visual Bugs (Status: ✅ DONE, 6/6)
+
+- [x] **U1:** Brand rename "Prodigy" → "TalentSync" across Navbar, Footer, Hero, and `<title>` (4 files: `Navbar.jsx`, `Footer.jsx`, `Hero.jsx`, `index.html`). Calltoaction.jsx and AppDownload.jsx had no "Prodigy" text.
+- [x] **U2:** Fix Hero background overlay opacity — `from-blue-900/100` → `/80` (`Hero.jsx:79`)
+- [x] **U3:** Remove duplicate "Learn More" button on JobCard (`JobCard.jsx:169-186`)
+- [x] **U4:** Fix dead time display — `job.postedAt` → `job.date` in `getTimePassed` (`JobCard.jsx:21-31,71,167`)
+- [x] **U5:** Fix footer copyright — "© 2025 Prodigy" → "© 2026 TalentSync" (`Footer.jsx:327`)
+- [x] **U6:** Fix favicon path — `../client/public/newFavicon.svg` → `/newFavicon.svg` (`index.html:6`)
+
+#### 6.4.2 P1 — High Visual & Functional Issues (Status: 🔄 IN PROGRESS, 3/6)
+
+- [ ] **U7:** Apply `primary` color from Tailwind config (#004AAD) consistently — replace all raw blue-600/indigo-600/indigo-700 (12+ files)
+- [x] **U8:** Fix hardcoded localhost link in AppDownload → `<Link to="#">` (`AppDownload.jsx:166-171`)
+- [ ] **U9:** Wire "Sort by" dropdown — currently decorative with no onChange (`JobListing.jsx:350-357`)
+- [x] **U10:** Fix dead footer links — all `<a href="/">` → `href="#"` (`Footer.jsx:123-274,330-333`)
+- [ ] **U11:** Wire or remove fake footer newsletter — visual feedback only, no API (`Footer.jsx:8-14`)
+- [x] **U12:** Remove Hero unused SVG imports (6 logos) (`Hero.jsx:10-15`)
+
+#### 6.4.3 P2 — Medium Polish (Status: 🔄 IN PROGRESS, 4/9)
+
+- [ ] **U13:** Unify icon library (react-icons → lucide-react)
+- [ ] **U14:** Fix typography confusion (Syne/Outfit/Poppins)
+- [x] **U15:** Unhide scrollbars — replace `display:none` with styled 6px custom scrollbar (`index.css:19-37`)
+- [ ] **U16:** Replace 787-line Loading.css with Tailwind skeleton
+- [x] **U17:** Move Navbar `<style>` keyframes to `index.css` (`Navbar.jsx:100-108` removed)
+- [x] **U18:** Move Footer `<style>` keyframes to `index.css` (`Footer.jsx:341-351` removed)
+- [ ] **U19:** Unify Applications page theme (slate-900 → light)
+- [ ] **U20:** Fix ManageJobs applicant count (use real aggregation query)
+- [x] **U21:** Fix footer social links — mzherx personal URLs → `#` with aria-labels (`Footer.jsx:288-307`)
+
+#### 6.4.4 P3 — Low Accessibility & Cleanup (Status: 🔄 IN PROGRESS, 4/9)
+
+- [ ] **U22:** Remove Navbar spacer hack (`<div>` → `pt-20`)
+- [ ] **U23:** Fix ViewApplications mobile layout
+- [x] **U24:** Fix HTML lang — `en` → `vi` (`index.html:2`)
+- [ ] **U25:** Remove JobListing mobile duplicate search
+- [x] **U26:** Add `aria-label` to icon-only buttons — bookmark (`JobCard.jsx:98`), socials (`Footer.jsx:288-303`), close (`RecruiterLogin.jsx:467` pre-existing)
+- [ ] **U27:** Add page `<title>` management per route
+- [ ] **U28:** Add Suspense/Loading boundary for routes
+- [x] **U29:** Add error recovery UI to ManageJobs — error state + "Thử lại" retry button (`ManageJobs.jsx:14,68-78`)
+- [x] **U30:** Remove 823 lines dead sample data from `assets.js` (`manageJobsData`, `jobsApplied`, `viewApplicationsPageData`, `jobsData` deleted)
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 

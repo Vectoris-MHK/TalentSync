@@ -11,11 +11,12 @@ const ManageJobs = () => {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { backendUrl, companyToken } = useContext(AppContext);
 
-  // Function to fetch company Job Applications
   const fetchCompanyJobs = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const { data } = await axios.get(backendUrl + "/api/company/list-jobs", {
         headers: { token: companyToken },
@@ -23,12 +24,13 @@ const ManageJobs = () => {
 
       if (data.success) {
         setJobs(data.jobsData.reverse());
-        console.log(data.jobsData);
       } else {
         toast.error(data.message);
+        setError(data.message);
       }
     } catch (error) {
       toast.error(error.message);
+      setError(error.message || "Không thể tải dữ liệu. Vui lòng thử lại.");
     } finally {
       setIsLoading(false);
     }
@@ -62,6 +64,20 @@ const ManageJobs = () => {
   }, [companyToken]);
 
   if (isLoading) return <Loading />;
+
+  if (error && !jobs) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] bg-white rounded-xl shadow-md gap-4">
+        <p className="text-xl text-gray-600">Không thể tải dữ liệu. Vui lòng thử lại.</p>
+        <button
+          onClick={fetchCompanyJobs}
+          className="bg-primary text-white py-2 px-6 rounded-lg font-medium hover:bg-primary/90 transition"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
 
   if (jobs && jobs.length === 0) {
     return (

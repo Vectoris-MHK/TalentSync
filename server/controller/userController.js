@@ -132,9 +132,11 @@ export const updateUserResume = async (req, res) => {
     }
 
     if (resumeFile) {
+      const isPdf = resumeFile.mimetype === "application/pdf";
       const resumeUpload = await v2.uploader.upload(resumeFile.path, {
-        resource_type: "auto",
+        resource_type: isPdf ? "raw" : "auto",
         type: "upload",
+        format: isPdf ? "pdf" : undefined,
       });
       userData.resume = resumeUpload.secure_url;
     }

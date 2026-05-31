@@ -132,7 +132,10 @@ export const updateUserResume = async (req, res) => {
     }
 
     if (resumeFile) {
-      const resumeUpload = await v2.uploader.upload(resumeFile.path);
+      const resumeUpload = await v2.uploader.upload(resumeFile.path, {
+        resource_type: "auto",
+        type: "upload",
+      });
       userData.resume = resumeUpload.secure_url;
     }
     await userData.save();

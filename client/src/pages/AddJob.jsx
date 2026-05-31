@@ -34,7 +34,7 @@ const AddJob = () => {
     e.preventDefault();
     
     if (!isFormValid) {
-      toast.error("Please fill all required fields");
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
       return;
     }
     
@@ -87,7 +87,7 @@ const AddJob = () => {
             ['link', 'image']
           ]
         },
-        placeholder: 'Create a detailed job description...'
+        placeholder: 'Tạo mô tả công việc chi tiết...'
       });
     }
   }, []);
@@ -100,16 +100,16 @@ const AddJob = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 mt-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-primary">Post a New Position</h2>
-        <p className="text-gray-500 mt-1">Create a job listing to attract the perfect candidates</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-primary">Đăng tin tuyển dụng mới</h2>
+        <p className="text-gray-500 mt-1">Tạo tin tuyển dụng để thu hút ứng viên phù hợp nhất</p>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-10">
         <div className="flex justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">Basic Info</span>
-          <span className="text-sm font-medium text-gray-700">Job Details</span>
-          <span className="text-sm font-medium text-gray-700">Preview & Post</span>
+          <span className="text-sm font-medium text-gray-700">Thông tin cơ bản</span>
+          <span className="text-sm font-medium text-gray-700">Chi tiết công việc</span>
+          <span className="text-sm font-medium text-gray-700">Xem trước & Đăng</span>
         </div>
         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
           <div 
@@ -130,7 +130,7 @@ const AddJob = () => {
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
             <div className="flex items-center mb-6">
               <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold mr-3">1</div>
-              <h3 className="text-xl font-semibold text-gray-800">Job Basics</h3>
+              <h3 className="text-xl font-semibold text-gray-800">Thông tin cơ bản</h3>
             </div>
             
             <div className="space-y-6">
@@ -141,7 +141,7 @@ const AddJob = () => {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="e.g. Senior React Developer"
+                    placeholder="VD: Chuyên viên phát triển React cao cấp"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
@@ -159,7 +159,7 @@ const AddJob = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Salary (Annual) <span className="text-red-500">*</span>
+                  Lương (Hàng năm) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
@@ -175,7 +175,7 @@ const AddJob = () => {
                     className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all duration-200"
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">Enter the annual salary in USD</p>
+                <p className="mt-1 text-xs text-gray-500">Nhập mức lương hàng năm (USD)</p>
               </div>
             </div>
           </div>
@@ -189,7 +189,7 @@ const AddJob = () => {
                 (!title || salary <= 0) ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              Continue to Job Details
+              Tiếp tục đến Chi tiết công việc
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
@@ -207,27 +207,27 @@ const AddJob = () => {
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
             <div className="flex items-center mb-6">
               <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold mr-3">2</div>
-              <h3 className="text-xl font-semibold text-gray-800">Job Details</h3>
+              <h3 className="text-xl font-semibold text-gray-800">Chi tiết công việc</h3>
             </div>
             
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Description <span className="text-red-500">*</span>
+                  Mô tả công việc <span className="text-red-500">*</span>
                 </label>
                 <div 
                   ref={editorRef}
                   className="w-full border border-gray-300 rounded-lg min-h-48"
                 ></div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Be specific about responsibilities, requirements, benefits, and company culture
+                  Mô tả cụ thể về trách nhiệm, yêu cầu, phúc lợi và văn hóa công ty
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Job Category
+                    Ngành nghề
                   </label>
                   <select
                     value={category}
@@ -244,7 +244,7 @@ const AddJob = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Job Location
+                    Địa điểm làm việc
                   </label>
                   <select
                     value={location}
@@ -261,16 +261,16 @@ const AddJob = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Experience Level
+                    Cấp độ kinh nghiệm
                   </label>
                   <select
                     value={level}
                     onChange={(e) => setLevel(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white transition-all duration-200"
                   >
-                    <option value="Beginner level">Beginner level</option>
-                    <option value="Intermediate level">Intermediate level</option>
-                    <option value="Senior level">Senior level</option>
+                    <option value="Beginner level">Mới bắt đầu</option>
+                    <option value="Intermediate level">Trung cấp</option>
+                    <option value="Senior level">Cao cấp</option>
                   </select>
                 </div>
               </div>
@@ -286,14 +286,14 @@ const AddJob = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              Back
+              Quay lại
             </button>
             <button
               type="button"
               onClick={() => setFormStep(3)}
               className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
             >
-              Preview Job
+              Xem trước
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
@@ -311,14 +311,14 @@ const AddJob = () => {
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
             <div className="flex items-center mb-6">
               <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold mr-3">3</div>
-              <h3 className="text-xl font-semibold text-gray-800">Preview & Post</h3>
+              <h3 className="text-xl font-semibold text-gray-800">Xem trước & Đăng tin</h3>
             </div>
             
             <div className="space-y-6">
               <div className="p-6 border border-dashed border-gray-300 rounded-xl bg-gray-50">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{title || "Job Title"}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{title || "Chức danh"}</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {location}
@@ -333,12 +333,12 @@ const AddJob = () => {
                   </div>
                   <div className="text-right">
                     <span className="text-lg font-bold text-gray-900">${salary.toLocaleString()}</span>
-                    <p className="text-sm text-gray-500">per year</p>
+                    <p className="text-sm text-gray-500">mỗi năm</p>
                   </div>
                 </div>
                 
                 <div className="border-t border-gray-200 pt-4 mt-4">
-                  <h4 className="font-medium text-gray-700 mb-2">Job Description</h4>
+                  <h4 className="font-medium text-gray-700 mb-2">Mô tả công việc</h4>
                   <div className="prose max-w-none">
                     {quillRef.current && (
                       <div dangerouslySetInnerHTML={{ __html: quillRef.current.root.innerHTML }} />
@@ -358,7 +358,7 @@ const AddJob = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              Edit Details
+              Chỉnh sửa chi tiết
             </button>
             <button
               type="submit"
@@ -373,11 +373,11 @@ const AddJob = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Posting...
+                  Đang đăng...
                 </>
               ) : (
                 <>
-                  Post Job
+                  Đăng tin
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block ml-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>

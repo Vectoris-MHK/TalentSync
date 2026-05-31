@@ -17,7 +17,7 @@ export const getJobs = async (req, res) => {
 
     } catch (error) {
         console.error("Controller error:", error);
-        res.json({success: false, message: "An unexpected error occurred"})
+        res.json({success: false, message: "Đã xảy ra lỗi không mong muốn"})
     }
 };
 
@@ -36,7 +36,7 @@ export const getJobById = async (req, res) => {
         if(!job){
             return res.json({
                 success:false,
-                message:"Job not found" 
+                message:"Không tìm thấy công việc" 
             })
         }
 
@@ -127,7 +127,7 @@ export const getRecommendContent = async (req, res) => {
     } else {
       const user = await User.findById(userId);
       if (!user || !user.embedding || user.embedding.length === 0) {
-        return res.json({ success: false, message: "No query text and no user embedding available" });
+        return res.json({ success: false, message: "Không có văn bản truy vấn và không có embedding người dùng" });
       }
       queryVector = user.embedding;
     }
@@ -217,7 +217,7 @@ export const getRecommendContent = async (req, res) => {
     return res.json({ success: true, jobs: results, queryVectorSize: queryVector.length });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -240,7 +240,7 @@ export const getCollaborativeJobs = async (req, res) => {
     return res.json({ success: true, jobs: results });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -252,7 +252,7 @@ export const getRecommendFeed = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
-    if (!user) return res.json({ success: false, message: "User not found" });
+    if (!user) return res.json({ success: false, message: "Không tìm thấy người dùng" });
 
     const appliedJobs = await JobApplication.find({ userId }).select("jobId").lean();
     const appliedJobIds = appliedJobs.map((a) => a.jobId);
@@ -385,6 +385,6 @@ export const getRecommendFeed = async (req, res) => {
     return res.json({ success: true, jobs: popularJobs, mode: "popular" });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };

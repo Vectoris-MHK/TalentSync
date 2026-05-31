@@ -35,10 +35,10 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const formatTime = date => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const formatTime = date => date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    return hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+    return hour < 12 ? "Chào buổi sáng" : hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
   };
   const logout = () => {
     setCompanyToken(null);
@@ -48,9 +48,9 @@ const Dashboard = () => {
   };
 
   const navItems = [
-    { path: "add-job", label: "Add Job", icon: "➕" },
-    { path: "manage-job", label: "Manage Jobs", icon: "📂" },
-    { path: "view-applications", label: "Applications", icon: "📨" },
+    { path: "add-job", label: "Thêm việc làm", icon: "➕" },
+    { path: "manage-job", label: "Quản lý việc làm", icon: "📂" },
+    { path: "view-applications", label: "Đơn ứng tuyển", icon: "📨" },
   ];
 
   return (
@@ -87,13 +87,13 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-indigo-800">{companyData?.name}</p>
-                  <p className="text-xs text-indigo-500">Recruiter Mode</p>
+                  <p className="text-xs text-indigo-500">Chế độ tuyển dụng</p>
                 </div>
               </div>
               <button
                 onClick={logout}
                 className="mt-4 text-sm text-red-500 hover:underline w-full text-left"
-              >Sign out</button>
+                >Đăng xuất</button>
             </div>
           </motion.aside>
         )}
@@ -111,7 +111,7 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold text-gray-800">
               {activeTab.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()) || "Dashboard"}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <p className="text-sm text-gray-500 mt-1">{currentTime.toLocaleDateString('vi-VN', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-600 font-semibold">{getGreeting()},</p>

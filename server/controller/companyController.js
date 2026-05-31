@@ -12,14 +12,14 @@ export const registerCompany = async (req, res) => {
   const imageFile = req.file;
 
   if (!name || !email || !password || !imageFile) {
-    return res.json({ success: false, message: "All fields are required" });
+    return res.json({ success: false, message: "Vui lòng điền đầy đủ tất cả các trường" });
   }
 
   try {
     const companyExists = await Company.findOne({ email });
 
     if (companyExists) {
-      return res.json({ success: false, message: "Company Already Exists" });
+      return res.json({ success: false, message: "Công ty đã tồn tại" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -46,7 +46,7 @@ export const registerCompany = async (req, res) => {
     });
   } catch (error) {
     console.error("registerCompany error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -58,7 +58,7 @@ export const loginCompany = async (req, res) => {
     const company = await Company.findOne({ email });
 
     if (!company) {
-      return res.json({ success: false, message: "Invalid email or password" });
+      return res.json({ success: false, message: "Email hoặc mật khẩu không hợp lệ" });
     }
 
     if (await bcrypt.compare(password, company.password)) {
@@ -75,11 +75,11 @@ export const loginCompany = async (req, res) => {
     } else
       res.json({
         success: false,
-        message: "Invalid email or password",
+        message: "Email hoặc mật khẩu không hợp lệ",
       });
   } catch (error) {
     console.error("loginCompany error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -91,7 +91,7 @@ export const getCompanyData = async (req, res) => {
     res.json({ success: true, company });
   } catch (error) {
     console.error("getCompanyData error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -126,7 +126,7 @@ export const postJob = async (req, res) => {
     res.json({ success: true, newJob });
   } catch (error) {
     console.error("postJob error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 // Get Company Job Applicants
@@ -143,7 +143,7 @@ export const getCompanyJobApplicants = async (req, res) => {
     return res.json({ success: true, applications });
   } catch (error) {
     console.error("getCompanyJobApplicants error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -168,7 +168,7 @@ export const getCompanyPostedJobs = async (req, res) => {
     res.json({ success: true, jobsData });
   } catch (error) {
     console.error("Error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -184,7 +184,7 @@ export const ChangeJobApplicationStatus = async (req, res) => {
     {_id: id,},
     {status}
   )
-  res.json({success:true, message:"Status Changed"})
+  res.json({success:true, message:"Đã cập nhật trạng thái"})
   }
   catch(error){
     console.error("ChangeJobApplicationStatus error:", error);
@@ -204,7 +204,7 @@ export const changeVisiblity = async (req, res) => {
     const job = await Job.findById(id);
 
     if (!job) {
-      return res.json({ success: false, message: "Job not found" });
+      return res.json({ success: false, message: "Không tìm thấy công việc" });
     }
 
     if (companyID.toString() === job.companyId.toString()) {
@@ -214,6 +214,6 @@ export const changeVisiblity = async (req, res) => {
     res.json({ success: true, job });
   } catch (error) {
     console.error("changeVisiblity error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };

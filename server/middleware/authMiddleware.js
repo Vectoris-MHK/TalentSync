@@ -8,7 +8,7 @@ export const protectCompany = async (req, res, next) => {
     if(!token){
         return res.json({
             success: false,
-            message: "Not authorized"})
+            message: "Không được ủy quyền"})
     }
     try {
         
@@ -21,7 +21,7 @@ export const protectCompany = async (req, res, next) => {
     } catch (error) {
         res.json({
             success: false,
-            message: "Not authorized, Login Again"})
+            message: "Không được ủy quyền, vui lòng đăng nhập lại"})
     }
 
 }

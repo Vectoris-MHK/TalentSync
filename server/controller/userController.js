@@ -30,14 +30,14 @@ export const getUserData = async (req, res) => {
         console.log("Auto-created user from Clerk:", userId);
       } catch (clerkErr) {
         console.error("Failed to fetch/create user from Clerk:", clerkErr.message);
-        return res.json({ success: false, message: "User not found" });
+        return res.json({ success: false, message: "Không tìm thấy người dùng" });
       }
     }
     res.json({ success: true, user });
   } catch (error) {
     console.log("Error fetching user:", error.message); // Log any errors
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -52,14 +52,14 @@ export const applyForJob = async (req, res) => {
     if (isAlreadyApplied) {
       return res.json({
         success: false,
-        message: "You have already applied for this job",
+        message: "Bạn đã ứng tuyển công việc này rồi",
       });
     }
 
     const jobData = await Job.findById(jobId);
 
     if (!jobData) {
-      return res.json({ success: false, message: "Job not found" });
+      return res.json({ success: false, message: "Không tìm thấy công việc" });
     }
 
     await JobApplication.create({
@@ -75,10 +75,10 @@ export const applyForJob = async (req, res) => {
       console.warn("Failed to log apply event:", eventErr.message);
     }
 
-    res.json({ success: true, message: "Applied Successfully" });
+    res.json({ success: true, message: "Ứng tuyển thành công" });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -99,7 +99,7 @@ export const getUserJobApplications = async (req, res) => {
     return res.json({ success: true, applications });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -127,7 +127,7 @@ export const updateUserResume = async (req, res) => {
         console.log("Auto-created user from Clerk during resume update:", userId);
       } catch (clerkErr) {
         console.error("Failed to fetch/create user from Clerk:", clerkErr.message);
-        return res.json({ success: false, message: "User not found" });
+        return res.json({ success: false, message: "Không tìm thấy người dùng" });
       }
     }
 
@@ -142,10 +142,10 @@ export const updateUserResume = async (req, res) => {
     }
     await userData.save();
 
-    return res.json({ success: true, message: "Resume Updated Successfully" });
+    return res.json({ success: true, message: "Đã cập nhật hồ sơ thành công" });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -156,7 +156,7 @@ export const getUserProfile = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
-    if (!user) return res.json({ success: false, message: "User not found" });
+    if (!user) return res.json({ success: false, message: "Không tìm thấy người dùng" });
 
     // Aggregate: group UserEvents by jobId, sum weights, top 50
     const topJobs = await UserEvent.aggregate([
@@ -219,7 +219,7 @@ export const getUserProfile = async (req, res) => {
     return res.json({ success: true, coldStart: false, user });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -230,7 +230,7 @@ export const updateUserPreferences = async (req, res) => {
   const { preferences } = req.body;
 
   if (!Array.isArray(preferences)) {
-    return res.json({ success: false, message: "preferences must be an array" });
+    return res.json({ success: false, message: "Sở thích phải là một mảng" });
   }
 
   const VALID_CATEGORIES = ["Lập trình", "Thiết kế", "Marketing", "Tài chính", "Quản lý", "Kinh doanh"];
@@ -243,12 +243,12 @@ export const updateUserPreferences = async (req, res) => {
       { new: true }
     );
 
-    if (!user) return res.json({ success: false, message: "User not found" });
+    if (!user) return res.json({ success: false, message: "Không tìm thấy người dùng" });
 
     return res.json({ success: true, preferences: user.preferences, user });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };
 
@@ -261,14 +261,14 @@ export const logUserEvent = async (req, res) => {
 
   const VALID_TYPES = ["search", "view", "bookmark", "apply"];
   if (!jobId || !eventType || !VALID_TYPES.includes(eventType)) {
-    return res.json({ success: false, message: "Invalid jobId or eventType" });
+    return res.json({ success: false, message: "jobId hoặc eventType không hợp lệ" });
   }
 
   const WEIGHT_MAP = { search: 4, view: 1, bookmark: 3, apply: 5 };
 
   try {
     const job = await Job.findById(jobId);
-    if (!job) return res.json({ success: false, message: "Job not found" });
+    if (!job) return res.json({ success: false, message: "Không tìm thấy công việc" });
 
     if (eventType === "view") {
       const existing = await UserEvent.findOne({
@@ -278,7 +278,7 @@ export const logUserEvent = async (req, res) => {
         timestamp: { $gt: Date.now() - 30 * 60 * 1000 },
       });
       if (existing) {
-        return res.json({ success: true, skipped: true, message: "View already logged within 30 minutes" });
+        return res.json({ success: true, skipped: true, message: "Lượt xem đã được ghi nhận trong vòng 30 phút" });
       }
     }
 
@@ -293,6 +293,6 @@ export const logUserEvent = async (req, res) => {
     return res.json({ success: true, event });
   } catch (error) {
     console.error("Controller error:", error);
-    res.json({ success: false, message: "An unexpected error occurred" });
+    res.json({ success: false, message: "Đã xảy ra lỗi không mong muốn" });
   }
 };

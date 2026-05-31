@@ -58,12 +58,12 @@ const Navbar = () => {
                   className="hidden md:flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50"
                 >
                   <Briefcase size={18} />
-                  <span className="font-medium">My Jobs</span>
+                  <span className="font-medium">Việc làm của tôi</span>
                 </Link>
                 <div className="flex items-center gap-3">
                   <div className="hidden md:block">
                     <span className="text-sm font-medium text-gray-600">
-                      Hi, {user.firstName}
+                      Chào, {user.firstName}
                     </span>
                   </div>
                   <UserButton 
@@ -83,13 +83,13 @@ const Navbar = () => {
                   onClick={(e) => setShowRecruiterLogin(true)}
                   className="hidden md:block text-sm font-medium text-gray-600 hover:text-blue-600 transition-all duration-200 px-4 py-2 rounded-lg hover:bg-blue-50"
                 >
-                  Recruiter Portal
+                  Cổng tuyển dụng
                 </button>
                 <button
                   onClick={(e) => openSignIn()}
                   className={`bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-2.5 rounded-xl font-medium text-sm ${scrolled ? 'shadow-lg hover:shadow-blue-500/30' : 'hover:shadow-md'} transition-all duration-300`}
                 >
-                  Get Started
+                  Bắt đầu
                 </button>
               </>
             )}

@@ -37,12 +37,12 @@ router.post(
       if (err.code === "LIMIT_FILE_SIZE") {
         return res
           .status(400)
-          .json({ success: false, message: "File too large. Maximum size is 10MB" });
+          .json({ success: false, message: "Tệp quá lớn. Kích thước tối đa là 10MB" });
       }
       if (err.code === "INVALID_TYPE") {
         return res
           .status(400)
-          .json({ success: false, message: "Unsupported file type. Chỉ hỗ trợ PDF, DOCX, PNG, JPG" });
+          .json({ success: false, message: "Định dạng tệp không được hỗ trợ. Chỉ hỗ trợ PDF, DOCX, PNG, JPG" });
       }
       next(err);
     });

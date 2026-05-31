@@ -45,7 +45,7 @@ const ViewApplications = () => {
 
       if (data.success) {
         fetchCompanyJobApplications();
-        toast.success(`Application ${status.toLowerCase()} successfully`);
+        toast.success(`Đơn ứng tuyển đã được ${status.toLowerCase() === 'accepted' ? 'chấp nhận' : 'từ chối'} thành công`);
       } else {
         toast.error(data.message);
       }
@@ -129,8 +129,8 @@ const ViewApplications = () => {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">Application Management</h1>
-          <p className="text-gray-500">Review and manage candidate applications</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">Quản lý đơn ứng tuyển</h1>
+          <p className="text-gray-500">Xem xét và quản lý đơn ứng tuyển của ứng viên</p>
         </motion.div>
 
         <motion.div
@@ -147,7 +147,7 @@ const ViewApplications = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search applicants..."
+                placeholder="Tìm kiếm ứng viên..."
                 className="pl-10 pr-4 py-2.5 w-full rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-colors"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -163,7 +163,7 @@ const ViewApplications = () => {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                All
+                Tất cả
               </button>
               <button 
                 onClick={() => setFilterStatus("pending")}
@@ -173,7 +173,7 @@ const ViewApplications = () => {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                Pending
+                Đang chờ
               </button>
               <button 
                 onClick={() => setFilterStatus("accepted")}
@@ -183,7 +183,7 @@ const ViewApplications = () => {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                Accepted
+                Đã chấp nhận
               </button>
               <button 
                 onClick={() => setFilterStatus("rejected")}
@@ -193,7 +193,7 @@ const ViewApplications = () => {
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
-                Rejected
+                Đã từ chối
               </button>
             </div>
           </div>
@@ -207,28 +207,28 @@ const ViewApplications = () => {
                   <th className="py-4 px-5 text-left text-sm font-semibold">
                     <div className="flex items-center gap-2">
                       <User size={16} />
-                      <span>Applicant</span>
+                      <span>Ứng viên</span>
                     </div>
                   </th>
                   <th className="py-4 px-5 text-left text-sm font-semibold max-md:hidden">
                     <div className="flex items-center gap-2">
                       <Briefcase size={16} />
-                      <span>Job Position</span>
+                      <span>Vị trí</span>
                     </div>
                   </th>
                   <th className="py-4 px-5 text-left text-sm font-semibold max-md:hidden">
                     <div className="flex items-center gap-2">
                       <MapPin size={16} />
-                      <span>Location</span>
+                      <span>Địa điểm</span>
                     </div>
                   </th>
                   <th className="py-4 px-5 text-left text-sm font-semibold">
                     <div className="flex items-center gap-2">
                       <FileText size={16} />
-                      <span>Resume</span>
+                      <span>Hồ sơ</span>
                     </div>
                   </th>
-                  <th className="py-4 px-5 text-left text-sm font-semibold">Status</th>
+                  <th className="py-4 px-5 text-left text-sm font-semibold">Trạng thái</th>
                 </tr>
               </thead>
               
@@ -242,8 +242,8 @@ const ViewApplications = () => {
                           alt="No applications" 
                           className="w-20 h-20 mb-4 opacity-30"
                         />
-                        <h3 className="text-lg font-medium text-gray-700 mb-1">No applications found</h3>
-                        <p className="text-gray-500 text-center mb-2">No matching applications with the current filters</p>
+                        <h3 className="text-lg font-medium text-gray-700 mb-1">Không tìm thấy đơn ứng tuyển</h3>
+                        <p className="text-gray-500 text-center mb-2">Không có đơn ứng tuyển nào phù hợp với bộ lọc hiện tại</p>
                         {(searchTerm || filterStatus !== "all") && (
                           <button 
                             onClick={() => {
@@ -252,7 +252,7 @@ const ViewApplications = () => {
                             }}
                             className="mt-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
                           >
-                            Clear filters
+                            Xóa bộ lọc
                           </button>
                         )}
                       </div>
@@ -278,7 +278,7 @@ const ViewApplications = () => {
                             />
                           </div>
                           <div>
-                            <div className="font-medium text-gray-800">{applicant.userId?.name || 'Unknown'}</div>
+                            <div className="font-medium text-gray-800">{applicant.userId?.name || 'Chưa xác định'}</div>
                             <div className="text-gray-500 text-sm md:hidden">{applicant.jobId?.title || 'N/A'}</div>
                           </div>
                         </div>
@@ -287,7 +287,7 @@ const ViewApplications = () => {
                         {applicant.jobId?.title || 'N/A'}
                       </td>
                       <td className="py-4 px-5 text-gray-700 max-md:hidden">
-                        {applicant.jobId?.location || 'Remote'}
+                        {applicant.jobId?.location || 'Từ xa'}
                       </td>
                       <td className="py-4 px-5">
                         <a
@@ -297,7 +297,7 @@ const ViewApplications = () => {
                           className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
                         >
                           <FileText size={16} />
-                          View Resume
+                          Xem hồ sơ
                         </a>
                       </td>
                       <td className="py-4 px-5 relative">
@@ -307,7 +307,7 @@ const ViewApplications = () => {
                               onClick={() => setActiveDropdown(activeDropdown === index ? null : index)}
                               className="bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors flex items-center gap-1"
                             >
-                              <span>Pending</span>
+                              <span>Đang chờ</span>
                               <MoreHorizontal size={16} />
                             </button>
                             
@@ -329,7 +329,7 @@ const ViewApplications = () => {
                                     className="w-full px-4 py-3 text-left text-sm font-medium text-green-600 hover:bg-green-50 flex items-center gap-2 transition-colors"
                                   >
                                     <Check size={16} />
-                                    Accept
+                                    Chấp nhận
                                   </button>
                                   <button
                                     onClick={() => {
@@ -339,7 +339,7 @@ const ViewApplications = () => {
                                     className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                                   >
                                     <X size={16} />
-                                    Reject
+                                    Từ chối
                                   </button>
                                 </motion.div>
                               )}

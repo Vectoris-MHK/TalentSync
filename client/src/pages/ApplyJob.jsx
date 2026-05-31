@@ -75,11 +75,11 @@ const ApplyJob = () => {
   const applyHandler = async () => {
     try {
       if (!userData) {
-        return toast.error("Please login to apply.");
+        return toast.error("Vui lòng đăng nhập để ứng tuyển.");
       }
 
       if (!userData.resume) {
-        return toast.error("Please upload a resume before applying.");
+        return toast.error("Vui lòng tải lên hồ sơ trước khi ứng tuyển.");
       }
 
       const token = await getToken();
@@ -90,14 +90,14 @@ const ApplyJob = () => {
       );
 
       if (data.success) {
-        toast.success("Application submitted successfully!");
+        toast.success("Đơn ứng tuyển đã được gửi thành công!");
         fetchUserApplications();
         setAlreadyApplied(true);
       } else {
         toast.error(data.message);
       }
     } catch {
-      toast.error("Error applying for the job. Please try again.");
+      toast.error("Lỗi khi ứng tuyển. Vui lòng thử lại.");
     }
   };
 
@@ -124,7 +124,7 @@ const ApplyJob = () => {
           toast.error(data.message);
         }
       } catch {
-        toast.error("Failed to fetch job details. Please try again later.");
+        toast.error("Không thể tải thông tin công việc. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
@@ -183,7 +183,7 @@ const ApplyJob = () => {
                       </div>
                       <div className="flex items-center text-blue-100">
                         <FiClock className="mr-2" />
-                        Posted {moment(jobData?.date).fromNow()}
+                        Đã đăng {moment(jobData?.date).fromNow()}
                       </div>
                     </div>
                   </div>
@@ -205,15 +205,15 @@ const ApplyJob = () => {
                     {isAlreadyApplied ? (
                       <>
                         <FiCheckCircle className="mr-2" />
-                        Applied Successfully
+                          Đã ứng tuyển thành công
                       </>
                     ) : (
-                      "Apply Now"
+                      "Ứng tuyển ngay"
                     )}
                   </button>
                   {!isAlreadyApplied && (
                     <p className="mt-2 text-blue-100 text-sm">
-                      {userData?.resume ? "Your resume is ready" : "Upload resume to apply"}
+                      {userData?.resume ? "Hồ sơ của bạn đã sẵn sàng" : "Tải lên hồ sơ để ứng tuyển"}
                     </p>
                   )}
                 </motion.div>
@@ -232,7 +232,7 @@ const ApplyJob = () => {
                   transition={{ delay: 0.2 }}
                   className="bg-white rounded-xl shadow-md p-8 mb-8"
                 >
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Job Description</h2>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Mô tả công việc</h2>
                   <div 
                     className="prose max-w-none text-gray-700"
                     dangerouslySetInnerHTML={{ __html: jobData?.description || "" }}
@@ -247,7 +247,7 @@ const ApplyJob = () => {
                     transition={{ delay: 0.3 }}
                     className="bg-white rounded-xl shadow-md p-8 mb-8"
                   >
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Requirements</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Yêu cầu</h2>
                     <div 
                       className="prose max-w-none text-gray-700"
                       dangerouslySetInnerHTML={{ __html: jobData.requirements }}
@@ -263,7 +263,7 @@ const ApplyJob = () => {
                     transition={{ delay: 0.4 }}
                     className="bg-white rounded-xl shadow-md p-8"
                   >
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Benefits</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Phúc lợi</h2>
                     <div 
                       className="prose max-w-none text-gray-700"
                       dangerouslySetInnerHTML={{ __html: jobData.benefits }}
@@ -281,15 +281,15 @@ const ApplyJob = () => {
                   transition={{ delay: 0.3 }}
                   className="bg-white rounded-xl shadow-md p-6"
                 >
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">About {jobData?.companyId?.name}</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Về {jobData?.companyId?.name}</h3>
                   <p className="text-gray-600 mb-4">
-                    {jobData?.companyId?.description || "Leading company in their industry."}
+                    {jobData?.companyId?.description || "Công ty hàng đầu trong lĩnh vực của họ."}
                   </p>
                   <a 
                     href={`/company/${jobData?.companyId?._id}`}
                     className="text-blue-600 hover:text-blue-800 font-medium flex items-center"
                   >
-                    View company profile <FiExternalLink className="ml-1" />
+                    Xem hồ sơ công ty <FiExternalLink className="ml-1" />
                   </a>
                 </motion.div>
 
@@ -300,14 +300,14 @@ const ApplyJob = () => {
                   transition={{ delay: 0.4 }}
                   className="bg-white rounded-xl shadow-md p-6"
                 >
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Similar Jobs</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Việc làm tương tự</h3>
                   <div className="space-y-4">
                     {similarJobs.length > 0 ? (
                       similarJobs.map((job) => (
                         <JobCard key={job._id} job={job} compact />
                       ))
                     ) : (
-                      <p className="text-gray-500">No similar jobs found</p>
+                      <p className="text-gray-500">Không tìm thấy việc làm tương tự</p>
                     )}
                   </div>
                 </motion.div>
@@ -319,7 +319,7 @@ const ApplyJob = () => {
                   transition={{ delay: 0.5 }}
                   className="bg-blue-50 border border-blue-100 rounded-xl p-6"
                 >
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Ready to apply?</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Sẵn sàng ứng tuyển?</h3>
                   <button
                     onClick={applyHandler}
                     disabled={isAlreadyApplied}
@@ -332,15 +332,15 @@ const ApplyJob = () => {
                     {isAlreadyApplied ? (
                       <>
                         <FiCheckCircle className="mr-2" />
-                        Application Submitted
+                        Đã nộp đơn ứng tuyển
                       </>
                     ) : (
-                      "Apply Now"
+                      "Ứng tuyển ngay"
                     )}
                   </button>
                   {!userData?.resume && !isAlreadyApplied && (
                     <p className="mt-3 text-sm text-blue-800">
-                      Don&apos;t forget to upload your resume first
+                      Đừng quên tải lên hồ sơ của bạn trước
                     </p>
                   )}
                 </motion.div>

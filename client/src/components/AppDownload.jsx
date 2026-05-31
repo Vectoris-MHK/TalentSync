@@ -34,7 +34,7 @@ const AppDownload = () => {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              Find faster
+              Tìm nhanh hơn
             </motion.span>
 
             <motion.h1
@@ -43,8 +43,8 @@ const AppDownload = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Discover Your <span className="text-blue-600">Dream Job</span>{" "}
-              Today
+              Khám Phá <span className="text-blue-600">Công Việc Mơ Ước</span>{" "}
+              Ngay Hôm Nay
             </motion.h1>
 
             <motion.p
@@ -53,9 +53,9 @@ const AppDownload = () => {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              Join millions of professionals and explore thousands of career
-              opportunities. Get personalized matches, salary insights, and
-              company reviews - all in one place.
+              Tham gia cùng hàng triệu chuyên gia và khám phá hàng nghìn cơ hội
+              nghề nghiệp. Nhận gợi ý cá nhân hóa, thông tin lương và
+              đánh giá công ty - tất cả trong một nền tảng.
             </motion.p>
 
             {/* Features */}
@@ -71,11 +71,10 @@ const AppDownload = () => {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Smart Job Matching
+                    Kết nối việc làm thông minh
                   </h3>
                   <p className="text-gray-600">
-                    AI-powered recommendations based on your skills and
-                    preferences
+                    Gợi ý dựa trên AI phù hợp với kỹ năng và sở thích của bạn
                   </p>
                 </div>
               </div>
@@ -86,10 +85,10 @@ const AppDownload = () => {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Salary Insights
+                    Thông tin lương
                   </h3>
                   <p className="text-gray-600">
-                    See personalized salary estimates for every position
+                    Xem ước tính lương cá nhân hóa cho từng vị trí
                   </p>
                 </div>
               </div>
@@ -100,10 +99,10 @@ const AppDownload = () => {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    Company Analytics
+                    Phân tích công ty
                   </h3>
                   <p className="text-gray-600">
-                    Detailed reviews and ratings for 600,000+ companies
+                    Đánh giá và xếp hạng chi tiết cho hơn 600.000 công ty
                   </p>
                 </div>
               </div>
@@ -120,14 +119,14 @@ const AppDownload = () => {
                 to="/jobs"
                 className="px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center"
               >
-                Browse Jobs
+                Duyệt việc làm
               </Link>
 
               <Link
                 to="/recruiter-dashboard"
                 className="px-8 py-4 bg-white hover:bg-gray-50 text-blue-700 font-medium rounded-lg shadow-sm border border-gray-300 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                Recruiter Dashboard
+                Cổng tuyển dụng
                 <FiArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
@@ -143,7 +142,7 @@ const AppDownload = () => {
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <img
                 src={HeroImage}
-                alt="Diverse professionals collaborating in modern office"
+                alt="Chuyên gia đa dạng đang hợp tác trong văn phòng hiện đại"
                 className="w-full h-auto object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/30 to-transparent"></div>
@@ -167,7 +166,7 @@ const AppDownload = () => {
                     to="#"
                     className="text-xs bg-indigo-50 text-blue-700 px-3 py-1 rounded-full"
                   >
-                    Apply now
+                    Ứng tuyển ngay
                   </Link>
                 </div>
               </div>

@@ -6,7 +6,7 @@ export const clerkWebhooks = async (req, res) => {
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
     if (!webhookSecret || webhookSecret === "your_svix_webhook_secret") {
       console.error("Webhook: CLERK_WEBHOOK_SECRET is not configured");
-      return res.status(500).json({ success: false, message: "Webhook secret not configured" });
+      return res.status(500).json({ success: false, message: "Webhook secret chưa được cấu hình" });
     }
 
     const webhook = new Webhook(webhookSecret);
@@ -23,13 +23,13 @@ export const clerkWebhooks = async (req, res) => {
       });
     } catch (verifyErr) {
       console.error("Webhook signature verification failed:", verifyErr.message);
-      return res.status(400).json({ success: false, message: "Invalid webhook signature" });
+      return res.status(400).json({ success: false, message: "Chữ ký webhook không hợp lệ" });
     }
 
     const { data, type } = payload;
     if (!data || !type) {
       console.error("Webhook: Invalid payload");
-      return res.status(200).json({ success: false, message: "Invalid request body" });
+      return res.status(200).json({ success: false, message: "Nội dung yêu cầu không hợp lệ" });
     }
 
     switch (type) {
@@ -61,11 +61,11 @@ export const clerkWebhooks = async (req, res) => {
         break;
       }
       default:
-        res.status(200).json({ success: false, message: "Unhandled event type" });
+        res.status(200).json({ success: false, message: "Loại sự kiện không được xử lý" });
         break;
     }
   } catch (error) {
     console.error("Webhook error:", error.message);
-    res.status(200).json({ success: false, message: "Webhooks Error" });
+    res.status(200).json({ success: false, message: "Lỗi webhooks" });
   }
 };

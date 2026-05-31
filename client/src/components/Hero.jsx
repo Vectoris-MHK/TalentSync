@@ -5,15 +5,6 @@ import { motion } from "framer-motion";
 import { FiSearch, FiMapPin, FiArrowRight } from "react-icons/fi";
 import { FiBriefcase, FiUsers, FiTrendingUp } from "react-icons/fi";
 
-
-// Import company logos directly
-import companyLogo1 from "../assets/facebook-1-logo-svgrepo-com.svg";
-import companyLogo2 from "../assets/linkedin-logo-svgrepo-com.svg";
-import companyLogo3 from "../assets/slack-logo-svgrepo-com.svg";
-import companyLogo4 from "../assets/instagram-logo-svgrepo-com.svg";
-import companyLogo5 from "../assets/netflix-2-logo-svgrepo-com.svg";
-import companyLogo6 from "../assets/google-1-1-logo-svgrepo-com.svg";
-
 const Hero = () => {
   const { setSearchFilter, setIsSearched } = useContext(AppContext);
   const titleRef = useRef(null);
@@ -76,7 +67,7 @@ const Hero = () => {
             alt="Background"
             className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/100 to-cyan-700/100 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-cyan-700/80 mix-blend-multiply"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-40">
@@ -89,7 +80,7 @@ const Hero = () => {
             >
               Find Your <span className="text-yellow-300">Dream Job</span>
               <br />
-              With Prodigy
+              With TalentSync
             </motion.h1>
 
             <motion.p

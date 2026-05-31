@@ -10,10 +10,12 @@ const connectDB = async () => {
 
     const uri = await uriFromSrv(process.env.MONGODB_URI);
 
+    const isVercel = !!process.env.VERCEL || !!process.env.VERCEL_ENV;
+
     await mongoose.connect(uri, {
         dbName: "job-portal",
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: isVercel ? 15000 : 5000,
+        connectTimeoutMS: isVercel ? 15000 : 5000,
     });
 }
 

@@ -163,12 +163,12 @@ const AppDownload = () => {
                   <span className="text-blue-700 font-medium">
                     $95k - $120k
                   </span>
-                  <a
-                    href="http://localhost:5173/apply-job/680bb7839f1dfc75766deffe"
+                  <Link
+                    to="#"
                     className="text-xs bg-indigo-50 text-blue-700 px-3 py-1 rounded-full"
                   >
                     Apply now
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,15 +1,15 @@
 {
+    "installCommand": "cd .. && pnpm install --frozen-lockfile",
     "version": 2,
-    "builds": [
-        {
-            "src": "server.js",
-            "use": "@vercel/node"
-        }
-    ],
     "routes": [
         {
-            "src": "/(.*)",
-            "dest": "server.js"
+            "src": "/.*",
+            "dest": "/server.js"
         }
-    ]
+    ],
+    "functions": {
+        "server.js": {
+            "maxDuration": 60
+        }
+    }
 }

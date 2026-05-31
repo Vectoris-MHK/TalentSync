@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import Loading from "../components/Loading";
@@ -31,32 +31,44 @@ const ApplyJob = () => {
     fetchUserApplications,
   } = useContext(AppContext);
 
-  // Fetch job details
-  const fetchJob = async () => {
+  // Fetch similar jobs via recommend-content API, fallback to client-side filter
+  const fetchSimilarJobs = async (currentJob) => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/jobs/${id}`);
-      if (data.success) {
-        setJobData(data.job);
-        findSimilarJobs(data.job);
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        toast.error(data.message);
+      const { data } = await axios.get(
+        `${backendUrl}/api/jobs/recommend-content?query=${encodeURIComponent(currentJob.title)}&exclude=${currentJob._id}`
+      );
+      if (data.success && data.jobs?.length > 0) {
+        setSimilarJobs(data.jobs.slice(0, 4));
+        return;
       }
-    } catch (error) {
-      setIsLoading(false);
-      toast.error("Failed to fetch job details. Please try again later.");
+    } catch {
+      // fall through to client-side fallback
     }
+    // Fallback: client-side filter by category / company
+    const similar = jobs
+      .filter(
+        (job) =>
+          job._id !== currentJob._id &&
+          (job.companyId?._id === currentJob.companyId?._id ||
+            job.category === currentJob.category)
+      )
+      .slice(0, 4);
+    setSimilarJobs(similar);
   };
 
-  // Find similar jobs
-  const findSimilarJobs = (currentJob) => {
-    const similar = jobs.filter(job => 
-      job._id !== currentJob._id && 
-      (job.companyId._id === currentJob.companyId._id || 
-       job.category === currentJob.category)
-    ).slice(0, 4);
-    setSimilarJobs(similar);
+  // Fire view event when job page is opened (only for authenticated users)
+  const logViewEvent = async (jobId) => {
+    if (!userData) return;
+    try {
+      const token = await getToken();
+      await axios.post(
+        `${backendUrl}/api/users/events`,
+        { jobId, eventType: "view" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch {
+      // Non-critical — ignore silently
+    }
   };
 
   // Handle job application
@@ -84,7 +96,7 @@ const ApplyJob = () => {
       } else {
         toast.error(data.message);
       }
-    } catch (error) {
+    } catch {
       toast.error("Error applying for the job. Please try again.");
     }
   };
@@ -100,12 +112,29 @@ const ApplyJob = () => {
   };
 
   useEffect(() => {
-    if (id) fetchJob();
+    if (!id) return;
+    const load = async () => {
+      try {
+        const { data } = await axios.get(`${backendUrl}/api/jobs/${id}`);
+        if (data.success) {
+          setJobData(data.job);
+          fetchSimilarJobs(data.job);
+          logViewEvent(id);
+        } else {
+          toast.error(data.message);
+        }
+      } catch {
+        toast.error("Failed to fetch job details. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    load();
   }, [id, backendUrl]);
 
   useEffect(() => {
     checkAlreadyApplied();
-  }, [jobData, userApplications]);
+  }, [checkAlreadyApplied, jobData, userApplications]);
 
   if (isLoading || !jobData) {
     return <Loading />;
@@ -311,7 +340,7 @@ const ApplyJob = () => {
                   </button>
                   {!userData?.resume && !isAlreadyApplied && (
                     <p className="mt-3 text-sm text-blue-800">
-                      Don't forget to upload your resume first
+                      Don&apos;t forget to upload your resume first
                     </p>
                   )}
                 </motion.div>

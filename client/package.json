@@ -13,16 +13,17 @@
     "@clerk/clerk-react": "catalog:",
     "@tailwindcss/forms": "catalog:",
     "axios": "catalog:",
+    "framer-motion": "catalog:",
     "k-convert": "catalog:",
     "lucide-react": "catalog:",
     "moment": "catalog:",
+    "prop-types": "catalog:",
     "quill": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-icons": "catalog:",
     "react-router-dom": "catalog:",
-    "react-toastify": "catalog:",
-    "framer-motion": "catalog:"
+    "react-toastify": "catalog:"
   },
   "devDependencies": {
     "@eslint/js": "catalog:",

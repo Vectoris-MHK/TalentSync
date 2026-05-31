@@ -1,11 +1,32 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { AppContext } from "../context/AppContext";
 import { assets, JobCategories, JobLocations } from "../assets/assets";
 import JobCard from "./JobCard";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
 
 const JobListing = () => {
-  const { isSearched, searchFilter, setSearchFilter, jobs } = useContext(AppContext);
+  const { isSearched, searchFilter, setSearchFilter, jobs, backendUrl, userData } = useContext(AppContext);
+  const { getToken } = useAuth();
+
+  // Track which job IDs have already had a view event fired this session
+  const viewedJobIds = useRef(new Set());
+
+  const logViewEvent = useCallback(async (jobId) => {
+    if (!userData || viewedJobIds.current.has(jobId)) return;
+    viewedJobIds.current.add(jobId);
+    try {
+      const token = await getToken();
+      await axios.post(
+        `${backendUrl}/api/users/events`,
+        { jobId, eventType: "view" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch {
+      // Non-critical — ignore
+    }
+  }, [userData, backendUrl, getToken]);
 
   const initialLoad = useRef(true);
   const [showFilter, setShowFilter] = useState(true);
@@ -374,6 +395,19 @@ const JobListing = () => {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.3 }}
                       layout
+                      ref={(el) => {
+                        if (!el || !userData) return;
+                        const observer = new IntersectionObserver(
+                          ([entry]) => {
+                            if (entry.isIntersecting) {
+                              logViewEvent(job._id);
+                              observer.disconnect();
+                            }
+                          },
+                          { threshold: 0.5 }
+                        );
+                        observer.observe(el);
+                      }}
                     >
                       <JobCard job={job} />
                     </motion.div>

@@ -205,8 +205,38 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 - [x] **`+ADD`** Event tracking audit — 4 event types reviewed:
   - `view` (weight=1): ✅ Done — ApplyJob mount + JobListing IntersectionObserver
   - `apply` (weight=5): ✅ Done — auto server-side in `applyForJob()`
-  - `bookmark` (weight=3): ⬜ **To-Do** — `JobCard.jsx` bookmark button fires UI toggle only, no API call
+  - `bookmark` (weight=3): ✅ Done — FiBookmark button wired to POST /api/users/events
   - `search` (weight=4): ❌ Intentionally skipped — Hero search has no `jobId` context; `view` events serve as proxy
+
+### 6.4 UI/UX Audit Fixes (Status: ⬜ TO-DO, Start: 2026-05-31)
+
+> **`+ADD`** Comprehensive UI/UX audit completed 2026-05-31. Task inventory: `docs/implement/ui-ux-audit.md`. Execution plan: `docs/implement/ui-ux-plan.md`. 30 issues identified across P0–P3 priorities. P0+P1 (11 tasks, 1.65h) must be done before demo video.
+
+#### 6.4.1 P0 — Critical Brand & Visual Bugs (Status: ⬜ TO-DO)
+
+- [ ] **U1:** Brand rename "Prodigy" → "TalentSync" across Navbar/Footer/Hero/CTA/AppDownload/title (5 files + index.html)
+- [ ] **U2:** Fix Hero background overlay opacity — `from-blue-900/100` hides background image (`Hero.jsx:79`)
+- [ ] **U3:** Remove duplicate "Learn More" button on JobCard — both buttons navigate + scroll to same place (`JobCard.jsx:169-186`)
+- [ ] **U4:** Fix dead time display — `getTimePassed` reads `job.postedAt`, data model uses `job.date` (`JobCard.jsx:21-31`)
+- [ ] **U5:** Fix footer copyright — "© 2025 Prodigy" → "© 2026 TalentSync" (`Footer.jsx:327`)
+- [ ] **U6:** Fix favicon path — `../client/public/newFavicon.svg` broken in production build (`index.html:8`)
+
+#### 6.4.2 P1 — High Visual & Functional Issues (Status: ⬜ TO-DO)
+
+- [ ] **U7:** Apply `primary` color from Tailwind config (#004AAD) consistently — replace all raw blue-600/indigo-600/indigo-700 (12+ files)
+- [ ] **U8:** Fix hardcoded localhost link in AppDownload (`AppDownload.jsx:167`)
+- [ ] **U9:** Wire "Sort by" dropdown — currently decorative with no onChange (`JobListing.jsx:350-357`)
+- [ ] **U10:** Fix dead footer links — all `<a href="/">` point home with no routes (`Footer.jsx:123-274`)
+- [ ] **U11:** Wire or remove fake footer newsletter — visual feedback only, no API (`Footer.jsx:8-14`)
+- [ ] **U12:** Remove Hero unused SVG imports + fix broken Wikipedia logo URLs (`Hero.jsx:10-15,23-30`)
+
+#### 6.4.3 P2 — Medium Polish (Status: ⬜ TO-DO, Post-submission OK)
+
+- [ ] **U13–U21:** Unify icon library, fix typography, unhide scrollbars, replace 787-line Loading.css, move inline `<style>` to index.css, unify Dashboard dark theme, fix ManageJobs applicants field, fix social links (9 tasks, 1.45h)
+
+#### 6.4.4 P3 — Low Accessibility & Cleanup (Status: ⬜ TO-DO, Post-submission)
+
+- [ ] **U22–U30:** Navbar spacer, mobile layout, HTML lang, duplicate search, aria-labels, page titles, loading states, error recovery, remove 675 lines dead sample data (9 tasks, 1.40h)
 
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 

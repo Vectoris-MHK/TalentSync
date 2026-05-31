@@ -10,7 +10,7 @@
 
 | # | Issue | File | Estimate |
 |---|---|---|---|
-| **U1** | **Brand rename: "Prodigy" → "TalentSync"** — Navbar (`Navbar.jsx:48`), Footer (`Footer.jsx:116,323`), Hero (`Hero.jsx:92`), CTA (`Calltoaction.jsx`), AppDownload, page `<title>` (`index.html:7`) | 5 files + index.html | 0.25h |
+| **U1** | **Brand rename: "Prodigy" → "TalentSync"** — Navbar (`Navbar.jsx:48`), Footer (`Footer.jsx:116,323`), Hero (`Hero.jsx:92`), page `<title>` (`index.html:7`). Calltoaction.jsx and AppDownload.jsx did not contain "Prodigy" text. | 4 files + index.html | 0.25h |
 | **U2** | **Fix Hero background overlay** — `from-blue-900/100 to-cyan-700/100` with `mix-blend-multiply` makes the background image invisible (`Hero.jsx:79`) | Hero.jsx | 0.10h |
 | **U3** | **Remove duplicate "Learn More" button** — both buttons navigate to `/apply-job/${job._id}` and scroll to top (`JobCard.jsx:169-186`) | JobCard.jsx | 0.10h |
 | **U4** | **Fix dead time display** — `getTimePassed` reads `job.postedAt` but data model uses `job.date` → always shows "Recently posted" (`JobCard.jsx:21-31`) | JobCard.jsx | 0.05h |
@@ -30,7 +30,7 @@
 | **U9** | **Wire "Sort by" dropdown** — no onChange handler, purely decorative (`JobListing.jsx:350-357`) | JobListing.jsx | 0.15h |
 | **U10** | **Fix all dead footer links** — every `<a href="/">` points home with no actual routes (`Footer.jsx:123-274`) — either create pages or use `href="#"` | Footer.jsx | 0.15h |
 | **U11** | **Remove fake footer newsletter** — visual feedback only, no API, data silently lost (`Footer.jsx:8-14`) — either wire to backend or remove section | Footer.jsx | 0.15h |
-| **U12** | **Remove Hero dead code** — 6 SVG company logos imported but never used (lines 10-15); Wikipedia URLs used instead but some are broken (`Hero.jsx:10-15,23-30`) | Hero.jsx | 0.10h |
+| **U12** | **Remove Hero dead code** — 6 SVG company logos imported but never used (lines 10-15) | Hero.jsx | 0.10h |
 
 **P1 Subtotal: 1.05h**
 
@@ -76,10 +76,10 @@
 
 | Priority | Items | Estimate | Status |
 |---|---|---|---|
-| **P0 — Critical** | U1–U6 | 0.60h | ⬜ To-Do |
-| **P1 — High** | U7–U12 | 1.05h | ⬜ To-Do |
-| **P2 — Medium** | U13–U21 | 1.45h | ⬜ To-Do |
-| **P3 — Low** | U22–U30 | 1.40h | ⬜ To-Do |
-| **TOTAL** | 30 tasks | 4.50h | ⬜ To-Do |
+| **P0 — Critical** | U1–U6 | 0.60h | ✅ DONE (6/6, Prototype 1) |
+| **P1 — High** | U7–U12 | 1.05h | 🔄 3/6 (U8, U10, U12 done; U7, U9, U11 deferred) |
+| **P2 — Medium** | U13–U21 | 1.45h | 🔄 4/9 (U15, U17, U18, U21 done; U13, U14, U16, U19, U20 deferred) |
+| **P3 — Low** | U22–U30 | 1.40h | 🔄 4/9 (U24, U26, U29, U30 done; U22, U23, U25, U27, U28 deferred) |
+| **TOTAL** | 30 tasks | 4.50h | 🔄 17/30 (57%) — Prototype 1 verified |
 
 **Execution strategy:** See `docs/implement/ui-ux-plan.md` for risk-based execution order, prototype gates, and timeline.

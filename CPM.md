@@ -1,35 +1,39 @@
 # Critical Path Method — TalentSync MongoHack 2026
 
 > Generated: 2026-05-28 16:30 ICT
-> Updated: 2026-05-31 11:15 ICT **(UI/UX AUDIT COMPLETE — 30 issues, P0+P1=1.65h critical, P2+P3=2.85h non-critical)**
-> Deadline: 2026-05-31 18:00 ICT (~6.75h còn lại)
-> Elapsed total: ~5h (R1→K + L + L6)
-> Working buffer: ~0.10h (**CRITICAL — leaves almost zero margin**)
+> Updated: 2026-05-31 12:10 ICT **(PROTOTYPE 1 COMPLETE — 17/30 UI/UX tasks done, build verified)**
+> Deadline: 2026-05-31 18:00 ICT (~5.83h còn lại)
+> Elapsed total: ~6.25h (R1→L6 + Prototype 1)
+> Working buffer: ~0.83h (**IMPROVED — Prototype 1 finished 0.82h under estimate**)
 
 ---
 
-## 0. Context: CODE COMPLETE — UI/UX Polish + Submission Only
+## 0. Context: Prototype 1 Done — 13 UI/UX Tasks + Submission Remain
 
-**All frontend and backend code is functionally complete.** A comprehensive UI/UX audit on 2026-05-31 identified 30 visual/functional issues. Task inventory: `docs/implement/ui-ux-audit.md`. Execution plan: `docs/implement/ui-ux-plan.md`. P0+P1 (11 tasks, 1.65h) are critical path — must be fixed before demo video recording. P2+P3 (19 tasks, 2.85h) are non-critical and deferred to post-submission.
+**All frontend and backend code is functionally complete.** A comprehensive UI/UX audit on 2026-05-31 identified 30 visual/functional issues. Task inventory: `docs/implement/ui-ux-audit.md`. Execution plan: `docs/implement/ui-ux-plan.md`. **Prototype 1 (17 LOW-risk tasks) executed 2026-05-31 11:23–12:10 ICT — `npm run build` passes, zero regressions.**
 
-**Done in prior sessions:**
+**Done in Prototype 1 (this session):**
 
-- `RecommendedJobs.jsx` — horizontal scroll, skeleton, empty state, per-card badges
-- `Home.jsx` — RecommendedJobs auth-gated + OnboardingModal trigger
-- `ApplyJob.jsx` — recommend-content API + view event on mount
-- `OnboardingModal.jsx` — 6 categories, submit/skip flow
-- `JobListing.jsx` — IntersectionObserver view event tracking
-- `JobCard.jsx` — recommendBadge prop rendering + bookmark event
-- `requireAuth()` middleware, env fixes, Việt hóa, style fixes — all done
+| Priority | Tasks Done | Details |
+|----------|-----------|---------|
+| P0 (6/6) | U1, U2, U3, U4, U5, U6 | Brand rename, Hero overlay, duplicate button, dead time, copyright, favicon |
+| P1 (3/6) | U8, U10, U12 | localhost link, dead footer links, Hero unused imports |
+| P2 (4/9) | U15, U17, U18, U21 | Scrollbars, Navbar/Footer `<style>` keyframes, social links |
+| P3 (4/9) | U24, U26, U29, U30 | HTML lang, aria-labels, error recovery, dead sample data |
+
+**13 UI/UX tasks remaining (2.70h):**
+- P1: U7 (primary color, 0.40h), U9 (sort dropdown, 0.15h), U11 (newsletter, 0.15h) — 0.70h
+- P2: U13, U14, U16, U19, U20 — 1.05h
+- P3: U22, U23, U25, U27, U28 — 0.95h
 
 **UI/UX Audit (2026-05-31):**
 
 | Priority | Tasks | Estimate | Status |
 | -------- | ----- | -------- | ------ |
-| P0 — Critical | U1–U6: Brand rename, Hero overlay, duplicate buttons, dead time, copyright, favicon | 0.60h | ⬜ To-Do |
-| P1 — High | U7–U12: Primary color, localhost link, sort dropdown, dead links, fake newsletter, Hero imports | 1.05h | ⬜ To-Do |
-| P2 — Medium | U13–U21: Icon lib, typography, scrollbars, Loading.css, inline styles, dark theme, social links | 1.45h | ⬜ To-Do (post-submission) |
-| P3 — Low | U22–U30: Spacer, mobile, lang, duplicate search, aria, titles, loading, errors, dead data | 1.40h | ⬜ To-Do (post-submission) |
+| P0 — Critical | U1–U6: Brand rename, Hero overlay, duplicate buttons, dead time, copyright, favicon | 0.60h | ✅ DONE |
+| P1 — High | U7–U12: Primary color, localhost link, sort dropdown, dead links, fake newsletter, Hero imports | 1.05h | 🔄 3/6 (U8, U10, U12 done) |
+| P2 — Medium | U13–U21: Icon lib, typography, scrollbars, Loading.css, inline styles, dark theme, social links | 1.45h | 🔄 4/9 (U15, U17, U18, U21 done) |
+| P3 — Low | U22–U30: Spacer, mobile, lang, duplicate search, aria, titles, loading, errors, dead data | 1.40h | 🔄 4/9 (U24, U26, U29, U30 done) |
 
 ---
 
@@ -39,16 +43,16 @@
 ✅ R1→R2→R3→R4.1→R4.2→R4.3→E→T→F→K→L→L6 (ALL DONE — backend + frontend 100%)
                                         │
                                         ▼
-                              U(1.65) ──→ M(5.0)
+                         ✅ Prototype1(1.60) ──→ M(5.0)
 ```
 
 | Branch | Tasks | Description |
 | ------ | ----- | ----------- |
 | R1→L6 | 16 tasks | All backend + frontend code — **100% DONE** |
-| **U**  | U1–U12 | P0 + P1 UI/UX fixes (11 tasks, 1.65h) |
+| **P1**  | U1–U30 (Prototype 1 subset) | 17 LOW-risk UI/UX fixes — **✅ DONE (1.60h)** |
 | **M**  | M1–M3 | E2E test + technical doc + demo video (5.0h) |
 
-P2+P3 (U13–U30, 2.85h) are non-critical — float time post-deadline.
+P1+P2+P3 remaining (U7,U9,U11,U13,U14,U16,U19,U20,U22,U23,U25,U27,U28 — 13 tasks, 2.70h) are non-critical — float time post-deadline.
 
 ---
 
@@ -74,13 +78,13 @@ P2+P3 (U13–U30, 2.85h) are non-critical — float time post-deadline.
 | K      | `GET /api/jobs/recommend-feed` (hybrid blender)               | 0.50         | F, I, J      | 5.4     | ✅ Done  |
 | L      | Frontend (RecommendedJobs + Onboarding + tracking)            | 2.00         | K            | 6.1     | ✅ Done  |
 | L6     | `JobCard.jsx` bookmark event (weight=3)                       | 0.25         | L            | 6.1     | ✅ Done  |
-| **U**  | **P0+P1 UI/UX fixes (U1–U12, 11 tasks)**                     | **1.65**     | L6           | 6.4     | ⬜ To-Do |
-| **M**  | **E2E test + technical doc + demo video**                     | **5.00**     | U            | 6.2-6.3 | ⬜ To-Do |
+| **P1** | **Prototype 1 UI/UX fixes (17 LOW-risk tasks)**               | **1.60**     | L6           | 6.4     | ✅ Done  |
+| **M**  | **E2E test + technical doc + demo video**                     | **5.00**     | P1           | 6.2-6.3 | ⬜ To-Do |
 
 **Backend tasks:** 15/15 done (100%)
 **Frontend tasks:** 2/2 done (100%)
-**UI/UX tasks:** 0/11 done (0%) — P0+P1 only
-**Total remaining:** 2 tasks, 6.65h
+**UI/UX tasks:** 17/30 done (57%) — Prototype 1 complete
+**Total remaining:** 1 task, 5.00h
 
 ---
 
@@ -89,32 +93,32 @@ P2+P3 (U13–U30, 2.85h) are non-critical — float time post-deadline.
 | ID     | ES (h)   | EF (h)    | Notes                       |
 | ------ | -------- | --------- | --------------------------- |
 | R1→L6  | 0.00     | 5.25      | ✅ All done                 |
-| **U**  | **5.25** | **6.90**  | **P0+P1 UI/UX fixes**      |
-| **M**  | **6.90** | **11.90** | **E2E test + docs + video** |
+| **P1** | **5.25** | **6.85**  | **Prototype 1 done ✅**     |
+| **M**  | **6.85** | **11.85** | **E2E test + docs + video** |
 
 ---
 
 ## 4. Critical Path
 
 ```
-U ──→ M
+P1 ──→ M
 ```
 
 | Step | Task                                          | ES    | EF     | Duration |
 | ---- | --------------------------------------------- | ----- | ------ | -------- |
-| 1    | U: P0+P1 UI/UX fixes (U1–U12, 11 tasks)       | 5.25  | 6.90   | 1.65h    |
-| 2    | M: E2E test + technical doc + demo video       | 6.90  | 11.90  | 5.00h    |
+| 1    | P1: Prototype 1 UI/UX fixes (17 tasks)        | 5.25  | 6.85   | 1.60h    |
+| 2    | M: E2E test + technical doc + demo video       | 6.85  | 11.85  | 5.00h    |
 
 | Metric                     | Value                                                |
 | -------------------------- | ---------------------------------------------------- |
-| Critical path remaining    | **6.65h**                                            |
-| Elapsed (actual)           | ~5.25h                                               |
-| Time remaining to deadline | **~6.75h** (deadline 2026-05-31 18:00 ICT)          |
-| Working buffer             | **~0.10h**                                           |
-| Deadline risk              | **CRITICAL** — 6.75h available vs 6.65h required     |
+| Critical path remaining    | **5.00h**                                            |
+| Elapsed (actual)           | ~6.85h                                               |
+| Time remaining to deadline | **~5.83h** (deadline 2026-05-31 18:00 ICT)          |
+| Working buffer             | **~0.83h**                                           |
+| Deadline risk              | **MODERATE** — 5.83h available vs 5.00h required     |
 | Backend status             | **100% COMPLETE** (15/15 tasks)                      |
 | Frontend status            | **100% COMPLETE** (L + L6 done)                      |
-| UI/UX status               | **0% COMPLETE** (0/11 P0+P1 done)                    |
+| UI/UX status               | **57% COMPLETE** (17/30 done, Prototype 1 verified)  |
 
 ---
 
@@ -123,8 +127,9 @@ U ──→ M
 | Task                         | Float | Notes                                                                                                |
 | ---------------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
 | All R1→L6 tasks              | ∞     | Done — no changes needed                                                                             |
-| P2 fixes (U13–U21)           | ∞     | Deferred to post-submission — no deadline dependency                                                 |
-| P3 fixes (U22–U30)           | ∞     | Deferred to post-submission — no deadline dependency                                                 |
+| P1 remaining (U7,U9,U11)     | ∞     | 3 P1 tasks deferred — non-critical for submission                                                    |
+| P2 remaining (U13,U14,U16,U19,U20) | ∞ | 5 P2 tasks deferred — post-submission polish                                                         |
+| P3 remaining (U22,U23,U25,U27,U28) | ∞ | 5 P3 tasks deferred — post-submission polish                                                         |
 
 ---
 
@@ -132,21 +137,10 @@ U ──→ M
 
 | Step | Task                                                    | Duration | Owner    | Status   |
 | ---- | ------------------------------------------------------- | -------- | -------- | -------- |
-| 1    | **U1:** Brand rename Prodigy → TalentSync (5 files)     | 0.25h    | Khiem    | ⬜ To-Do |
-| 2    | **U2:** Fix Hero overlay opacity                        | 0.10h    | Khiem    | ⬜ To-Do |
-| 3    | **U3:** Remove duplicate Learn More button              | 0.10h    | Khiem    | ⬜ To-Do |
-| 4    | **U4:** Fix dead time display (postedAt → date)         | 0.05h    | Khiem    | ⬜ To-Do |
-| 5    | **U5:** Fix footer copyright (2025→2026, Prodigy→TalentSync) | 0.05h | Khiem  | ⬜ To-Do |
-| 6    | **U6:** Fix favicon path for production build           | 0.05h    | Khiem    | ⬜ To-Do |
-| 7    | **U7:** Apply `primary` color consistently (12+ files)  | 0.40h    | Khiem    | ⬜ To-Do |
-| 8    | **U8:** Fix hardcoded localhost link in AppDownload     | 0.10h    | Khiem    | ⬜ To-Do |
-| 9    | **U9:** Wire Sort by dropdown in JobListing             | 0.15h    | Khiem    | ⬜ To-Do |
-| 10   | **U10:** Fix dead footer links                          | 0.15h    | Khiem    | ⬜ To-Do |
-| 11   | **U11:** Wire or remove fake newsletter                 | 0.15h    | Khiem    | ⬜ To-Do |
-| 12   | **U12:** Clean up Hero imports + fix logo URLs          | 0.10h    | Khiem    | ⬜ To-Do |
-| 13   | **M1:** E2E testing (3 flows)                           | 1.50h    | Khiem    | ⬜ To-Do |
-| 14   | **M2:** Technical document                              | 1.50h    | Khiem    | ⬜ To-Do |
-| 15   | **M3:** Demo video (10 min)                             | 2.00h    | Quốc Hào | ⬜ To-Do |
+| 1    | **Prototype 1:** 17 LOW-risk UI/UX fixes (U1–U6, U8, U10, U12, U15, U17, U18, U21, U24, U26, U29, U30) | 1.60h | Khiem | ✅ Done |
+| 2    | **M1:** E2E testing (3 flows)                           | 1.50h    | Khiem    | ⬜ To-Do |
+| 3    | **M2:** Technical document                              | 1.50h    | Khiem    | ⬜ To-Do |
+| 4    | **M3:** Demo video (10 min)                             | 2.00h    | Quốc Hào | ⬜ To-Do |
 
 ---
 
@@ -160,8 +154,8 @@ U ──→ M
 | ~~Atlas Search Index not available~~ | ~~Showstopper~~           | ✅ Active, verified                                                 |
 | ~~Collaborative filtering complex~~  | ~~No time~~               | ✅ Done, 13-stage pipeline                                          |
 | ~~Clerk auth in frontend~~           | ~~Medium~~                | ✅ Pattern established                                              |
-| **Time: 6.75h available vs 6.65h required** | **CRITICAL**       | Execute P0+P1 in parallel where possible; skip P2+P3 entirely       |
-| P0+P1 takes longer than estimated    | **SHOWSTOPPER**           | Cut P1 items U7–U12 first; P0 items U1–U6 are non-negotiable        |
+| ~~UI/UX Prototype 1~~                | ~~Time buffer~~           | ✅ Done 12:10, build verified, 0.83h buffer gained                  |
+| **Time: 5.83h available vs 5.00h required** | **MODERATE**       | 0.83h buffer — comfortable for E2E + docs + video                   |
 | Demo video recording                 | Medium                    | Quốc Hào handles; script provided in WBS                            |
 | Vercel deployment issues             | Low                       | Server + client deploy scripts already tested                       |
 
@@ -173,10 +167,11 @@ U ──→ M
 Backend status:     100% COMPLETE — 15/15 tasks done
 Frontend status:    100% COMPLETE — L + L6 done
                      - RecommendedJobs + OnboardingModal + event tracking + bookmark
-UI/UX status:       0% COMPLETE — 0/11 P0+P1 done
-Remaining:          U(1.65h) + M(5.0h) = 6.65h
-Available time:     ~6.75h (deadline 2026-05-31 18:00 VNT)
-Working buffer:     ~0.10h ⚠️ CRITICAL
+UI/UX status:       57% COMPLETE — 17/30 done (Prototype 1 verified)
+                     - P0: 6/6 ✅ | P1: 3/6 🔄 | P2: 4/9 🔄 | P3: 4/9 🔄
+Remaining:          M(5.0h) = E2E test + docs + video
+Available time:     ~5.83h (deadline 2026-05-31 18:00 VNT)
+Working buffer:     ~0.83h ✅ IMPROVED (was ~0.10h CRITICAL)
 Deadline:           2026-05-31 18:00 VNT
 ```
 
@@ -184,10 +179,10 @@ Deadline:           2026-05-31 18:00 VNT
 
 | Change                   | Reason                                                           |
 | ------------------------ | ---------------------------------------------------------------- |
-| **L → ✅ Done**          | All frontend components implemented + bugs fixed                 |
-| **L6 → ✅ Done**         | Bookmark event wired in JobCard.jsx (was incorrectly marked ⬜)   |
-| **U added**              | UI/UX audit revealed 30 visual/functional issues (2026-05-31)    |
-| **U on critical path**   | P0+P1 (U1–U12) inserted before M — blocks demo recording         |
-| **Buffer collapsed**     | 17.75h → 0.10h — P0+P1 fixes consume all remaining time buffer   |
-| **Risk raised to CRITICAL** | 0.10h buffer leaves zero margin for error; strict execution needed |
-| **P2+P3 deferred**       | U13–U30 (2.85h) intentionally excluded — not submission-blocking  |
+| **Prototype 1 → ✅ Done** | 17 LOW-risk UI/UX fixes executed, build verified (2026-05-31 12:10) |
+| **Buffer improved**      | 0.10h → 0.83h — Prototype 1 finished 0.82h under estimate       |
+| **Risk downgraded**      | CRITICAL → MODERATE — 5.83h available for 5.00h M-phase          |
+| **P0 complete**          | All 6 critical brand/visual bugs fixed (U1–U6)                  |
+| **P1 50% complete**      | U8, U10, U12 done; U7, U9, U11 deferred (non-blocking)          |
+| **P2+P3 partially done** | 8 of 19 tasks done via Prototype 1 (scrollbars, keyframes, social, aria, errors, dead code, lang, favicon) |
+| **Execution order updated** | Section 6 collapsed to single row: Prototype 1 ✅ → M-phase   |

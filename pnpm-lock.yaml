@@ -158,6 +158,9 @@ importers:
       moment:
         specifier: 'catalog:'
         version: 2.30.1
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
       quill:
         specifier: 'catalog:'
         version: 2.0.3

@@ -34,7 +34,7 @@ This document uses the following conventions:
 - Detailed requirements inherit the priority of their parent section unless a different priority is stated.
 - API paths, database collections, environment variables, and file paths are formatted as inline code.
 
-### 1.3 Intended Audience and Reading Suggestions
+### 1.3 Intended Audience and Reading Suggestions 
 
 This SRS is intended for:
 

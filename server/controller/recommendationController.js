@@ -74,7 +74,7 @@ export const recommendFromCv = async (req, res) => {
           as: "company",
         },
       },
-      { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+      { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           vectorScore: { $meta: "vectorSearchScore" },

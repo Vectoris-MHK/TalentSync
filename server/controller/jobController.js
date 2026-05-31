@@ -96,7 +96,7 @@ async function getCollaborativeResults(userId, excludedJobIds, limit = 20) {
     { $unwind: "$job" },
     { $match: { "job.visible": true } },
     { $lookup: { from: "companies", localField: "job.companyId", foreignField: "_id", as: "company" } },
-    { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+    { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
     {
       $project: {
         _id: "$job._id", title: "$job.title", description: "$job.description",
@@ -168,7 +168,7 @@ export const getRecommendContent = async (req, res) => {
           as: "company",
         },
       },
-      { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+      { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           vectorScore: { $meta: "vectorSearchScore" },
@@ -290,7 +290,7 @@ export const getRecommendFeed = async (req, res) => {
               as: "company",
             },
           },
-          { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+          { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
           {
             $addFields: {
               vectorScore: { $meta: "vectorSearchScore" },
@@ -342,7 +342,7 @@ export const getRecommendFeed = async (req, res) => {
         {
           $lookup: { from: "companies", localField: "companyId", foreignField: "_id", as: "company" },
         },
-        { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+        { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
         {
           $project: {
             _id: 1, title: 1, description: 1, location: 1, category: 1, level: 1, salary: 1, date: 1,
@@ -372,7 +372,7 @@ export const getRecommendFeed = async (req, res) => {
       {
         $lookup: { from: "companies", localField: "companyId", foreignField: "_id", as: "company" },
       },
-      { $unwind: { path: "$company", preserveNullAndEmpty: true } },
+      { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
       {
         $project: {
           _id: 1, title: 1, description: 1, location: 1, category: 1, level: 1, salary: 1, date: 1,

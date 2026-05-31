@@ -3,19 +3,35 @@ import JobApplication from "../models/JobApplication.js";
 import Job from "../models/Job.js";
 import UserEvent from "../models/UserEvent.js";
 import { v2 } from "cloudinary";
+import { createClerkClient } from "@clerk/express";
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 // Get user Data
 export const getUserData = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
 
   console.log("User ID from request:", userId); // Log the user ID
 
   try {
-    const user = await User.findById(userId);
+    let user = await User.findById(userId);
 
     if (!user) {
-      console.log("User not found in database"); // Log if user is not found
-      return res.json({ success: false, message: "User not found" });
+      // Fallback: fetch from Clerk and auto-create in DB (handles missing webhook)
+      try {
+        const clerkUser = await clerkClient.users.getUser(userId);
+        user = await User.create({
+          _id: clerkUser.id,
+          email: clerkUser.emailAddresses[0]?.emailAddress || "",
+          name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
+          image: clerkUser.imageUrl,
+          resume: "",
+        });
+        console.log("Auto-created user from Clerk:", userId);
+      } catch (clerkErr) {
+        console.error("Failed to fetch/create user from Clerk:", clerkErr.message);
+        return res.json({ success: false, message: "User not found" });
+      }
     }
     res.json({ success: true, user });
   } catch (error) {
@@ -28,7 +44,7 @@ export const getUserData = async (req, res) => {
 // Apply For a Job
 export const applyForJob = async (req, res) => {
   const { jobId } = req.body;
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
 
   try {
     const isAlreadyApplied = await JobApplication.findOne({ userId, jobId });
@@ -69,7 +85,7 @@ export const applyForJob = async (req, res) => {
 // Get User applied applications
 export const getUserJobApplications = async (req, res) => {
   try {
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     const applications = await JobApplication.find({ userId })
       .populate("companyId", "name email image")
@@ -90,15 +106,29 @@ export const getUserJobApplications = async (req, res) => {
 // Update User Profile (resume)
 export const updateUserResume = async (req, res) => {
   try {
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
     const resumeFile = req.file;
 
     console.log("Resume file:", resumeFile);
 
-    const userData = await User.findById(userId);
+    let userData = await User.findById(userId);
 
     if (!userData) {
-      return res.json({ success: false, message: "User not found" });
+      // Auto-create user from Clerk if webhook hasn't fired yet
+      try {
+        const clerkUser = await clerkClient.users.getUser(userId);
+        userData = await User.create({
+          _id: clerkUser.id,
+          email: clerkUser.emailAddresses[0]?.emailAddress || "",
+          name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
+          image: clerkUser.imageUrl,
+          resume: "",
+        });
+        console.log("Auto-created user from Clerk during resume update:", userId);
+      } catch (clerkErr) {
+        console.error("Failed to fetch/create user from Clerk:", clerkErr.message);
+        return res.json({ success: false, message: "User not found" });
+      }
     }
 
     if (resumeFile) {
@@ -117,7 +147,7 @@ export const updateUserResume = async (req, res) => {
 // GET /api/users/profile
 // Compute user embedding from weighted average of interacted job embeddings, save it, return user profile
 export const getUserProfile = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
 
   try {
     const user = await User.findById(userId);
@@ -191,7 +221,7 @@ export const getUserProfile = async (req, res) => {
 // POST /api/users/preferences
 // Save user category preferences for cold-start recommendation
 export const updateUserPreferences = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
   const { preferences } = req.body;
 
   if (!Array.isArray(preferences)) {
@@ -221,7 +251,7 @@ export const updateUserPreferences = async (req, res) => {
 // Log user behavior event (search, view, bookmark, apply)
 // Weights: search=4, view=1, bookmark=3, apply=5
 export const logUserEvent = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
   const { jobId, eventType } = req.body;
 
   const VALID_TYPES = ["search", "view", "bookmark", "apply"];

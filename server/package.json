@@ -20,10 +20,13 @@
     "dotenv": "catalog:",
     "express": "catalog:",
     "jsonwebtoken": "catalog:",
+    "mammoth": "catalog:",
     "mongoose": "catalog:",
     "multer": "catalog:",
     "openai": "catalog:",
-    "svix": "catalog:"
+    "pdf-parse": "catalog:",
+    "svix": "catalog:",
+    "tesseract.js": "catalog:"
   },
   "devDependencies": {
     "nodemon": "catalog:"

@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
       message: "Embedding must be 0 or 3072 dimensions",
     },
   },
+  cvFileName: { type: String },
+  cvUploadedAt: { type: Date },
+  cvTextPreview: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);

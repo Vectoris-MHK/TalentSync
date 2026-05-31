@@ -9,6 +9,7 @@ import companyRoutes from './routes/companyRoutes.js'
 import connectCloudinary from './config/cloudinary.js';
 import JobRoutes from './routes/jobRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
 import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
@@ -78,6 +79,7 @@ app.post('/webhooks', express.raw({ type: 'application/json' }), clerkWebhooks);
 app.use('/api/company', dbReady, companyRoutes);
 app.use('/api/jobs', dbReady, JobRoutes);
 app.use('/api/users', dbReady, userRoutes);
+app.use('/api/recommendations', dbReady, recommendationRoutes);
 
 Sentry.setupExpressErrorHandler(app);
 

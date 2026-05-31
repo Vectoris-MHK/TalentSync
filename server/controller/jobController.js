@@ -116,7 +116,7 @@ async function getCollaborativeResults(userId, excludedJobIds, limit = 20) {
 // Content-based recommendation via $vectorSearch + Aggregation Pipeline
 // Query: ?query=text OR use user.embedding; optional filters: location, level, category, exclude
 export const getRecommendContent = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
   const { query, location, level, category, exclude } = req.query;
 
   try {
@@ -223,9 +223,9 @@ export const getRecommendContent = async (req, res) => {
 
 // GET /api/jobs/collaborative
 // "Users who liked what you liked also liked..." collaborative filtering pipeline
-// Requires Clerk auth (req.auth.userId)
+// Requires Clerk auth (req.auth().userId)
 export const getCollaborativeJobs = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
 
   try {
     const seenEvents = await UserEvent.find({ userId }).select("jobId").sort({ timestamp: -1 }).limit(500).lean();
@@ -248,7 +248,7 @@ export const getCollaborativeJobs = async (req, res) => {
 // Hybrid feed: 70% content-based + 30% collaborative when user has embedding
 // Cold start: preferences → category match → recency sort, or popular jobs
 export const getRecommendFeed = async (req, res) => {
-  const userId = req.auth.userId;
+  const userId = req.auth().userId;
 
   try {
     const user = await User.findById(userId);

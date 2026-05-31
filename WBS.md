@@ -50,9 +50,9 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 > **Epic 3-6 scope boundaries:**
 >
 > - **Epic 3 (Schema & Seed Data):** Schema code written. All seed data migrated to new cluster. ✅
-> - **Epic 4 (Semantic Search Engine - P0):** Embedding service ✅, Vector Search index ✅, recommend-content API ✅. **EPIC COMPLETE.**
+> - **Epic 4 (Semantic Search Engine - P0):** Embedding service ✅, Vector Search index ✅, recommend-content API ✅, CV-based recommendation API ⬜. **EPIC IN PROGRESS.**
 > - **Epic 5 (Behavior-Based Recommendation - P1):** Behavior tracking ✅, user profile ✅, collaborative filtering ✅, hybrid feed ✅. **EPIC COMPLETE.**
-> - **Epic 6 (Frontend & Finalization):** Frontend components, onboarding flow, event tracking UI, testing, tài liệu, video demo, nộp bài.
+> - **Epic 6 (Frontend & Finalization):** Frontend components ✅, onboarding flow ✅, event tracking UI ✅, CV recommendation UI ⬜, testing, tài liệu, video demo, nộp bài.
 
 ---
 
@@ -69,6 +69,19 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   - `embedding: { type: [Number], default: [] }`
 - Tạo model `UserEvent` (MỚI) (Status: Done)
   - `userId: String`, `jobId: ObjectId`, `eventType: enum`, `weight: Number`, `timestamp: Number`
+- **`+ADD`** Mở rộng `User` schema — CV metadata (Status: To-Do)
+  - `cvFileName: String` — tên file CV upload gần nhất
+  - `cvUploadedAt: Date` — thời điểm upload
+  - `cvTextPreview: String` — 500 ký tự đầu của CV text (không lưu full text vì privacy)
+  - `cvEmbedding: { type: [Number], default: [] }` — 3072d vector của CV (optional cache)
+- **`+ADD`** Tạo collection `recommendation_logs` (MỚI) (Status: To-Do)
+  - `userId: String`
+  - `cvFileName: String`
+  - `cvTextPreview: String`
+  - `embeddingModel: String` — `"text-embedding-3-large"`
+  - `filters: Object` — `{ location, level, category }`
+  - `recommendedJobs: [{ jobId: ObjectId, similarityScore: Number, finalScore: Number }]`
+  - `createdAt: Date`
 
 ### 3.2 Seed Data (Status: DONE, Completed: 2026-05-28 18:35)
 
@@ -140,6 +153,38 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
 - [x] E2E: seed → embed → vector index → recommend-content returns ranked, category-correct results
 - [x] `testVectorSearch.js` confirms `$vectorSearch` executing with actual scores
 
+### 4.5 CV-based Recommendation API (P0 Extension) — Status: TO-DO
+
+- [ ] **`+ADD`** Upload CV endpoint: `POST /api/recommendations/from-cv`
+  - Route: `routes/recommendationRoutes.js` (new file)
+  - Auth: `requireAuth()` middleware required
+  - multer middleware: accept PDF, DOCX, PNG, JPG, JPEG — max 10MB
+  - Response: ranked job list with `vectorSearchScore`, `finalScore`, `matchReasons`
+- [ ] **`+ADD`** CV text extraction service: `server/services/cvExtractionService.js`
+  - PDF: `pdf-parse` — extract raw text
+  - DOCX: `mammoth` — extract raw text
+  - Image (PNG/JPG/JPEG): `tesseract.js` OCR
+  - Fallback: nếu PDF text < 100 ký tự → retry với OCR
+  - Output: `{ text, wordCount, extractionMethod }`
+- [ ] **`+ADD`** CV embedding: reuse `embeddingService.js::generateEmbedding(cvText)`
+  - Same model: `text-embedding-3-large`, 3072d
+  - No new index needed — reuse `idx_jobs_vector`
+- [ ] **`+ADD`** Recommendation aggregation pipeline (CV → Jobs):
+  - `$vectorSearch` — `idx_jobs_vector`, `queryVector = cvEmbedding`, numCandidates=200, limit=50
+  - `$match` — `visible: true`, optional `location`/`level`/`category` filters
+  - `$lookup` — Company (name, image)
+  - `$addFields` — `vectorScore` (from `$meta`) + `recencyBoost`
+  - `$addFields` — `finalScore = vectorScore×0.7 + recencyBoost×0.3`
+  - `$sort` — `finalScore` descending
+  - `$limit` — 20
+  - `$project` — clean response, **không trả về `embedding` field**
+- [ ] **`+ADD`** Match reasons (rule-based skill overlap):
+  - So sánh keywords từ CV text với `job.description` + `job.title`
+  - Output: `matchReasons: ["React", "Node.js", "3 năm kinh nghiệm"]`
+- [ ] **`+ADD`** Recommendation log: lưu vào `recommendation_logs` collection sau mỗi request
+  - Lưu: `userId`, `cvFileName`, `cvTextPreview` (500 ký tự), `embeddingModel`, `filters`, `recommendedJobs[{jobId, similarityScore, finalScore}]`, `createdAt`
+  - Mục đích: debugging + demo Atlas profiler
+
 ---
 
 ## 5. Behavior-Based Recommendation (P1 Enhance) (Status: DONE, Completed: 2026-05-28 19:00)
@@ -208,6 +253,33 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   - `bookmark` (weight=3): ⬜ **To-Do** — `JobCard.jsx` bookmark button fires UI toggle only, no API call
   - `search` (weight=4): ❌ Intentionally skipped — Hero search has no `jobId` context; `view` events serve as proxy
 
+### 6.1.x CV Recommendation UI (Status: TO-DO)
+
+- [ ] **`+ADD`** Create `CVRecommendationPage.jsx`
+  - Route: `/cv-recommend` (add to `App.jsx` router)
+  - Auth-gated: redirect to login if not signed in
+- [ ] **`+ADD`** Upload CV drag-and-drop box
+  - Accept: PDF, DOCX, PNG, JPG, JPEG — max 10MB
+  - Show file name + size after selection
+  - Validate file type + size client-side before submit
+- [ ] **`+ADD`** Optional filters: location, level, category (reuse existing `JobCategories`/`JobLocations`)
+- [ ] **`+ADD`** Call `POST /api/recommendations/from-cv` (Clerk token required, multipart/form-data)
+- [ ] **`+ADD`** Display suggested job list:
+  - title, company (name + logo), location, salary, `finalScore` (hiển thị dạng % match)
+  - `matchReasons` badges (e.g. "React", "Node.js")
+  - Apply button → link to `/apply-job/:id`
+  - View detail button → link to `/apply-job/:id`
+- [ ] **`+ADD`** Loading states (4 phases):
+  - `uploading` — "Đang tải CV lên..."
+  - `extracting` — "Đang đọc nội dung CV..."
+  - `embedding` — "Đang phân tích kỹ năng..."
+  - `searching` — "Đang tìm việc làm phù hợp..."
+- [ ] **`+ADD`** Error states:
+  - Unsupported file type → "Chỉ hỗ trợ PDF, DOCX, PNG, JPG"
+  - OCR failed → "Không thể đọc CV. Vui lòng thử file khác."
+  - CV text quá ngắn (< 50 từ) → "CV quá ngắn để phân tích. Vui lòng upload CV đầy đủ hơn."
+  - No matching jobs → "Chưa tìm thấy việc làm phù hợp. Thử điều chỉnh bộ lọc."
+
 ### 6.2 Testing & Verification (Start: 2026-05-30)
 
 - [x] **`+ADD`** L6: `JobCard.jsx` bookmark event — wire `FiBookmark` button to `POST /api/users/events { eventType: "bookmark" }` (weight=3); optimistic UI toggle; only fire on bookmark (not un-bookmark)
@@ -215,8 +287,13 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   - Flow 1: New user → onboarding → popular jobs → interaction → recommendations improve
   - Flow 2: Returning user → profile embedding → vector + collaborative blend
   - Flow 3: User A (IT) vs User B (Design) → different recommendations
+  - **`+ADD`** Flow 4: User uploads CV → OCR/extract text → CV embedding → `$vectorSearch` → suggested jobs returned
   - Verify: Atlas profiler shows aggregation pipeline stages executing
   - Verify: Vector search index healthy & responding
+  - **`+ADD`** Verify: CV-related API returns ranked jobs with `vectorSearchScore` + `finalScore`
+  - **`+ADD`** Verify: frontend does **not** expose `embedding` field in response
+  - **`+ADD`** Verify: invalid file type (e.g. `.exe`) → 400 error handled correctly
+  - **`+ADD`** Verify: OCR failure / CV text quá ngắn → error message hiển thị đúng
 
 ### 6.3 Tài liệu & Nộp bài (Start: 2026-05-30)
 
@@ -224,12 +301,18 @@ Hierarchical list of all phases and tasks for the Mongo Hack project. Each item 
   - MVP Description, System Architecture (Mermaid diagram), Data Schema (5 collections)
   - Embedding Pipeline, Vector Search Configuration, Aggregation Pipeline stages
   - Recommendation Flow (3 modes), Cold Start Strategy, Sample Data overview
+  - **`+ADD`** CV-based Recommendation Flow (Upload → OCR → Embed → `$vectorSearch` → Rank)
+  - **`+ADD`** OCR/Extraction Pipeline (pdf-parse / mammoth / tesseract.js)
+  - **`+ADD`** CV Embedding Pipeline (reuse `embeddingService.js`, 3072d)
+  - **`+ADD`** MongoDB `$vectorSearch` Aggregation Pipeline for CV matching
+  - **`+ADD`** Privacy note: không lưu full raw CV text — chỉ lưu preview 500 ký tự + metadata
 - [ ] Demo video (10 min, Assignee: Quốc Hào):
   - 00:00-02:00: Problem & TalentSync solution
   - 02:00-04:30: User onboarding → personalized job feed
   - 04:30-06:00: User applies → recommendations update real-time
   - 06:00-07:30: Architecture — Atlas UI → Vector Search → Aggregation Pipeline
   - 07:30-09:00: MongoDB integration details, scoring explanation
-  - 09:00-10:00: Conclusion — single DB for operational + vector
+  - **`+ADD`** 09:00-09:30: Upload CV → show recommended jobs → explain vector search score
+  - 09:30-10:00: Conclusion — single DB for operational + vector
 - [ ] Submit before 2026-05-31 18:00 VNT
   - Checklist: MongoDB primary DB, $vectorSearch, Aggregation Pipeline, Demo <10min, Architecture docs

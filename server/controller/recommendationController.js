@@ -15,7 +15,7 @@ const THIRTY_DAYS_MS = 30 * 86400000;
  */
 export const recommendFromCv = async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: "No file uploaded" });
+    return res.status(400).json({ success: false, message: "Không có tệp được tải lên" });
   }
 
   const { userId } = req.auth();

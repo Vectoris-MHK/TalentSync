@@ -49,7 +49,7 @@ const Applications = () => {
   const updateResume = async () => {
     try {
       if (!resume) {
-        toast.error("Please select a resume file.");
+        toast.error("Vui lòng chọn một tệp hồ sơ.");
         return;
       }
 
@@ -72,7 +72,7 @@ const Applications = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Failed to update resume. Please try again.");
+      toast.error("Không thể cập nhật hồ sơ. Vui lòng thử lại.");
     }
 
     setIsEdit(false);
@@ -145,7 +145,7 @@ const Applications = () => {
         className="fixed top-4 left-4 z-50 flex items-center px-4 py-2 bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 text-white rounded-lg hover:bg-slate-700/80 hover:border-slate-600/50 transition-all duration-300 shadow-lg"
       >
         <Home className="w-4 h-4 mr-2" />
-        Home
+        Trang chủ
       </motion.button>
       
       <motion.div 
@@ -159,9 +159,9 @@ const Applications = () => {
           className="mb-12 text-center"
         >
           <h1 className="text-6xl mt-20 font-bold text-white mb-4">
-            Application Dashboard
+            Bảng điều khiển ứng tuyển
           </h1>
-          <p className="text-slate-400 text-lg">Track your career journey with precision</p>
+          <p className="text-slate-400 text-lg">Theo dõi hành trình sự nghiệp của bạn một cách chính xác</p>
         </motion.div>
 
         {/* Stats Grid */}
@@ -170,9 +170,9 @@ const Applications = () => {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
         >
           {[
-            { label: "Total Applications", value: stats.total, icon: Briefcase, color: "from-slate-600 to-slate-700" },
-            { label: "Accepted", value: stats.accepted, icon: CheckCircle, color: "from-emerald-600 to-emerald-700" },
-            { label: "Pending", value: stats.pending, icon: Clock, color: "from-amber-600 to-amber-700" }
+            { label: "Tổng đơn ứng tuyển", value: stats.total, icon: Briefcase, color: "from-slate-600 to-slate-700" },
+            { label: "Đã chấp nhận", value: stats.accepted, icon: CheckCircle, color: "from-emerald-600 to-emerald-700" },
+            { label: "Đang chờ", value: stats.pending, icon: Clock, color: "from-amber-600 to-amber-700" }
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -224,8 +224,8 @@ const Applications = () => {
                   <FileText className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-white">Resume Management</h3>
-                  <p className="text-slate-400">Keep your profile updated</p>
+                  <h3 className="text-xl font-semibold text-white">Quản lý hồ sơ</h3>
+                  <p className="text-slate-400">Luôn cập nhật hồ sơ của bạn</p>
                 </div>
               </div>
               
@@ -242,7 +242,7 @@ const Applications = () => {
                       <div className="flex items-center px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-lg hover:bg-slate-700/80 hover:border-slate-500/50 transition-all duration-200">
                         <Download className="w-4 h-4 text-slate-300 mr-2 group-hover:text-white transition-colors" />
                         <span className="text-slate-300 group-hover:text-white transition-colors">
-                          {resume ? resume.name : "Select Resume"}
+                          {resume ? resume.name : "Chọn hồ sơ"}
                         </span>
                       </div>
                       <input
@@ -259,7 +259,7 @@ const Applications = () => {
                       whileTap={{ scale: 0.98 }}
                       className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
                     >
-                      Save Resume
+                      Lưu hồ sơ
                     </motion.button>
                   </motion.div>
                 ) : (
@@ -279,7 +279,7 @@ const Applications = () => {
                       rel="noopener noreferrer"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      View Resume
+                      Xem hồ sơ
                     </motion.a>
                     
                     <motion.button
@@ -289,7 +289,7 @@ const Applications = () => {
                       className="flex items-center px-6 py-3 bg-slate-700/50 border border-slate-600/50 text-slate-300 font-medium rounded-lg hover:bg-slate-700/80 hover:border-slate-500/50 hover:text-white transition-all duration-200"
                     >
                       <Edit className="w-4 h-4 mr-2" />
-                      Update Resume
+                      Cập nhật hồ sơ
                     </motion.button>
                   </motion.div>
                 )}
@@ -314,8 +314,8 @@ const Applications = () => {
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white">Application Tracker</h3>
-                    <p className="text-slate-400">Monitor your progress</p>
+                    <h3 className="text-xl font-semibold text-white">Theo dõi đơn ứng tuyển</h3>
+                    <p className="text-slate-400">Giám sát tiến trình của bạn</p>
                   </div>
                 </div>
 
@@ -379,7 +379,7 @@ const Applications = () => {
                                   {job.jobId?.title || "N/A"}
                                 </p>
                                 <p className="text-slate-400 text-sm">
-                                  {job.companyId?.name || "Unknown Company"}
+                                  {job.companyId?.name || "Công ty chưa xác định"}
                                 </p>
                                 <div className="flex items-center text-xs text-slate-500 mt-1 space-x-4">
                                   <div className="flex items-center">
@@ -429,12 +429,12 @@ const Applications = () => {
                     </motion.div>
                     
                     <h3 className="text-xl font-semibold text-white mb-2">
-                      {selectedStatus === 'all' ? 'No applications yet' : `No ${selectedStatus} applications`}
+                      {selectedStatus === 'all' ? 'Chưa có đơn ứng tuyển' : `Không có đơn ${selectedStatus} nào`}
                     </h3>
                     <p className="text-slate-400 mb-8 max-w-md mx-auto">
                       {selectedStatus === 'all' 
-                        ? 'Start your journey by applying to exciting opportunities'
-                        : `You don't have any ${selectedStatus} applications at the moment`
+                        ? 'Bắt đầu hành trình bằng cách ứng tuyển vào các cơ hội hấp dẫn'
+                        : `Bạn chưa có đơn ${selectedStatus} nào vào lúc này`
                       }
                     </p>
                     
@@ -443,7 +443,7 @@ const Applications = () => {
                       whileTap={{ scale: 0.95 }}
                       className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
                     >
-                      Explore Opportunities
+                      Khám phá cơ hội
                     </motion.button>
                   </motion.div>
                 )}

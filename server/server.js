@@ -42,7 +42,7 @@ function dbReady(req, res, next) {
       console.error("DB init failed:", err);
       res.status(503).json({
         success: false,
-        message: "Service temporarily unavailable. Please try again."
+        message: "Dịch vụ tạm thời không khả dụng. Vui lòng thử lại."
       });
     });
 }

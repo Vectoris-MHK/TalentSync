@@ -82,7 +82,7 @@ const ManageJobs = () => {
   if (jobs && jobs.length === 0) {
     return (
       <div className="flex items-center justify-center h-[70vh] bg-white rounded-xl shadow-md">
-        <p className="text-xl sm:text-2xl text-gray-600">No Jobs Available or posted</p>
+        <p className="text-xl sm:text-2xl text-gray-600">Chưa có tin tuyển dụng nào</p>
       </div>
     );
   }
@@ -103,8 +103,8 @@ const ManageJobs = () => {
                   className="mb-8"
                 >
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">Manage Jobs</h1>
-          <p className="text-gray-600">View, update, and manage your job listings</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-2">Quản lý việc làm</h1>
+          <p className="text-gray-600">Xem, cập nhật và quản lý tin tuyển dụng của bạn</p>
         </div>
         </motion.div>
 
@@ -117,17 +117,17 @@ const ManageJobs = () => {
         >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-primary">
-            <p className="text-gray-500 text-sm mb-1">Total Jobs</p>
+            <p className="text-gray-500 text-sm mb-1">Tổng số tin</p>
             <p className="text-2xl font-bold text-primary">{jobs.length}</p>
           </div>
           <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-green-500">
-            <p className="text-gray-500 text-sm mb-1">Active Jobs</p>
+            <p className="text-gray-500 text-sm mb-1">Đang hiển thị</p>
             <p className="text-2xl font-bold text-green-600">
               {jobs.filter(job => job.visible).length}
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-md p-5 border-l-4 border-blue-500">
-            <p className="text-gray-500 text-sm mb-1">Total Applicants</p>
+            <p className="text-gray-500 text-sm mb-1">Tổng ứng viên</p>
             <p className="text-2xl font-bold text-blue-600">
               {jobs.reduce((sum, job) => sum + job.applicants, 0)}
             </p>
@@ -141,19 +141,19 @@ const ManageJobs = () => {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="py-4 px-6 text-left max-sm:hidden sm:text-[16px] font-semibold">#</th>
-                  <th className="py-4 px-6 text-left sm:text-[16px] font-semibold">Job Title</th>
+                  <th className="py-4 px-6 text-left sm:text-[16px] font-semibold">Chức danh</th>
                   <th className="py-4 px-6 text-left max-sm:hidden sm:text-[16px] font-semibold">
-                    Date
+                    Ngày đăng
                   </th>
                   <th className="py-4 px-6 text-left max-sm:hidden sm:text-[16px] font-semibold">
-                    Location
+                    Địa điểm
                   </th>
                   <th className="py-4 px-6 text-center sm:text-[16px] font-semibold">
                     <span className="flex items-center justify-center">
-                      Applicants
+                      Ứng viên
                     </span>
                   </th>
-                  <th className="py-4 px-6 text-center sm:text-[16px] font-semibold">Visible</th>
+                  <th className="py-4 px-6 text-center sm:text-[16px] font-semibold">Hiển thị</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,7 +211,7 @@ const ManageJobs = () => {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
-            Add new Job
+            Thêm tin mới
           </button>
         </div>
       </div>

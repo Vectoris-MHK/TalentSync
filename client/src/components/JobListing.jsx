@@ -184,7 +184,7 @@ const JobListing = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                Hide Filters
+                Ẩn bộ lọc
               </>
             ) : (
               <>
@@ -200,7 +200,7 @@ const JobListing = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                Show Filters
+                Hiện bộ lọc
               </>
             )}
           </button>
@@ -213,13 +213,13 @@ const JobListing = () => {
                   <div className="mb-8 bg-gray-50 p-4 rounded-lg">
                     <div className="flex justify-between items-center mb-3">
                       <h3 className="font-bold text-lg text-gray-800">
-                        Current Search
+                        Tìm kiếm hiện tại
                       </h3>
                       <button
                         onClick={clearAllFilters}
                         className="text-sm text-primary hover:underline"
                       >
-                        Clear all
+                        Xóa tất cả
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -285,14 +285,14 @@ const JobListing = () => {
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="font-bold text-lg text-gray-800">
-                    Categories
+                    Ngành nghề
                   </h4>
                   {selectedCategory.length > 0 && (
                     <button
                       onClick={() => setSelectedCategory([])}
                       className="text-sm text-primary hover:underline"
                     >
-                      Clear
+                      Xóa
                     </button>
                   )}
                 </div>
@@ -324,13 +324,13 @@ const JobListing = () => {
               {/* Locations */}
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-bold text-lg text-gray-800">Locations</h4>
+                  <h4 className="font-bold text-lg text-gray-800">Địa điểm</h4>
                   {selectedLocation.length > 0 && (
                     <button
                       onClick={() => setSelectedLocation([])}
                       className="text-sm text-primary hover:underline"
                     >
-                      Clear
+                      Xóa
                     </button>
                   )}
                 </div>
@@ -366,8 +366,8 @@ const JobListing = () => {
                     className="mt-2 text-sm text-primary hover:underline"
                   >
                     {showAllLocations
-                      ? "Show less"
-                      : `Show all (${JobLocations.length})`}
+                      ? "Thu gọn"
+                      : `Xem tất cả (${JobLocations.length})`}
                   </button>
                 )}
               </div>
@@ -383,10 +383,10 @@ const JobListing = () => {
             className="font-bold text-3xl md:text-4xl text-gray-900 mb-2"
             id="job-list"
           >
-            Latest Jobs
+            Việc làm mới nhất
           </h3>
           <p className="text-gray-600">
-            Find your dream job from top companies worldwide
+            Tìm công việc mơ ước từ các công ty hàng đầu trên toàn thế giới
           </p>
         </div>
 
@@ -395,7 +395,7 @@ const JobListing = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search jobs..."
+              placeholder="Tìm kiếm việc làm..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               value={searchFilter.title}
               onChange={(e) =>
@@ -426,18 +426,18 @@ const JobListing = () => {
             <span className="font-semibold text-gray-900">
               {filterJobs.length}
             </span>{" "}
-            jobs
+            việc làm
             {(selectedCategory.length > 0 || selectedLocation.length > 0) && (
               <span className="text-sm ml-2">
-                (filtered by{" "}
+                (lọc theo{" "}
                 {selectedCategory.length > 0
-                  ? `${selectedCategory.length} categor${selectedCategory.length > 1 ? "ies" : "y"}`
+                  ? `${selectedCategory.length} ngành nghề`
                   : ""}
                 {selectedCategory.length > 0 && selectedLocation.length > 0
-                  ? " and "
+                  ? " và "
                   : ""}
                 {selectedLocation.length > 0
-                  ? `${selectedLocation.length} location${selectedLocation.length > 1 ? "s" : ""}`
+                  ? `${selectedLocation.length} địa điểm`
                   : ""}
                 )
               </span>
@@ -445,15 +445,15 @@ const JobListing = () => {
           </p>
           <div className="flex items-center">
             <label htmlFor="sort" className="text-gray-600 mr-2 text-sm">
-              Sort by:
+              Sắp xếp:
             </label>
             <select
               id="sort"
               className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-primary focus:border-primary"
             >
-              <option>Most Recent</option>
-              <option>Highest Salary</option>
-              <option>Most Popular</option>
+              <option>Mới nhất</option>
+              <option>Lương cao nhất</option>
+              <option>Phổ biến nhất</option>
             </select>
           </div>
         </div>
@@ -482,16 +482,16 @@ const JobListing = () => {
                 />
               </svg>
               <h4 className="text-xl font-medium text-gray-700 mb-2">
-                No jobs found
+                Không tìm thấy việc làm
               </h4>
               <p className="text-gray-500 mb-4">
-                Try adjusting your search or filter criteria
+                Thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc
               </p>
               <button
                 onClick={clearAllFilters}
                 className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
               >
-                Clear all filters
+                Xóa tất cả bộ lọc
               </button>
             </motion.div>
           ) : (

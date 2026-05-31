@@ -16,7 +16,7 @@ const jobSchema = new mongoose.Schema({
         default: [],
         validate: {
             validator: v => v.length === 0 || v.length === 3072,
-            message: "Embedding must be 0 or 3072 dimensions",
+            message: "Embedding phải có 0 hoặc 3072 chiều",
         },
     },
 

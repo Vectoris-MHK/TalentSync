@@ -63,7 +63,7 @@ const Footer = () => {
                     Join the TalentSync Community
                   </h2>
                   <p className="text-lg text-gray-300 font-light max-w-2xl">
-                    Stay ahead with the latest job opportunities, career insights, and exclusive resources delivered straight to your inbox.
+                    Luôn cập nhật cơ hội việc làm mới nhất, thông tin nghề nghiệp và tài nguyên độc quyền gửi thẳng đến hộp thư của bạn.
                   </p>
                 </div>
                 
@@ -75,7 +75,7 @@ const Footer = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full bg-black/30 px-6 py-4 text-white placeholder-gray-400 rounded-lg focus:outline-none"
-                        placeholder="Your email address"
+                        placeholder="Địa chỉ email của bạn"
                         required
                       />
                     </div>
@@ -88,7 +88,7 @@ const Footer = () => {
                           : "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500"
                       } transition-all duration-300 shadow-lg shadow-blue-900/30`}
                     >
-                      {submitted ? "Subscribed!" : "Subscribe Now"}
+                      {submitted ? "Đã đăng ký!" : "Đăng ký ngay"}
                     </motion.button>
                   </form>
                 </div>
@@ -115,7 +115,7 @@ const Footer = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-white">TalentSync</h3>
                 </div>
-                <p className="mt-4 text-gray-400">The future of professional networking and career development.</p>
+                <p className="mt-4 text-gray-400">Nền tảng kết nối chuyên nghiệp và phát triển sự nghiệp tương lai.</p>
               </div>
               
               <ul className="space-y-3">
@@ -126,7 +126,7 @@ const Footer = () => {
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                       </svg>
                     </span>
-                    Home
+                    Trang chủ
                   </a>
                 </li>
                 <li>
@@ -136,7 +136,7 @@ const Footer = () => {
                         <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                       </svg>
                     </span>
-                    Dashboard
+                    Bảng điều khiển
                   </a>
                 </li>
                 <li>
@@ -147,7 +147,7 @@ const Footer = () => {
                         <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
                       </svg>
                     </span>
-                    Jobs
+                    Việc làm
                   </a>
                 </li>
                 <li>
@@ -157,7 +157,7 @@ const Footer = () => {
                         <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                       </svg>
                     </span>
-                    Features
+                    Tính năng
                   </a>
                 </li>
               </ul>
@@ -165,36 +165,36 @@ const Footer = () => {
             
             {/* Column 2 */}
             <motion.div variants={itemVariants}>
-              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Job Seekers</h3>
+              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Người tìm việc</h3>
               <ul className="space-y-3">
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Resume Builder
+                     Tạo hồ sơ
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Job Listings
+                    Danh sách việc làm
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Career Guidance
+                    Hướng nghiệp
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Skill Development
+                    Phát triển kỹ năng
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Interview Prep
+                    Luyện phỏng vấn
                   </a>
                 </li>
               </ul>
@@ -202,30 +202,30 @@ const Footer = () => {
             
             {/* Column 3 */}
             <motion.div variants={itemVariants}>
-              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Resources</h3>
+              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Tài nguyên</h3>
               <ul className="space-y-3">
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    FAQs
+                     Câu hỏi thường gặp
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Quick Start
+                    Bắt đầu nhanh
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Documentation
+                    Tài liệu
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    User Guide
+                    Hướng dẫn sử dụng
                   </a>
                 </li>
                 <li>
@@ -239,36 +239,36 @@ const Footer = () => {
             
             {/* Column 4 */}
             <motion.div variants={itemVariants}>
-              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Support</h3>
+              <h3 className="text-xl font-semibold text-white mb-6 pb-2 border-b border-gray-800">Hỗ trợ</h3>
               <ul className="space-y-3">
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Customer Support
+                     Hỗ trợ khách hàng
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Cookies Policy
+                    Chính sách Cookie
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    License Info
+                    Thông tin giấy phép
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Terms & Conditions
+                    Điều khoản & Điều kiện
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors duration-300 flex items-center">
                     <span className="text-blue-500 mr-2">→</span>
-                    Privacy Policy
+                    Chính sách bảo mật
                   </a>
                 </li>
               </ul>
@@ -324,13 +324,13 @@ const Footer = () => {
           </div>
           
           <div className="text-sm text-gray-500">
-            © 2026 TalentSync. All rights reserved.
+            © 2026 TalentSync. Đã đăng ký bản quyền.
           </div>
           
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Privacy</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Terms</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Sitemap</a>
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Bảo mật</a>
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Điều khoản</a>
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors duration-300">Sơ đồ trang</a>
           </div>
         </motion.div>
       </div>

@@ -10,7 +10,7 @@ const CallToAction = () => {
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={CtaBackground}
-          alt="Professional team collaborating"
+          alt="Đội ngũ chuyên nghiệp đang hợp tác"
           className="object-cover w-full h-full"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-indigo-900/70"></div>
@@ -38,9 +38,9 @@ const CallToAction = () => {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
             >
-              <span className="block">Let's Get Connected</span>
+              <span className="block">Hãy Kết Nối Ngay</span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-200">
-                Find Your Dream Job
+                Tìm Công Việc Mơ Ước
               </span>
             </motion.h2>
 
@@ -51,7 +51,7 @@ const CallToAction = () => {
               transition={{ delay: 0.3 }}
               className="max-w-2xl mx-auto mt-6 text-lg text-blue-100"
             >
-              Your Career, Your Future — Simplified with Smart Matching Technology
+              Sự Nghiệp Của Bạn, Tương Lai Của Bạn — Đơn Giản Hóa Với Công Nghệ Kết Nối Thông Minh
             </motion.p>
 
             {/* Buttons */}
@@ -68,7 +68,7 @@ const CallToAction = () => {
   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
 >
   <FiSearch className="w-5 h-5 mr-2" />
-  Search Jobs
+  Tìm việc
 </motion.button>
 
 <motion.button
@@ -78,7 +78,7 @@ const CallToAction = () => {
   onClick={() => window.location.href = '/'}
 >
   <FiStar className="w-5 h-5 mr-2" />
-  Explore Features
+  Khám phá tính năng
 </motion.button>
             </motion.div>
 
@@ -89,7 +89,7 @@ const CallToAction = () => {
               transition={{ delay: 0.5 }}
               className="mt-12 text-sm text-blue-200"
             >
-              Trusted by over 1M+ professionals worldwide
+              Được hơn 1 triệu chuyên gia trên toàn thế giới tin dùng
             </motion.div>
           </div>
         </motion.div>

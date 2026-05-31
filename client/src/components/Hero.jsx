@@ -23,17 +23,17 @@ const Hero = () => {
   
 
   const popularTags = [
-    "Developer",
-    "Designer",
+    "Lập trình",
+    "Thiết kế",
     "Marketing",
-    "Remote",
-    "Manager",
+    "Từ xa",
+    "Quản lý",
   ];
 
   const stats = [
-    { icon: FiBriefcase, number: "50K+", label: "Active Jobs" },
-    { icon: FiUsers, number: "1M+", label: "Job Seekers" },
-    { icon: FiTrendingUp, number: "95%", label: "Success Rate" }
+    { icon: FiBriefcase, number: "50K+", label: "Việc làm đang tuyển" },
+    { icon: FiUsers, number: "1M+", label: "Người tìm việc" },
+    { icon: FiTrendingUp, number: "95%", label: "Tỷ lệ thành công" }
   ];
 
   const handleTagClick = (tag) => {
@@ -78,9 +78,9 @@ const Hero = () => {
               transition={{ delay: 0.2, duration: 0.8 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6"
             >
-              Find Your <span className="text-yellow-300">Dream Job</span>
+              <span className="text-yellow-300">Công việc mơ ước</span> của bạn
               <br />
-              With TalentSync
+              cùng TalentSync
             </motion.h1>
 
             <motion.p
@@ -89,8 +89,8 @@ const Hero = () => {
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-xl text-white/90 max-w-2xl mx-auto mb-10"
             >
-              Your next big career move starts here. Explore thousands of job
-              opportunities and take control of your future.
+              Bước tiến sự nghiệp lớn tiếp theo của bạn bắt đầu từ đây. Khám phá hàng nghìn
+              cơ hội việc làm và làm chủ tương lai của bạn.
             </motion.p>
 
             {/* Stats bar */}
@@ -143,7 +143,7 @@ const Hero = () => {
                       <input
                         type="text"
                         ref={titleRef}
-                        placeholder="Job title, keywords, or company"
+                        placeholder="Chức danh, từ khóa hoặc công ty"
                         className="w-full text-lg outline-none placeholder-gray-400 bg-transparent font-medium"
                         defaultValue={activeTag || ""}
                       />
@@ -158,7 +158,7 @@ const Hero = () => {
                       <input
                         type="text"
                         ref={locationRef}
-                        placeholder="Location or remote"
+                        placeholder="Địa điểm hoặc làm từ xa"
                         className="w-full text-lg outline-none placeholder-gray-400 bg-transparent font-medium"
                       />
                     </motion.div>
@@ -175,7 +175,7 @@ const Hero = () => {
                         whileHover={{ x: "100%" }}
                         transition={{ duration: 0.6 }}
                       />
-                      <span className="relative z-10">Search Jobs</span>
+                      <span className="relative z-10">Tìm việc</span>
                       <FiArrowRight className="ml-3 relative z-10 group-hover/button:translate-x-1 transition-transform duration-200" />
                     </motion.button>
                   </div>
@@ -190,7 +190,7 @@ const Hero = () => {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="mt-8 text-white/80"
             >
-              <span className="mr-4 text-lg font-medium">Popular Searches:</span>
+              <span className="mr-4 text-lg font-medium">Tìm kiếm phổ biến:</span>
               <div className="flex flex-wrap justify-center gap-3 mt-3">
                 {popularTags.map((tag, i) => (
                   <motion.button
@@ -235,7 +235,7 @@ const Hero = () => {
           Trusted By
         </p>
         <h3 className="text-base text-gray-700 font-normal">
-          Innovative companies worldwide
+          Được các công ty đổi mới trên toàn thế giới tin dùng
         </h3>
       </div>
 

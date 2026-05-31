@@ -15,23 +15,23 @@ const JobCard = ({ job, recommendBadge }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const stripHtmlTags = (html) => {
-    return html ? html.replace(/<[^>]*>?/gm, "") : "No description provided";
+    return html ? html.replace(/<[^>]*>?/gm, "") : "Chưa có mô tả";
   };
 
   const getTimePassed = (date) => {
-    if (!date) return "Recently posted";
+    if (!date) return "Mới đăng";
     const diff = Date.now() - new Date(date);
     const mins = Math.floor(diff / 60000);
     const hrs = Math.floor(mins / 60);
     const days = Math.floor(hrs / 24);
-    if (days > 0) return `${days}d ago`;
-    if (hrs > 0) return `${hrs}h ago`;
-    if (mins > 0) return `${mins}m ago`;
-    return "Just now";
+    if (days > 0) return `${days} ngày trước`;
+    if (hrs > 0) return `${hrs} giờ trước`;
+    if (mins > 0) return `${mins} phút trước`;
+    return "Vừa xong";
   };
 
   const formatSalary = (salary) => {
-    if (!salary) return "Salary available";
+    if (!salary) return "Lương thỏa thuận";
     if (typeof salary === "string") return salary;
     if (salary.min && salary.max) return `${salary.min} - ${salary.max}`;
     return `${salary.amount}`;
@@ -68,9 +68,9 @@ const JobCard = ({ job, recommendBadge }) => {
       >
         <div className="bg-white rounded-2xl overflow-hidden">
           {/* Ribbon */}
-          {getTimePassed(job.date) === "Just now" && (
+          {getTimePassed(job.date) === "Vừa xong" && (
             <span className="absolute top-4 right-4 bg-indigo-500 text-white text-[10px] px-2 py-1 rounded-full font-semibold shadow-md z-10 animate-pulse">
-              NEW
+              MỚI
             </span>
           )}
 
@@ -85,8 +85,8 @@ const JobCard = ({ job, recommendBadge }) => {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-zinc-800">{job.title || "Job Title"}</h3>
-                <p className="text-sm text-gray-500">{job.companyId?.name || "Company"}</p>
+                <h3 className="text-lg font-bold text-zinc-800">{job.title || "Chức danh"}</h3>
+                <p className="text-sm text-gray-500">{job.companyId?.name || "Công ty"}</p>
               </div>
             </div>
             <button
@@ -94,8 +94,8 @@ const JobCard = ({ job, recommendBadge }) => {
               className={`p-2 rounded-full text-xl transition ${
                 isSaved ? "text-indigo-500" : "text-gray-400 hover:text-indigo-600"
               }`}
-              title={isSaved ? "Saved" : "Save job"}
-              aria-label={isSaved ? "Saved" : "Save job"}
+              title={isSaved ? "Đã lưu" : "Lưu việc làm"}
+              aria-label={isSaved ? "Đã lưu" : "Lưu việc làm"}
             >
               <FiBookmark />
             </button>
@@ -104,10 +104,10 @@ const JobCard = ({ job, recommendBadge }) => {
           {/* Tags */}
           <div className="px-6 pb-4 flex flex-wrap gap-2 text-xs font-medium">
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700">
-              <FiMapPin className="text-sm" /> {job.location || "Remote"}
+              <FiMapPin className="text-sm" /> {job.location || "Từ xa"}
             </span>
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-pink-50 text-pink-600">
-              <FiBriefcase className="text-sm" /> {job.level || "Intermediate"}
+              <FiBriefcase className="text-sm" /> {job.level || "Trung cấp"}
             </span>
             <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600">
               <FiDollarSign className="text-sm" /> {formatSalary(job.salary)}
@@ -126,7 +126,7 @@ const JobCard = ({ job, recommendBadge }) => {
                 isExpanded ? "" : "line-clamp-3"
               } cursor-pointer hover:text-black`}
               onClick={() => setIsExpanded(!isExpanded)}
-              title="Click to expand"
+              title="Nhấn để xem thêm"
             >
               {stripHtmlTags(job.description)}
             </p>
@@ -147,7 +147,7 @@ const JobCard = ({ job, recommendBadge }) => {
                 ))}
                 {job.skills.length > 4 && (
                   <span className="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500">
-                    +{job.skills.length - 4} more
+                    +{job.skills.length - 4} kỹ năng khác
                   </span>
                 )}
               </div>
@@ -165,7 +165,7 @@ const JobCard = ({ job, recommendBadge }) => {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
-            <span className="text-xs text-gray-500">Posted {getTimePassed(job.date)}</span>
+            <span className="text-xs text-gray-500">Đăng {getTimePassed(job.date)}</span>
             <div className="flex gap-2">
               <button
                 onClick={() => {
@@ -174,7 +174,7 @@ const JobCard = ({ job, recommendBadge }) => {
                 }}
                 className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 rounded-md hover:shadow-md"
               >
-                Apply Now
+                Ứng tuyển ngay
               </button>
             </div>
           </div>

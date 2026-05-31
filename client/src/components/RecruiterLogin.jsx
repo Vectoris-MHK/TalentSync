@@ -63,7 +63,7 @@ const RecruiterLogin = () => {
     if (file && file.type.startsWith("image/")) {
       setImage(file);
     } else {
-      toast.error("Please upload an image file");
+          toast.error("Vui lòng tải lên tệp hình ảnh");
     }
   };
 
@@ -72,7 +72,7 @@ const RecruiterLogin = () => {
     
     if (state === "Sign Up" && !isTextDataSubmited) {
       if (passwordStrength < 3) {
-        toast.warning("Please use a stronger password for better security");
+        toast.warning("Vui lòng sử dụng mật khẩu mạnh hơn để bảo mật tốt hơn");
         return;
       }
       return setIsTextDataSubmited(true);
@@ -91,13 +91,13 @@ const RecruiterLogin = () => {
           setCompanyData(data.company);
           setCompanyToken(data.token);
           localStorage.setItem("companyToken", data.token);
-          toast.success("Login successful! Redirecting to dashboard...");
+          toast.success("Đăng nhập thành công! Đang chuyển hướng đến bảng điều khiển...");
           setTimeout(() => {
             setShowRecruiterLogin(false);
             navigate("/dashboard");
           }, 1000);
         } else {
-          toast.error(data.message || "Login failed. Please check your credentials.");
+          toast.error(data.message || "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.");
         }
       } else {
         const formData = new FormData();
@@ -117,17 +117,17 @@ const RecruiterLogin = () => {
           setCompanyData(data.company);
           setCompanyToken(data.token);
           localStorage.setItem("companyToken", data.token);
-          toast.success("Account created successfully! Welcome aboard!");
+          toast.success("Tạo tài khoản thành công! Chào mừng bạn!");
           setTimeout(() => {
             setShowRecruiterLogin(false);
             navigate("/dashboard");
           }, 1000);
         } else {
-          toast.error(data.message || "Registration failed. Please try again.");
+          toast.error(data.message || "Đăng ký thất bại. Vui lòng thử lại.");
         }
       }
     } catch (error) {
-      toast.error(error.message || "An error occurred. Please try again later.");
+      toast.error(error.message || "Đã xảy ra lỗi. Vui lòng thử lại sau.");
     } finally {
       setIsLoading(false);
     }
@@ -213,15 +213,15 @@ const RecruiterLogin = () => {
           {/* Header text */}
           <div className="px-8 pt-16 pb-4">
             <h1 className="text-2xl font-bold text-center text-gray-800 mb-1">
-              {state === "Login" ? "Welcome Back" : 
-               isTextDataSubmited ? "Add Your Brand" : "Join Our Platform"}
+              {state === "Login" ? "Chào mừng trở lại" : 
+               isTextDataSubmited ? "Thêm thương hiệu của bạn" : "Tham gia nền tảng"}
             </h1>
             <p className="text-sm text-center text-gray-500">
               {state === "Login" 
-                ? "Access your recruiter dashboard" 
+                ? "Truy cập bảng điều khiển tuyển dụng" 
                 : isTextDataSubmited 
-                  ? "Upload your company logo to complete setup" 
-                  : "Create an account to find top talent"
+                  ? "Tải lên logo công ty để hoàn tất thiết lập" 
+                  : "Tạo tài khoản để tìm kiếm nhân tài hàng đầu"
               }
             </p>
           </div>
@@ -257,7 +257,7 @@ const RecruiterLogin = () => {
                           onClick={() => setImage(null)}
                         >
                           <X size={20} className="text-white" />
-                          <span className="text-xs font-medium text-white mt-1">Remove</span>
+                          <span className="text-xs font-medium text-white mt-1">Xóa</span>
                         </div>
                       </div>
                     ) : (
@@ -265,8 +265,8 @@ const RecruiterLogin = () => {
                         <div className="p-4 rounded-full bg-blue-50 text-blue-500 mb-3">
                           <Upload size={28} />
                         </div>
-                        <span className="text-sm font-medium text-blue-600">Upload logo</span>
-                        <span className="text-xs text-gray-500 mt-1">Click or drag & drop</span>
+                        <span className="text-sm font-medium text-blue-600">Tải logo lên</span>
+                        <span className="text-xs text-gray-500 mt-1">Nhấn hoặc kéo thả</span>
                         <input
                           id="logo-upload"
                           type="file"
@@ -292,7 +292,7 @@ const RecruiterLogin = () => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         type="text"
-                        placeholder="Enter your company name"
+                        placeholder="Nhập tên công ty"
                         required
                       />
                     </div>
@@ -309,7 +309,7 @@ const RecruiterLogin = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       type="email"
-                      placeholder="Enter your email address"
+                        placeholder="Nhập địa chỉ email"
                       required
                     />
                   </div>
@@ -326,7 +326,7 @@ const RecruiterLogin = () => {
                         value={password}
                         onChange={handlePasswordChange}
                         type={showPassword ? "text" : "password"}
-                        placeholder={state === "Login" ? "Enter your password" : "Create a strong password"}
+                        placeholder={state === "Login" ? "Nhập mật khẩu" : "Tạo mật khẩu mạnh"}
                         required
                       />
                       <button 
@@ -358,12 +358,12 @@ const RecruiterLogin = () => {
                           ))}
                         </div>
                         <p className="text-xs mt-1 text-gray-500">
-                          {passwordStrength === 0 && "Enter a password"}
-                          {passwordStrength === 1 && "Password is too weak"}
-                          {passwordStrength === 2 && "Password is weak"}
-                          {passwordStrength === 3 && "Password is good"}
-                          {passwordStrength === 4 && "Password is strong"}
-                          {passwordStrength === 5 && "Password is very strong"}
+                          {passwordStrength === 0 && "Nhập mật khẩu"}
+                          {passwordStrength === 1 && "Mật khẩu quá yếu"}
+                          {passwordStrength === 2 && "Mật khẩu yếu"}
+                          {passwordStrength === 3 && "Mật khẩu tốt"}
+                          {passwordStrength === 4 && "Mật khẩu mạnh"}
+                          {passwordStrength === 5 && "Mật khẩu rất mạnh"}
                         </p>
                       </div>
                     )}
@@ -377,7 +377,7 @@ const RecruiterLogin = () => {
                     type="button"
                     className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
                   >
-                    Forgot password?
+                    Quên mật khẩu?
                   </button>
                 </div>
               )}
@@ -393,14 +393,14 @@ const RecruiterLogin = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Processing...
+                    Đang xử lý...
                   </span>
                 ) : state === "Login" ? (
-                  "Sign In"
+                  "Đăng nhập"
                 ) : isTextDataSubmited ? (
-                  "Create Account"
+                  "Tạo tài khoản"
                 ) : (
-                  "Continue"
+                  "Tiếp tục"
                 )}
               </button>
 
@@ -412,7 +412,7 @@ const RecruiterLogin = () => {
                       <div className="w-full border-t border-gray-200"></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                      <span className="px-3 text-gray-500 bg-white">Or continue with</span>
+                      <span className="px-3 text-gray-500 bg-white">Hoặc tiếp tục với</span>
                     </div>
                   </div>
                   
@@ -447,13 +447,13 @@ const RecruiterLogin = () => {
           <div className="py-5 bg-gray-50 border-t border-gray-100 rounded-b-3xl">
             <div className="flex justify-center px-8">
               <p className="text-sm text-gray-600">
-                {state === "Login" ? "Don't have an account? " : "Already have an account? "}
+                {state === "Login" ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
                 <button
                   type="button"
                   onClick={() => switchMode(state === "Login" ? "Sign Up" : "Login")}
                   className="font-medium text-blue-600 hover:text-blue-800 transition-colors"
                 >
-                  {state === "Login" ? "Sign up now" : "Sign in"}
+                  {state === "Login" ? "Đăng ký ngay" : "Đăng nhập"}
                 </button>
               </p>
             </div>

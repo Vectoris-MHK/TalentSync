@@ -99,6 +99,9 @@ catalogs:
     postcss:
       specifier: ^8.4.49
       version: 8.5.15
+    prop-types:
+      specifier: ^15.8.1
+      version: 15.8.1
     quill:
       specifier: ^2.0.3
       version: 2.0.3
@@ -159,7 +162,7 @@ importers:
         specifier: 'catalog:'
         version: 2.30.1
       prop-types:
-        specifier: ^15.8.1
+        specifier: 'catalog:'
         version: 15.8.1
       quill:
         specifier: 'catalog:'
